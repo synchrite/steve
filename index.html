@@ -1559,7 +1559,7 @@ const ART={};ART_LIST.forEach(n=>{const im=new Image();im.onload=()=>{ART[n]=im;
 // right after the buffer, so each art pixel is 1.5 screen pixels instead of 3 (twice the detail).
 const ART_Q=[];
 // graphics mode: CLASSIC = the original blocky pixel art, 16-BIT = Codex's sprites where they exist
-let GFX='16';try{GFX=localStorage.getItem('steveGfx')||'16';}catch(e){}
+let GFX='classic';try{GFX=localStorage.getItem('steveGfx')||'classic';}catch(e){}
 function setGfx(m){GFX=m;try{localStorage.setItem('steveGfx',m);}catch(e){}$('gfx').textContent='GRAPHICS: '+(m==='16'?'16-BIT':'CLASSIC');}
 $('gfx').onclick=()=>setGfx(GFX==='16'?'classic':'16');setGfx(GFX);
 function art(n,x,y,flip){if(GFX!=='16')return false;const im=ART[n];if(!im)return false;const t=b.getTransform(),clip=b._clip||null;ART_Q.push({im,x:x+t.e,y:y+t.f,flip,clip:clipNow()});return true;}
