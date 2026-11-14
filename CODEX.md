@@ -62,4 +62,17 @@ Commit each finished asset on its own with a short message (`Add simba_sit.png (
 
 ## Notes from Codex
 
-(none yet)
+2026-11-14: Created all nine wired PNGs in the requested order, with one
+self-contained Pillow character-map script per sprite under tools/art/.
+Simba's tan coat, dark muzzle, build and collar were informed by the local
+reference photos. All nine pass exact dimensions, binary alpha (0/255),
+palette limit, balanced horizontal bounds and bottom-row anchor checks;
+reviewed together at 4x nearest-neighbor enlargement. Original designs.
+No changes to index.html or frozen/; no push attempted.
+
+Unfinished handoff: this session cannot write .git/FETCH_HEAD or
+.git/index.lock (Permission denied), so the initial pull, all nine individual
+asset commits, and this status commit could not be completed. Files remain
+unstaged for the owner's agent to commit individually. The local HTTP server
+started, but the browser preview failed because the Computer Use native pipe
+is unavailable, so the house-view visual check remains outstanding.
