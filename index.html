@@ -184,7 +184,7 @@ function newRun(){
   wife:{x:SPOT.kitchen,st:'craft',t:8,tx:SPOT.craft,mood:80,job:null,cookieT:40,warned:false},
   kid:{x:100,st:'wander',t:6,tx:90,job:null},
   simba:{x:90,y:FLOOR,st:'roam',t:10,tx:80,tired:0,pat:0,max:1,wig:0,tug:50,face:1},
-  lamb:{x:60,y:FLOOR,st:'simba',vx:0,vy:0},drag:false,threads:{},party:[],partyWait:0,rel:{Wife:50,Kid:50,Mom:50,Dan:40,Dad:40,Brother:40,Sister:40,Simba:60},stove:{st:'off',t:0},deter:{lights:0,music:0,train:0}};camX=0;
+  lamb:{x:60,y:FLOOR,st:'simba',vx:0,vy:0},drag:false,threads:{},story:{},convoOn:{},party:[],partyWait:0,rel:{Wife:50,Kid:50,Mom:50,Dan:40,Dad:40,Brother:40,Sister:40,Simba:60},stove:{st:'off',t:0},deter:{lights:0,music:0,train:0}};camX=0;
  for(let i=0;i<6;i++)run.board.push(makeJob(i));
  M=lobbyScene();
 }
@@ -202,6 +202,7 @@ function rel(who,d){if(!run||!who||!(who in run.rel))return;run.rel[who]=clamp(r
 function jingle(l){const seq=l>=3?[523,659,784,1047,1319]:l>=2?[660,880,1100,1320]:[700,990];seq.forEach((f,i)=>setTimeout(()=>beep(f,.08,'triangle',.045),i*75));}
 function pop(t,x,c){if(!run)return;(run.pops||(run.pops=[])).push({t,x,c,life:1.3});}
 function king(d){if(!run)return;if(d>0)d*=1.35;const was=run.king;run.king=clamp(run.king+d,0,100);if(d>=.5)pop('+'+d.toFixed(1)+'👑',480,'#ffc23a');if(Math.floor(was/10)<Math.floor(run.king/10)&&run.king<100){jingle(3);toast(`👑 KING OF FORTNITE ${Math.floor(run.king/10)*10}%`,'#ffc23a');}if(was<100&&run.king>=100&&mode==='play')later(.5,kingWin);}
+function deed(brag){if(run)run.lastDeed={t:performance.now(),brag};}
 function toast(t,c){run.toast.push({t,c,life:2.8,y:0});if(run.toast.length>4)run.toast.shift();}
 function later(d,fn){run.timers.push({d,fn});}
 function addLot(n,w){run.lot=clamp(run.lot+n,0,100);pop((n>0?'+':'')+n,288,n>0?'#5ab0ff':'#ff7070');if(w)toast((n>0?'+':'')+n+' LOT · '+w,n>0?'#5ab0ff':'#ff7070');}
@@ -244,6 +245,8 @@ function options(replies,typed){const n=typed.length,out=[];let complete=null;
 function bestWords(replies){const top=Math.max(...replies.map(r=>r[1]));return pick(replies.filter(r=>r[1]===top))[0].split(' ');}
 const SHORT=[['k',0],['yes',0],['no',-1],['gimme a sec',0]];
 function prepReplies(it){if(it.prepped)return;it.prepped=true;const base=it.replies.filter(r=>!SHORT.some(q=>q[0]===r[0]));
+ if(it.fam&&base.length>1){const d=run.lastDeed;if(d&&performance.now()-d.t<150000&&!base.some(r=>r[0]===d.brag)){base.push([d.brag,1]);it.bragTxt=d.brag;}
+  if((!inMatch()||run.afk)&&!base.some(r=>/not gaming/.test(r[0]))){const ng=pick(['not gaming right now whats up','actually off the game whats up']);base.push([ng,1]);it.ngTxt=ng;}}
  if(base.length){const top=Math.max(...base.map(r=>r[1]));const ideal=base.filter(r=>r[1]===top).sort((a,b)=>b[0].length-a[0].length)[0];ideal[1]=Math.max(2,top+1);}
  it.replies=[...base,...SHORT];}
 window.openItem=id=>{const it=run.inbox.find(x=>x.id===id);if(!it)return;beep(900,.03,'sine',.03);
@@ -260,13 +263,15 @@ window.sendReply=()=>{if(!view)return;const v=view;const {complete}=options(v.ty
  const k=run.inbox.indexOf(it);if(k>=0)run.inbox.splice(k,1);v.log.push({who:'me',t:complete[0]});say('💬 *texting* '+complete[0],2.5);v.result=complete;v.typed=[];v.stage='sent';v.at=0;phoneDirty=true;};
 window.closeView=()=>{if(view&&view.type==='thread'&&view.stage!=='compose'&&view.stage!=='done'){finishThread(view);}view=null;phoneDirty=true;};
 function keepThread(v){const n=relName(v.item.from);if(!n||n==='Simba'||!run.threads)return;run.threads[n]=v.log.filter(m=>!/^\(new message/.test(m.t)).slice(-30);}
-function finishThread(v){if(v.applied)return;v.applied=true;setTimeout(()=>keepThread(v),2600);if(v.snooze)return;let [txt,sc]=v.result;if(v.fail){sc=-1;king(-1);}else if(!v.predict){if(sc>=2){king(2.4);jingle(2);}else if(sc===1){king(.8);jingle(1);}}if(!v.predict){rel(relName(v.item.from),sc>0?3:sc<0?-3:1);if(sc>=2&&v.openT&&performance.now()-v.openT<12000)confident();}v.item.onReply&&!v.fail?0:0;v.item.onReply&&v.item.onReply(sc,txt);v.after&&v.after();}
+function finishThread(v){if(v.applied)return;v.applied=true;
+ if(v.result&&v.item.bragTxt&&v.result[0]===v.item.bragTxt){const who=relName(v.item.from)||v.item.from;if(Math.random()<.8){rel(who,5);king(1.2);jingle(3);toast(`😎 ${who} is impressed`,'#7fe0a0');v.brag='ok';}else{rel(who,-1);toast(`😬 ${who}: "${pick(['ok mr hero','did you also do the dishes though','humble much? lol'])}"`,'#ffb27a');v.brag='bad';}}
+ if(v.result&&v.item.ngTxt&&v.result[0]===v.item.ngTxt){const who=relName(v.item.from)||v.item.from;rel(who,2);toast(`${who} likes that you're off the game`,'#ff9ac0');if(who==='Wife')addMood(4);}setTimeout(()=>keepThread(v),2600);if(v.snooze)return;let [txt,sc]=v.result;if(v.fail){sc=-1;king(-1);}else if(!v.predict){if(sc>=2){king(2.4);jingle(2);}else if(sc===1){king(.8);jingle(1);}}if(!v.predict){rel(relName(v.item.from),sc>0?3:sc<0?-3:1);if(sc>=2&&v.openT&&performance.now()-v.openT<12000)confident();}v.item.onReply&&!v.fail?0:0;v.item.onReply&&v.item.onReply(sc,txt);v.after&&v.after();}
 window.quickShort=w=>{if(!view||view.type!=='thread'||view.stage!=='compose')return;view.typed=[w];sendReply();};
 window.predictReply=()=>{const v=view;if(!v||v.type!=='thread'||v.stage!=='compose')return;const it=v.item,k=run.inbox.indexOf(it);if(k>=0)run.inbox.splice(k,1);
  const t=pick(['I am the duck of the house','yes the potato is ducky','on my way to the moon lol','ok see you at the walrus','love you tacos','sounds good I am a car','haha yes the shoes are soup']);
  v.log.push({who:'me',t});v.result=[t,0];v.predict=true;v.stage='sent';v.at=0;say('💬 '+t,2.5);beep(990,.05);phoneDirty=true;};
 function confident(){if(!run.buffs.some(b=>b.k==='conf'))toast('😎 CONFIDENT · Steve is playing better','#7fe0a0');run.buffs=run.buffs.filter(b=>b.k!=='conf');run.buffs.push({k:'conf',name:'Confident',t:25});run.flow=Math.min(100,run.flow+8);}
-function reaction(v){const r0=v.result&&v.result[0];if(!v.fail&&['k','yes','no'].includes(r0))return {k:pick(['k what?','...k?','did you even read it','k?? KAY?']),yes:pick(['yes WHAT?','yes to which part lol','ok but WHICH one','yes...?']),no:pick(['no?? to what','ok rude','no as in no?','wait what']),}[r0];if(v.snooze)return pick(['ok','np','👍','k']);if(v.fail)return pick(['nvm found another one','ok forget it','wow ok','never mind then']);if(v.predict)return pick(['???','what','are you ok','did the dog type this','lol what','huh']);const sc=v.result[1];return v.item.react?v.item.react(sc):sc>0?pick(['❤️','ok thanks!','👍','perfect','ty!!','sounds good']):sc<0?pick(['...wow','seriously?','ok then','k.']):pick(['ok','👌','k','cool']);}
+function reaction(v){if(v.item.convo)return '';if(v.brag==='ok')return pick(['wow!! look at you','ok thats actually impressive','my hero 😄']);if(v.brag==='bad')return pick(['ok mr hero','brag much lol','cool cool cool']);if(v.item.ngTxt&&v.result&&v.result[0]===v.item.ngTxt)return pick(['oh nice! nothing much, just saying hi','look at you, touching grass','proud of you lol']);const r0=v.result&&v.result[0];if(!v.fail&&['k','yes','no'].includes(r0))return {k:pick(['k what?','...k?','did you even read it','k?? KAY?']),yes:pick(['yes WHAT?','yes to which part lol','ok but WHICH one','yes...?']),no:pick(['no?? to what','ok rude','no as in no?','wait what']),}[r0];if(v.snooze)return pick(['ok','np','👍','k']);if(v.fail)return pick(['nvm found another one','ok forget it','wow ok','never mind then']);if(v.predict)return pick(['???','what','are you ok','did the dog type this','lol what','huh']);const sc=v.result[1];return v.item.react?v.item.react(sc):sc>0?pick(['❤️','ok thanks!','👍','perfect','ty!!','sounds good']):sc<0?pick(['...wow','seriously?','ok then','k.']):pick(['ok','👌','k','cool']);}
 function tvMessage(o){const m=o.tvm||pick(['call me when you get a sec','no rush, just checking in','give me a ring later','ok bye']);run.tvMsg={from:o.from,t:m,life:7};if(M)M.feed.push({t:`📺 ${o.from}: ${m}`,c:'#cfe9ff',life:7});}
 function ringCall(o){if((run.ringer||'ring')!=='ring'){buzz(true);later(rnd(2,4),()=>tvMessage(o));return;}if(run.call){voicemail(o);return;}o.ring=7;o.step=0;o.score=0;o.live=false;run.call=o;phoneDirty=true;buzz(true);}
 window.answerCall=()=>{const c=run.call;if(!c)return;c.live=true;c.lines.forEach(l=>{if(!l.r.some(q=>q[0]==='yes'))l.r.push(['yes',0],['k',0]);});view={type:'call',replies:c.lines[0].r,typed:[],auto:bestWords(c.lines[0].r),at:-2.8,log:[{who:'them',t:c.lines[0].q}]};phoneDirty=true;
@@ -283,7 +288,7 @@ function renderPhone(){
   <div class="btns"><button style="background:#2f8f50" onclick="answerCall()">ANSWER</button><button style="background:#a02a2a" onclick="ignoreCall()">GIMME A SEC</button></div><div class="tx" style="margin-top:12px;color:#777">Ignored calls go to the answering machine.</div></div>`;return;}
  if(view&&view.type==='stats'){const r=run.rel,lab=v=>v>85?'besties':v>65?'close':v>45?'good':v>25?'meh':'rocky';
   el.innerHTML=`<div class="thread"><div class="who"><span>📊 Stats</span><button onclick="closeView()">BACK</button></div><div class="log" style="padding:4px">
-  <div class="sec">RELATIONSHIPS</div>${REL_KEYS.map(k=>`<div style="display:flex;align-items:center;gap:6px;margin:6px 2px;font-size:8px"><span style="width:62px">${k}</span><span style="flex:1;height:8px;background:#222;border:2px solid #000"><i style="display:block;height:100%;width:${r[k]}%;background:${r[k]>65?'#ff9ac0':r[k]>35?'#f0b43c':'#e23b3b'}"></i></span><span style="width:52px;color:#9aa0b0;font-size:7px">${lab(r[k])}</span></div>`).join('')}
+  <div class="sec">RELATIONSHIPS</div>${REL_KEYS.map(k=>`<div style="display:flex;align-items:center;gap:6px;margin:6px 2px;font-size:8px"><span style="width:62px">${k}</span><span style="flex:1;height:8px;background:#222;border:2px solid #000"><i style="display:block;height:100%;width:${r[k]}%;background:${r[k]>65?'#ff9ac0':r[k]>35?'#f0b43c':'#e23b3b'}"></i></span><span style="width:52px;color:#9aa0b0;font-size:7px">${lab(r[k])}</span></div>${run.story&&run.story[k]&&run.story[k].note?`<div style="font-size:7px;color:#b0a0ff;margin:-3px 2px 6px 70px">📖 ${run.story[k].note}</div>`:''}`).join('')}
   <div class="sec">TODAY</div><div class="tx" style="padding:2px">Wins ${run.wins} · Elims ${run.kills} · Spotted ${run.spots}<br>Cars sold ${run.sales} · Jobs ${run.board.filter(j=>j.done).length}/${run.board.length}<br>Burglars stopped ${run.stops} · Simba elims ${run.simbaKills}<br>Party: ${run.party.length?run.party.join(', '):'solo'}</div></div></div>`;return;}
  if(view&&view.type==='history'){const h=run.threads[view.name]||[];el.innerHTML=`<div class="thread"><div class="who"><span>${view.icon} ${view.name}</span><button onclick="openContacts()">BACK</button></div><div class="log" id="log">${h.map(m=>`<div class="bub ${m.who}">${/^\[photo:/.test(m.t)?`<div class="photo">🐕</div><i style="font-size:7px;opacity:.7">${m.t.slice(8,-1)}</i>`:m.t}</div>`).join('')}</div><div class="sugg"><button class="big1" onclick="window._newMsg=true;textContact(${view.i})">NEW MESSAGE</button></div></div>`;const lg=$('log');if(lg)lg.scrollTop=lg.scrollHeight;return;}
  if(view&&view.type==='contacts'){el.innerHTML=`<div class="thread"><div class="who"><span>📇 Contacts</span><button onclick="closeView()">BACK</button></div><div class="log">${CONTACTS.map((ct,i)=>`<div class="item" style="display:flex;align-items:center;gap:8px;cursor:default"><span style="font-size:18px">${ct.i}</span><span class="fr" style="flex:1;margin:0">${ct.n}${ct.n==='Dan'?' <span style="color:#7fb2ff;font-size:7px">(plays!)</span>':''}</span><button onclick="callContact(${i})" style="font:inherit;font-size:8px;background:#2f8f50;color:#fff;border:2px solid #000;padding:6px;cursor:pointer">📞</button><button onclick="textContact(${i})" style="font:inherit;font-size:8px;background:#2f64b8;color:#fff;border:2px solid #000;padding:6px;cursor:pointer">💬</button></div>`).join('')}</div></div>`;return;}
@@ -321,7 +326,7 @@ function phoneTick(){dockPhone();if(!run){setPhone(false);return;}
    else if(v.auto&&v.at>.7){v.at=0;if(v.typed.length<v.auto.length){v.typed.push(v.auto[v.typed.length]);beep(500+v.typed.length*40,.02);phoneDirty=true;}else sendReply();}
    else if(v.at>-1.6&&v.at<-1.58)phoneDirty=true;}
   else if(v.stage==='sent'&&v.at>.9){v.stage='read';v.at=0;phoneDirty=true;}
-  else if(v.stage==='read'&&v.at>1.2){v.stage='typing';v.at=0;phoneDirty=true;}
+  else if(v.stage==='read'&&v.at>1.2){if(v.item.convo){v.stage='done';v.at=1;finishThread(v);}else v.stage='typing';v.at=0;phoneDirty=true;}
   else if(v.stage==='typing'&&v.at>1.8){v.log.push({who:'them',t:reaction(v)});v.stage='done';v.at=0;finishThread(v);beep(880,.05);phoneDirty=true;}
   else if(v.stage==='done'&&v.at>2.2){view=null;phoneDirty=true;}}$('clock').textContent=clockStr();$('batt').textContent=Math.max(4,71-Math.floor(run.clock/5));
  if(run.call&&!run.call.live&&mode==='play'){run.call.ring-=1/60;if(run.call.ring<=0)ignoreCall();}}
@@ -340,7 +345,7 @@ window.openContacts=()=>{view={type:'contacts'};phoneDirty=true;};
 window.callContact=i=>{if(run.call)return;const ct=CONTACTS[i];const c={from:ct.n,icon:ct.i,lines:ct.lines,step:0,score:0,live:true,outgoing:true,
   onDone:s=>{rel(ct.n,4);if(ct.n==='Dan')danJoins();else if(ct.n==='Mom')joinParty('Mom');else addFun(3,'Nice chat with '+ct.n);}};
  run.call=c;view={type:'call',replies:c.lines[0].r,typed:[],auto:bestWords(c.lines[0].r),at:-3.2,log:[{who:'them',t:'📞 Ringing... ringing...'},{who:'them',t:c.lines[0].q}]};phoneDirty=true;beep(440,.3,'sine');};
-window.textContact=i=>{const ct=CONTACTS[i];if(run.threads[ct.n]&&run.threads[ct.n].length&&!window._newMsg){view={type:'history',name:ct.n,icon:ct.i,i};phoneDirty=true;return;}window._newMsg=false;const msg=ct.n==='Dan'?'u on?':pick(['hey','whats up','hows it going']);
+window.textContact=i=>{const ct=CONTACTS[i];if(window._newMsg||!(run.threads[ct.n]&&run.threads[ct.n].length)){if(CONVOS[ct.n]&&!(run.convoOn&&run.convoOn[ct.n])){window._newMsg=false;const hi=pick(['hey','whats up','hows it going']);(run.threads[ct.n]||(run.threads[ct.n]=[])).push({who:'me',t:hi});say('💬 '+hi,2);view=null;phoneDirty=true;toast(`Texted ${ct.n}: "${hi}"`,'#9aa0b0');later(lively(ct.n)?rnd(2,5):rnd(15,40),()=>startConvo(ct.n));return;}}if(run.threads[ct.n]&&run.threads[ct.n].length&&!window._newMsg){view={type:'history',name:ct.n,icon:ct.i,i};phoneDirty=true;return;}window._newMsg=false;const msg=ct.n==='Dan'?'u on?':pick(['hey','whats up','hows it going']);
  view={type:'thread',item:{icon:ct.i,from:ct.n,msg:'(new message)',replies:[[msg,1]],react:()=>ct.n==='Dan'?'hopping on now!! mic might be weird':pick(['all good! the dog threw up on the rug','who is this','lol ok','did you see the game last night','im at costco'])},typed:[],hint:msg.split(' '),log:[],stage:'compose',at:0,after:()=>{if(ct.n==='Dan')later(4,danJoins);}};phoneDirty=true;};
 function joinParty(n){if(!run.party.includes(n)){run.party.push(n);toast(`${n} joined your party`,'#7fb2ff');}run.partyWait=0;}
 function danJoins(){joinParty('Dan');
@@ -396,9 +401,125 @@ const WIFE_Q=[
 ];
 function bankText(o,b){text({...o,msg:b.m,replies:[[b.i,2],[b.o,1]],react:sc=>sc>0?pick(b.r):pick(['ok','...','k'])});}
 
+
+// ================= branching conversations with the people Steve knows =================
+// Node: t = what they text; r = [reply, score, next node]; no r = final message.
+// End nodes can set story flags (set), add a note (note), nudge relationship (rel) or wife mood (mood),
+// pull Dan into the party (join) or send a buyer to the lot (lead).
+const C=(id,o)=>({id,...o});
+const CONVOS={
+ Dad:[
+  C('tires',{n:{a:{t:"Steve. You rotating the tires on all those cars?",r:[['every 5000 miles dad',2,'b'],['i sell cars dad',1,'c']]},
+   b:{t:"That's my boy. Your grandpa did every 3000. Old school.",r:[['grandpa was smart',2,'d'],['3000 is overkill',1,'e']]},
+   c:{t:"Doesn't mean you can't rotate a tire.",end:1},d:{t:"He was. He'd have liked your lot.",end:1,note:'Talked about Grandpa'},e:{t:"Overkill is how you live to 90.",end:1}}}),
+  C('fish',{need:st=>!st.fish,n:{a:{t:"Fish are biting at the reservoir this weekend.",r:[['lets go saturday',2,'b'],['maybe next weekend',1,'c']]},
+   b:{t:"I'll bring the bad coffee.",r:[['i love the bad coffee',2,'d'],['ill bring good coffee',1,'d']]},
+   c:{t:"Fish won't wait forever. Neither will I.",end:1},d:{t:"Saturday. 5am. Don't be late.",end:1,set:{fish:1},note:'Fishing trip planned'}}}),
+  C('fishreport',{need:st=>st.fish===1,n:{a:{t:"[photo: Dad holding up a very small fish]",r:[['huge fish dad',2,'b'],['thats a minnow dad',1,'c']]},
+   b:{t:"Thank you. Your mother called it bait.",end:1,set:{fish:2},note:'Dad caught "a bass"'},c:{t:"It's a BASS. Bring your glasses next time.",end:1,set:{fish:2}}}}),
+  C('emoji',{n:{a:{t:"Your mother is teaching me emojis. 🐟🔥🚗",r:[['you nailed it',2,'b'],['what does that mean',1,'c']]},
+   b:{t:"I'm a natural. 👍👍👍",end:1},c:{t:"Fish. Fire. Car. It's a sentence.",end:1}}}),
+  C('mower',{n:{a:{t:"The mower won't start. I've tried yelling at it.",r:[['check the spark plug',2,'b'],['did you try gas',1,'c']]},
+   b:{t:"...it was the spark plug. Don't tell your mother.",end:1},c:{t:"Of course it has gas. ...It did not have gas.",end:1}}}),
+  C('miss',{need:(st,r)=>r<38,n:{a:{t:"Haven't heard from you in a while. Everything ok?",r:[['sorry dad lets talk sunday',2,'b'],['all good',1,'c']]},
+   b:{t:"Sunday works. Proud of you, kid.",end:1,rel:6},c:{t:"Ok. Call your old man sometime.",end:1}}}),
+  C('proud',{need:(st,r)=>r>70,n:{a:{t:"Drove past your lot today. Looks sharp.",r:[['thanks dad that means a lot',2,'b'],['come by sometime',2,'c']]},
+   b:{t:"Your grandpa would have been proud too.",end:1,note:'Dad is proud'},c:{t:"I'll bring donuts. And opinions.",end:1}}}),
+ ],
+ Brother:[
+  C('raccoon1',{need:st=>!st.rac,n:{a:{t:"Dude. The raccoon is back. And he brought a FRIEND.",r:[['name them',2,'b'],['get a lid lock',1,'c']]},
+   b:{t:"Gary and Linda.",r:[['gary seems like trouble',2,'d'],['linda is the brains',2,'d']]},
+   c:{t:"They can open lid locks. They have HANDS, Steve.",end:1,set:{rac:1}},d:{t:"You're not wrong. War is declared.",end:1,set:{rac:1},note:'Raccoon war: Gary and Linda'}}}),
+  C('raccoon2',{need:st=>st.rac===1,n:{a:{t:"Update: Gary took a whole bag of chips. Linda watched.",r:[['linda is the getaway driver',2,'b'],['get motion lights',1,'c']]},
+   b:{t:"I need a security system like yours.",end:1,set:{rac:2}},c:{t:"They LIKE the lights. It's a stage now. Gary bows.",end:1,set:{rac:2}}}}),
+  C('raccoon3',{need:st=>st.rac===2,n:{a:{t:"Plot twist. Gary and Linda had babies. Three of them.",r:[['congrats uncle',2,'b'],['call animal control',1,'c']]},
+   b:{t:"I'm naming one Steve.",end:1,set:{rac:3},note:'Uncle to a raccoon named Steve'},c:{t:"I can't. They waved at me.",end:1,set:{rac:3},note:'Raccoons won'}}}),
+  C('pizza',{n:{a:{t:"Hot take: pineapple on pizza is fine.",r:[['correct',2,'b'],['absolutely not',1,'c']]},
+   b:{t:"Finally. The family is divided but we are right.",end:1},c:{t:"Wow. Telling Mom.",end:1}}}),
+  C('clip',{n:{a:{t:"Saw your clip. The part where you flew into a tree. Iconic.",r:[['the tree moved',2,'b'],['it was on purpose',1,'c']]},
+   b:{t:"Trees don't move, Steve. Unless... 👀",end:1},c:{t:"Sure. A tactical tree.",end:1}}}),
+  C('road',{need:(st,r)=>r>62&&!st.road,n:{a:{t:"Road trip this summer? Like old times.",r:[['yes but no gas station sushi',2,'b'],['maybe',1,'c']]},
+   b:{t:"No promises on the sushi.",end:1,set:{road:1},note:'Road trip is ON'},c:{t:"I'll take maybe. Putting it on the calendar in pen.",end:1,set:{road:1}}}}),
+  C('gym',{n:{a:{t:"I joined a gym. I've gone once. I'm basically a different person.",r:[['proud of you',2,'b'],['once counts',1,'c']]},
+   b:{t:"Thanks. I'm sore in places I didn't know I had.",end:1},c:{t:"It does count. It's 100% of the times I've gone.",end:1}}}),
+ ],
+ Sister:[
+  C('wub',{need:st=>!st.car,n:{a:{t:"Random car question. My car goes 'wub wub wub'.",r:[['bring it by the lot',2,'b'],['thats normal',0,'c']]},
+   b:{t:"Saturday? I'll bring donuts.",r:[['deal',2,'d'],['bring two dozen',1,'d']]},
+   c:{t:"Is it though? It's getting louder. It's singing now.",end:1},d:{t:"Done. The wub ends Saturday.",end:1,set:{car:1},note:'Fixing her wub wub'}}}),
+  C('wub2',{need:st=>st.car===1,n:{a:{t:"The wub is GONE. You're a wizard.",r:[['anytime sis',2,'b'],['it was mostly mike',1,'c']]},
+   b:{t:"Also my coworker wants to buy a car from you!",end:1,set:{car:2},lead:1,note:'Sent you a buyer'},c:{t:"Tell Mike he's a wizard too. Lesser wizard.",end:1,set:{car:2}}}}),
+  C('cat',{n:{a:{t:"My cat learned to open the fridge. She took the cheese.",r:[['she has good taste',2,'b'],['childproof the fridge',1,'c']]},
+   b:{t:"She's a cheese thief and I respect her.",end:1},c:{t:"She figured out the childproof lock in a day. I live with a genius.",end:1}}}),
+  C('chili',{n:{a:{t:"What's in Mom's chili? She won't tell me.",r:[['ask her about the cinnamon',2,'b'],['its a family secret',1,'c']]},
+   b:{t:"CINNAMON?? Everything makes sense now.",end:1},c:{t:"I AM family, Steve.",end:1}}}),
+  C('promo',{need:st=>!st.promo,n:{a:{t:"Guess who got promoted 🎉",r:[['no way congrats',2,'b'],['you',1,'b']]},
+   b:{t:"Dinner Friday, my treat. Bring your wife, not your controller.",end:1,set:{promo:1},note:'Got promoted!'}}}),
+  C('bday',{need:(st,r)=>r<40,n:{a:{t:"Did you forget my birthday or are you planning something big",r:[['planning something big',2,'b'],['i forgot sorry',1,'c']]},
+   b:{t:"Ok. I'm holding you to that.",end:1,rel:3},c:{t:"Honest. I'll allow it. You owe me cake.",end:1,rel:2}}}),
+ ],
+ Dan:[
+  C('headset',{n:{a:{t:"Bought a new headset. It's either amazing or haunted.",r:[['test it in a match',2,'b'],['return it',1,'c']]},
+   b:{t:"Hopping on. If you hear whispers, that's not me.",end:1,join:1},c:{t:"Can't. I already named it Kevin.",end:1}}}),
+  C('dream',{n:{a:{t:"Did I get a kill last night or was that a dream",r:[['it was beautiful',2,'b'],['that was a dream',1,'c']]},
+   b:{t:"I KNEW it. Framing it.",end:1},c:{t:"Rude. Accurate though.",end:1}}}),
+  C('snack',{n:{a:{t:"Hot chips or regular",r:[['hot obviously',2,'b'],['regular',1,'c']]},
+   b:{t:"Respect. My controller is red now.",end:1},c:{t:"Coward. Love you.",end:1}}}),
+  C('squad',{n:{a:{t:"Squad up tonight? Mic works this time, promise.",r:[['get on',2,'b'],['after dinner',1,'c']]},
+   b:{t:"Launching. (It does not work.)",end:1,join:1},c:{t:"I'll be there. Probably muted.",end:1}}}),
+  C('thanks',{need:(st,r)=>r>65,n:{a:{t:"Real talk, thanks for always letting me tag along.",r:[['anytime bro',2,'b'],['best duo',2,'b']]},
+   b:{t:"Ok that's enough feelings. Get on.",end:1,note:'Best duo'}}}),
+ ],
+ Wife:[
+  C('date',{n:{a:{t:"Date night Friday? You pick.",r:[['the taco place',2,'b'],['you pick',1,'c']]},
+   b:{t:"You remembered. 💕",end:1,mood:6},c:{t:"I said YOU pick. ...Taco place.",end:1}}}),
+  C('mug',{n:{a:{t:"[photo: a hand-painted mug that says WORLD'S OKAYEST GAMER]",r:[['i love it',2,'b'],['okayest??',1,'c']]},
+   b:{t:"Good. It lives on your desk now.",end:1,mood:4},c:{t:"Earn 'best' and I'll paint a new one.",end:1}}}),
+  C('cookietype',{n:{a:{t:"Chocolate chip or oatmeal raisin?",r:[['chocolate chip please',2,'b'],['surprise me',1,'c']]},
+   b:{t:"Correct answer. Oven's on.",end:1},c:{t:"Oatmeal raisin it is. 😈",end:1}}}),
+  C('sock',{n:{a:{t:"Simba stole a sock and is doing laps with it.",r:[['she is so proud',2,'b'],['get it back',1,'c']]},
+   b:{t:"Victory lap number six.",end:1},c:{t:"I tried. She's faster than me.",end:1}}}),
+  C('firstdate',{need:(st,r)=>r>60,n:{a:{t:"Remember our first date? You got us lost.",r:[['scenic route',2,'b'],['the gps lied',1,'b']]},
+   b:{t:"Sure. Still glad I said yes.",end:1,mood:8,note:'Still glad she said yes'}}}),
+  C('nophone',{need:(st,r)=>r<45,n:{a:{t:"Can we do a no-phone, no-game dinner tonight?",r:[['yes just us',2,'b'],['after one more',0,'c']]},
+   b:{t:"Thank you. That means a lot.",end:1,mood:10,rel:5},c:{t:"...ok.",end:1}}}),
+ ],
+ Kid:[
+  C('fair',{need:st=>!st.fair,n:{a:{t:"i need a science fair idea",r:[['how fast simba eats',2,'b'],['volcano',1,'c']]},
+   b:{t:"YES. i need a stopwatch and treats",end:1,set:{fair:1},note:'Science fair: Simba speed trials'},c:{t:"everyone does volcano dad",end:1}}}),
+  C('fair2',{need:st=>st.fair===1,n:{a:{t:"simba ate 10 treats in 4 seconds. new record",r:[['she is a champion',2,'b'],['thats too many treats',1,'c']]},
+   b:{t:"im giving her a ribbon",end:1,set:{fair:2},note:'Simba won a ribbon'},c:{t:"it was for SCIENCE",end:1,set:{fair:2}}}}),
+  C('joke',{n:{a:{t:"why did the car get a flat tire",r:[['why',2,'b'],['fork in the road',1,'c']]},
+   b:{t:"there was a fork in the road 😂",end:1},c:{t:"HEY how did you know",end:1}}}),
+  C('dream',{n:{a:{t:"i had a dream simba could talk",r:[['what did she say',2,'b'],['cool',1,'c']]},
+   b:{t:"she just said TREATS over and over",end:1},c:{t:"it was cooler than cool",end:1}}}),
+  C('lego',{n:{a:{t:"[photo: a lego car lot with tiny lego cars]",r:[['hire me',2,'b'],['nice build',1,'c']]},
+   b:{t:"ok you can be the manager",end:1,note:'Manager of the lego lot'},c:{t:"its for sale. $5",end:1}}}),
+ ],
+ Mom:[
+  C('casserole',{n:{a:{t:"I made your favorite casserole. Bringing it tomorrow.",r:[['you are the best mom',2,'b'],['which one',1,'c']]},
+   b:{t:"I know 😊",end:1},c:{t:"The one with the crunchy onions. You know the one.",end:1}}}),
+  C('patterson',{n:{a:{t:"Mrs. Patterson asked about you. I told her you own a business!",r:[['thanks mom',2,'b'],['who',1,'c']]},
+   b:{t:"She wants a car. Be nice to her.",end:1,lead:1},c:{t:"From church! She has the poodle.",end:1}}}),
+ ],
+};
+function lively(n){if(n==='Mom')return true;const h=Math.floor(run.clock/120);if(!run.lv||run.lv.h!==h)run.lv={h,m:{}};if(run.lv.m[n]==null)run.lv.m[n]=Math.random()<.35+(run.rel[n]||50)/220;return run.lv.m[n];}
+function convoList(n){const st=run.story[n]||(run.story[n]={}),r=run.rel[n]||50;let l=(CONVOS[n]||[]).filter(c=>!st['done_'+c.id]&&(!c.need||c.need(st,r)));
+ if(!l.length){(CONVOS[n]||[]).forEach(c=>{if(!c.need)delete st['done_'+c.id];});l=(CONVOS[n]||[]).filter(c=>!st['done_'+c.id]&&(!c.need||c.need(st,r)));}return l;}
+function startConvo(n){if(!run.story)run.story={};if(run.convoOn&&run.convoOn[n])return false;const l=convoList(n);if(!l.length)return false;(run.convoOn||(run.convoOn={}))[n]=1;sendNode(n,pick(l),'a');return true;}
+function sendNode(n,c,id){const nd=c.n[id],ct=CONTACTS.find(x=>x.n===n)||{i:n==='Wife'?'❤️':n==='Kid'?'🧒':'💬'};const st=run.story[n];
+ if(nd.end){st['done_'+c.id]=1;run.convoOn[n]=0;if(nd.set)Object.assign(st,nd.set);if(nd.note){st.note=nd.note;toast(`📖 ${n}: ${nd.note}`,'#b0a0ff');}if(nd.rel)rel(n,nd.rel);if(nd.mood)addMood(nd.mood);
+  if(nd.join){if(n==='Dan')danJoins();}if(nd.lead)later(rnd(15,35),()=>gateVisit(null,pick(['Mrs. Patterson','Coworker Jess','Ron from church'])));
+  text({icon:ct.i,from:n,fam:true,msg:nd.t,convo:1,replies:[['❤️',1],['😂',1],['👍',1]],react:()=>''});return;}
+ text({icon:ct.i,from:n,fam:true,msg:nd.t,convo:1,replies:nd.r.map(x=>[x[0],x[1]]),react:()=>'',onReply:(sc,txt)=>{const ctx=txt===(run.lastDeed&&run.lastDeed.brag)||/not gaming|off the game/.test(txt);const opt=ctx?nd.r[0]:nd.r.find(x=>x[0]===txt);let nx=opt?opt[2]:nd.r[nd.r.length-1][2];
+  const wait=lively(n)?rnd(2,5):rnd(20,50);if(!lively(n))toast(`${n} is slow to answer right now`,'#9aa0b0');
+  if(!opt&&txt!=='gimme a sec')later(wait*.5,()=>text({icon:ct.i,from:n,fam:true,msg:pick(['?','k what lol','you ok?','I asked you a question 😂','...that is not an answer']),convo:1,replies:[['sorry',1],['lol',1]],react:()=>''}));
+  later(wait,()=>sendNode(n,c,nx));}});}
+
 // ================= events =================
 function momSilly(){bankText({icon:'👵',from:'Mom',fam:true},pick(MOM_Q));}
 function textEvent(){
+ if(Math.random()<.45){const ppl=['Dad','Brother','Sister','Dan','Wife','Kid','Mom'].filter(n=>!(n==='Kid'&&run.kidAway));const n=pick(ppl);if(startConvo(n))return;}
  if(Math.random()<.05){momSilly();return;}
  const r=Math.random();
  if(r>=.25&&r<.42&&run.up.spam&&Math.random()<.75){toast('🚫 Spam blocker ate a call','#9aa0b0');return;}
@@ -457,7 +578,7 @@ function deter(kind){
  const g=run.burglars;if(!g||g.st==='flee'){toast('Nobody out there right now','#9aa0b0');return;}
  if(kind==='train'&&!run.up.train){toast('Buy the toy train + cutout in the shop','#9aa0b0');return;}
  const lim={lights:run.up.secsys?99:2,music:run.up.sound?4:2,train:3}[kind];
- if(run.deter[kind]<lim){run.deter[kind]++;run.cuFx={kind,t:3.5};g.st='flee';run.stops++;king(2);jingle(2);addFun(5);if(g.it)clearUrgent(g.it);
+ if(run.deter[kind]<lim){run.deter[kind]++;run.cuFx={kind,t:3.5};g.st='flee';run.stops++;king(2);jingle(2);addFun(5);deed(pick(['just scared off two burglars','chased burglars out of the yard','burglars ran from me lol']));if(g.it)clearUrgent(g.it);
   toast({lights:'💡 Lights on. "Somebody\'s home!" They bolt.',music:'🎵 Music cranked. "It\'s a party in there!" They run.',train:'🏀 The cardboard baller glides past the window. "That guy is HUGE." Gone.'}[kind],'#7fe0a0');beep(660,.1);}
  else{run.cuFx={kind,t:2};toast({lights:"💡 Lights again? They're not buying it anymore.",music:'🎵 They just bob their heads to the music.',train:"🏀 They've figured out the cutout."}[kind],'#ff9a7a');}
  phoneDirty=true;cuKey='';}
@@ -492,11 +613,11 @@ function repairTask(job){
  else if(job.kind==='fluids')startTask({kind:'bolts',label:job.label,bolts:[{x:PX+60,y:PY+40,done:0},{x:PX+110,y:PY+50,done:0}],stage:0,level:0,pour:false,time:16,win:()=>finishJob(job),fail:failT});
  else if(job.kind==='door'||job.kind==='bumper'){const bolts=[];for(let i=0;i<4;i++)bolts.push({x:PX+30+i*40+rnd(-8,8),y:PY+34+rnd(0,26),done:0});startTask({kind:'bolts',label:job.label,bolts,stage:0,level:0,pour:false,time:22,win:()=>finishJob(job),fail:failT,noPour:true});}
  else startTask({kind:'lugs',label:job.label,order:[0,2,4,1,3],k:0,time:16,win:()=>finishJob(job),fail:failT});}
-function finishJob(job,by){king(by?1:2.5);jingle(by?1:2);if(by==='Wife')rel('Wife',6);if(by==='Kid')rel('Kid',6);job.done=true;job.who=null;addCash(job.pay,(by?by+': ':'')+job.label.split(':')[0]);addLot(4);run.repairs++;}
+function finishJob(job,by){king(by?1:2.5);jingle(by?1:2);if(!by)deed(pick(['just finished a job on the lift','fixed a car myself','knocked out a repair']));if(by==='Wife')rel('Wife',6);if(by==='Kid')rel('Kid',6);job.done=true;job.who=null;addCash(job.pay,(by?by+': ':'')+job.label.split(':')[0]);addLot(4);run.repairs++;}
 function showTask(car,who){
  const zones=[['the engine',PX+20,PY+42,40,16],['the tires',PX+46,PY+66,22,16],['the trunk',PX+150,PY+40,34,18],['the interior',PX+82,PY+32,50,18],['the headlights',PX+8,PY+50,14,10]];
  startTask({kind:'show',label:`Showing the ${car} to ${who}`,car,who,zones,asks:shuffle(zones).slice(0,3),k:0,interest:0,flash:0,time:18,col:run.gate?run.gate.col:'#c8202a',
-  win:()=>{const p=ri(5,9)*100;addCash(p,'Sold the '+car);addLot(6);run.sales++;king(3);jingle(3);big('SOLD! +$'+p,'#7fe0a0');},fail:()=>addLot(1,`${who} will "think about it"`)});
+  win:()=>{const p=ri(5,9)*100;addCash(p,'Sold the '+car);addLot(6);run.sales++;king(3);jingle(3);deed(pick(['just sold a car','sold a jeep today','closed a sale']));big('SOLD! +$'+p,'#7fe0a0');},fail:()=>addLot(1,`${who} will "think about it"`)});
  if(run.gate){clearUrgent(run.gate.it);run.gate=null;}}
 function signTask(){const pk=run.door&&run.door.pk;startTask({kind:'sign',label:pk?'Signing for your order':'Signing for parts',prog:0,pts:[],ink:0,glitch:Array.from({length:ri(2,5)},()=>({y:rnd(22,70),a:rnd(-.3,.3),c:pick(['rgba(120,255,160,.25)','rgba(255,255,255,.18)','rgba(0,0,0,.35)'])})),scr:Array.from({length:ri(0,4)},()=>[rnd(0,180),rnd(0,60),rnd(10,50),rnd(-1,1)]),time:14,win:()=>{if(pk){const i=run.pending.indexOf(pk);if(i>=0)run.pending.splice(i,1);applyUp(pk);}else addLot(2,'Parts in');},fail:()=>addLot(-2)});if(run.door){clearUrgent(run.door.it);run.door=null;}}
 function trashTask(){startTask({kind:'trash',label:'Taking out the trash',bx:PX+24,by:PY+56,grab:false,time:10,win:()=>addMood(12,'Trash is out'),fail:()=>{}});}
@@ -995,17 +1116,21 @@ function drawTV(){
   const hx=TX+182,hy=iy-30;R(hx,hy,50,30,'#9a6a3a');for(let i=0;i<5;i++)R(hx,hy+i*6,50,1,'#7a4a24');R(hx-4,hy-8,58,8,'#6a4a2a');R(hx-2,hy-10,54,3,'#8a5a30');R(hx+20,hy+12,10,18,'#4a2a14');R(hx+6,hy+8,9,7,'#3a2a1a');R(hx+36,hy+8,9,7,'#3a2a1a');R(hx+37,hy+9,7,5,'#ffd25a');R(hx+48,hy+4,2,26,'#7a4a24');R(hx-8,hy+26,20,4,'#8a6a3a');
   // other players wandering, shooting at the sky, dancing
   if(M&&!M.lob)M.lob=Array.from({length:7},(_,i)=>({x:TX+60+i*28,tx:TX+60+i*28,sk:pick(SKINS),act:pick(['walk','dance','shoot','dance','walk']),t:rnd(1,4),f:1}));
-  for(const o of (M?M.lob:[])){o.t-=1/60;if(o.t<=0){o.t=rnd(2,5);o.act=pick(['walk','dance','shoot','dance','walk','emote']);o.tx=TX+50+Math.random()*200;}
+  const awayNow=!(run&&run.steve.x===SPOT.couch&&!run.task);
+  for(const o of (M?M.lob:[])){o.t-=1/60;if(o.t<=0){o.t=rnd(2,5);o.act=awayNow?pick(['shoot','dance','shoot','walk']):pick(['walk','dance','shoot','dance','walk','emote']);o.tx=awayNow?(M.sx||TX+132)+rnd(-30,30):TX+50+Math.random()*200;o.f=o.tx>o.x?1:-1;if(awayNow)o.f=(M.sx||TX+132)>o.x?1:-1;}
    if(o.act==='walk'){o.x+=clamp(o.tx-o.x,-.5,.5);o.f=o.tx>o.x?1:-1;}
    const yy=iy-4+Math.sin(o.x)*2,dz=o.act==='dance'?Math.round(Math.sin(t*10+o.x)*2):0,jump=o.act==='emote'?Math.abs(Math.sin(t*6))*5:0;
    R(o.x-3,yy+10,8,2,'rgba(0,0,0,.2)');R(o.x+dz,yy-jump,6,7,o.sk.b);R(o.x+1+dz,yy-5-jump,4,5,o.sk.h);R(o.x+2+dz,yy+2-jump,1,1,o.sk.a);
    const step=o.act==='walk'?Math.floor(t*8+o.x)%2:0;R(o.x+dz,yy+7-jump,2,3-step,'#2a2a30');R(o.x+4+dz,yy+7-jump,2,2+step,'#2a2a30');
    if(o.act==='dance'){R(o.x-2+dz,yy-2-Math.abs(dz),2,3,o.sk.b);R(o.x+6+dz,yy-2-Math.abs(-dz),2,3,o.sk.b);}
-   if(o.act==='shoot'){R(o.x+(o.f>0?6:-4),yy+2,4,2,'#222');if(Math.floor(t*6+o.x)%3===0){b.strokeStyle='#fff36a';b.beginPath();b.moveTo(o.x+(o.f>0?10:-4),yy+2);b.lineTo(o.x+(o.f>0?40:-30),yy-30);b.stroke();}}}
-  // Steve in the middle
-  const bx=TX+132,by=iy-22;R(bx-6,by+14,8,10,'#7a8a9a');R(bx+14,by+14,8,10,'#7a8a9a');R(bx,by+10,16,14,'#f4f4f4');R(bx+4,by+12,8,6,'#2d5fa8');R(bx+4,by+2,8,7,'#e8b890');R(bx+4,by+1,8,2,'#5a3e28');b.strokeStyle='rgba(230,245,255,.9)';b.beginPath();b.arc(bx+8,by+5,8,0,7);b.stroke();R(bx+3,by,3,2,'#fff');R(bx+3,by+24,4,4,'#f4f4f4');R(bx+9,by+24,4,4,'#f4f4f4');
+   if(o.act==='shoot'){R(o.x+(o.f>0?6:-4),yy+2,4,2,'#222');if(Math.floor(t*6+o.x)%3===0){b.strokeStyle='#fff36a';b.beginPath();b.moveTo(o.x+(o.f>0?10:-4),yy+2);if(awayNow)b.lineTo((M.sx||TX+132)+8,iy-12);else b.lineTo(o.x+(o.f>0?40:-30),yy-30);b.stroke();}}}
+  // Steve: dances and runs around when you're on the couch, stands there AFK when you're not
+  const here=run&&run.steve.x===SPOT.couch&&!run.task;if(M){if(M.sx==null)M.sx=TX+132;if(here){M.smode=M.smode||'dance';M.st2=(M.st2||0)-1/60;if(M.st2<=0){M.st2=rnd(2,4);M.smode=pick(['dance','run','dance','jump','run']);M.stx=TX+70+Math.random()*150;}if(M.smode==='run')M.sx+=clamp(M.stx-M.sx,-1.2,1.2);}}
+  const sdz=here&&M.smode==='dance'?Math.round(Math.sin(t*10)*2):0,sjp=here&&M.smode==='jump'?Math.abs(Math.sin(t*6))*8:0;
+  const bx=Math.round((M?M.sx:TX+132)+sdz),by=Math.round(iy-22-sjp);if(!here&&Math.floor(t*2)%2){R(bx-2,by-12,20,7,'#fff');R(bx-1,by-11,18,5,'#e23b3b');}R(bx-6,by+14,8,10,'#7a8a9a');R(bx+14,by+14,8,10,'#7a8a9a');R(bx,by+10,16,14,'#f4f4f4');R(bx+4,by+12,8,6,'#2d5fa8');R(bx+4,by+2,8,7,'#e8b890');R(bx+4,by+1,8,2,'#5a3e28');b.strokeStyle='rgba(230,245,255,.9)';b.beginPath();b.arc(bx+8,by+5,8,0,7);b.stroke();R(bx+3,by,3,2,'#fff');R(bx+3,by+24,4,4,'#f4f4f4');R(bx+9,by+24,4,4,'#f4f4f4');
   // party members stand next to him
   if(run)run.party.forEach((n,i)=>{const px=bx-18-i*14,py=by+8,col={Mom:'#a05ad0',Dan:'#2ab070',Wife:'#3a6aa0',Kid:'#e8c33a',Randoms:'#e07a2a'}[n]||'#888';R(px,py,8,10,col);R(px+1,py-6,6,6,'#e8b890');R(px+1,py+10,2,4,'#2a2a30');R(px+5,py+10,2,4,'#2a2a30');});
+ if(M&&M.phase==='lobby'){M.l3=(M.l3||rnd(8,14))-1/60;if(M.l3<=0){if(!M.isl)M.isl=islandWorld();M.l3cam=(M.l3cam||0)+1/60;islandRender(t);b.drawImage(fpsC,TX,TY,TW,TH);if(M.l3cam>4.5){M.l3=rnd(10,16);M.l3cam=0;}}}
  }else if(M.phase==='bus'){
   drawTopDown(t);const p=W2S(M.bus.x,M.bus.y);R(p.x-14,p.y-6,28,10,'#3a7bd5');R(p.x-10,p.y-14,20,8,'#ff5a7a');for(let i=0;i<4;i++)R(p.x-11+i*6,p.y-4,4,3,'#bfe8ff');R(p.x-6,p.y-20,12,6,'#fff');
  }else if(M.phase==='glide'){
@@ -1303,6 +1428,13 @@ function fpsShoot(me){M.fireCD=[.34,.24,.2,.11,.26][M.gun];M.kick=7;M.flashT=.05
   const half=Math.atan2(3.4,d),pitchOK=Math.abs(M.pitch)<40;if(Math.abs(a)<half+.012&&pitchOK&&d<bd&&losOK(me,e)){best=e;bd=d;}}
  if(best){const head=M.pitch>Math.min(18,250/bd)-6;const d=GUNS[M.gun].d*(head?1.6:1)*(1+(run.buffs.some(b=>b.k==='conf')?.2:0)+run.king/300);hitEnemy(best,d,me);best.alert=6;best.flinch=.35;M.hitT=.15;M.headT=head?.2:0;beep(head?1100:760,.03);}
 }
+function islandWorld(){const w={cx0:500,cy0:500,isR:70,mtn:{x:-9999,y:-9999},solids:[[512,470,24,18,2]]};return {grid:buildGrid(w),w,palms:[{x:450,y:480},{x:555,y:520}],dancers:Array.from({length:7},(_,i)=>({x:470+i*10,y:500+rnd(-14,14),skin:pick(SKINS),hp:100,sh:0,state:'idle',flash:0}))};}
+function islandRender(t){ensureCine();const I=M.isl,sv={...M};
+ const me={x:500+Math.sin(t)*6,y:505,hp:100,sh:50,me:true,col:'#f4f4f4'},a=t*.5,cx=me.x+Math.cos(a)*34,cy=me.y+Math.sin(a)*34;
+ I.dancers.forEach((d,i)=>{d.x+=Math.sin(t*2+i)*.2;});
+ Object.assign(M,{grid:I.grid,cx0:500,cy0:500,isR:70,trees:I.palms,bushes:[],chests:[],rares:[],vends:[],enemies:I.dancers,squad:[me],storm:{cx:500,cy:500,r:9999},t:10,T:80,feed:[],players:100,kills:0,gun:M.gun||0,fly:0});
+ M.ang=Math.atan2(me.y-cy,me.x-cx);M.pitch=-6;M.view3d={style:'orbit',t:0,act:true};const sx=me.x,sy=me.y;me.x=cx;me.y=cy;M.camOff={x:sx,y:sy};try{fpsRender();}catch(e){}
+ for(const k of Object.keys(M))if(!(k in sv))delete M[k];Object.assign(M,sv);}
 function ensureCine(){if(fpsC)return;fpsC=document.createElement('canvas');fpsC.width=FW;fpsC.height=FH;fctx=fpsC.getContext('2d');fimg=fctx.createImageData(FW,FH);fbuf=new Uint32Array(fimg.data.buffer);}
 function cineRender(){ensureCine();const me=M.squad[0],v=M.view3d,st=v.style||'chase',P=v.p||me;let cx=me.x,cy=me.y,look=M.ang||0;
  if(st==='chase'){const e=v.e,tg=e||{x:me.x+(me.vx||1)*10,y:me.y+(me.vy||0)*10},a=Math.atan2(tg.y-me.y,tg.x-me.x)+Math.sin(M.t*.6)*.1;cx=me.x-Math.cos(a)*(v.scope?2:16);cy=me.y-Math.sin(a)*(v.scope?2:16);look=a;M.pitch=0;}
