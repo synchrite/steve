@@ -63,9 +63,9 @@ canvas{width:100%;display:block;image-rendering:pixelated;border:4px solid #000;
 #game{display:block!important;max-width:1500px}
 #stage{max-width:calc((100vh - 64px)*4/3);margin:0 auto;overflow:hidden}
 #side,#tabs{display:none!important}
-#phone{position:absolute!important;left:8px;right:auto!important;top:200px;bottom:auto!important;height:500px!important;width:250px!important;aspect-ratio:auto;max-width:none;z-index:5;transition:transform .25s ease;display:flex!important}
-#phone.min{transform:translateX(calc(-100% - 24px))}
-#cuWrap{position:absolute;left:8px;top:8px;width:min(220px,26%);z-index:4;display:flex!important;padding:4px!important;gap:3px!important;border-width:3px!important}
+#phone{position:absolute!important;right:8px!important;left:auto!important;top:240px;bottom:auto!important;height:500px!important;width:250px!important;aspect-ratio:auto;max-width:none;z-index:5;transition:transform .25s ease;display:flex!important}
+#phone.min{transform:translateX(calc(100% + 24px))}
+#cuWrap{position:absolute;right:8px;left:auto;top:8px;width:min(290px,34%);z-index:4;display:flex!important;padding:4px!important;gap:3px!important;border-width:3px!important}
 #fpsWrap{position:absolute;inset:0;z-index:6;display:none;background:#000}#fps{width:100%;height:100%;display:block;image-rendering:pixelated;cursor:crosshair;touch-action:none}
 #fpsExit{position:absolute;right:8px;top:8px;font:inherit;font-size:9px;background:#2f8f50;color:#fff;border:3px solid #000;padding:8px;cursor:pointer}
 #fpsHint{position:absolute;left:8px;bottom:8px;right:8px;font-size:7px;color:#cfd3dd;text-shadow:1px 1px 0 #000;pointer-events:none;text-align:center}
@@ -75,7 +75,7 @@ canvas{width:100%;display:block;image-rendering:pixelated;border:4px solid #000;
 #phone{z-index:8!important}#pill{z-index:9!important}
 #cuTitle{font-size:7px!important;min-height:10px!important;cursor:move;touch-action:none}#cuTitle::before{content:'⠿ ';color:#777}
 #cuBtns{min-height:0!important}#cuBtns button{font-size:6px!important;padding:4px!important}
-#pill{position:absolute;left:10px;top:200px;z-index:6;font:inherit;font-size:9px;background:#0a0a0d;color:#fff;border:3px solid #3b3e48;border-radius:16px;padding:8px 12px;cursor:pointer}
+#pill{position:absolute;right:10px;left:auto;top:240px;z-index:6;font:inherit;font-size:9px;background:#0a0a0d;color:#fff;border:3px solid #3b3e48;border-radius:16px;padding:8px 12px;cursor:pointer}
 #pill.hide{display:none}#pill.alert{border-color:#e23b3b;animation:buzz .5s infinite}
 .sbar button{font:inherit;font-size:8px;background:#222;color:#fff;border:2px solid #444;padding:2px 6px;cursor:pointer}
 @media(max-width:700px){#phone{height:440px!important;width:220px!important}#cuWrap{width:42%}}
@@ -184,7 +184,7 @@ function newRun(){
   wife:{x:SPOT.kitchen,st:'craft',t:8,tx:SPOT.craft,mood:80,job:null,cookieT:40,warned:false},
   kid:{x:100,st:'wander',t:6,tx:90,job:null},
   simba:{x:90,y:FLOOR,st:'roam',t:10,tx:80,tired:0,pat:0,max:1,wig:0,tug:50,face:1},
-  lamb:{x:60,y:FLOOR,st:'simba',vx:0,vy:0},drag:false,threads:{},story:{},convoOn:{},party:[],partyWait:0,rel:{Wife:50,Kid:50,Mom:50,Dan:40,Dad:40,Brother:40,Sister:40,Simba:60},stove:{st:'off',t:0},deter:{lights:0,music:0,train:0}};camX=0;
+  lamb:{x:60,y:FLOOR,st:'simba',vx:0,vy:0},drag:false,threads:{},bladder:20,bath:null,story:{},convoOn:{},party:[],partyWait:0,rel:{Wife:50,Kid:50,Mom:50,Dan:40,Dad:40,Brother:40,Sister:40,Simba:60},stove:{st:'off',t:0},deter:{lights:0,music:0,train:0}};camX=0;
  for(let i=0;i<6;i++)run.board.push(makeJob(i));
  M=lobbyScene();
 }
@@ -199,6 +199,8 @@ function say(t,life=3){if(run)run.say={t,life};}
 const REL_KEYS=['Wife','Kid','Mom','Dan','Dad','Brother','Sister','Simba'];
 function relName(from){from=from||'';for(const k of REL_KEYS)if(from.startsWith(k))return k;if(from.startsWith('Wife'))return 'Wife';return null;}
 function rel(who,d){if(!run||!who||!(who in run.rel))return;run.rel[who]=clamp(run.rel[who]+d,0,100);}
+function trombone(){[392,370,349,294].forEach((f,i)=>setTimeout(()=>beep(f,i===3?.5:.18,'sawtooth',.035),i*190));}
+function crownDip(n,why){if(!run)return;run.king=clamp(run.king-n,0,100);pop('-'+n+'👑',480,'#ff7070');toast(`👑 -${n} · ${why}`,'#ff7070');trombone();}
 function jingle(l){const seq=l>=3?[523,659,784,1047,1319]:l>=2?[660,880,1100,1320]:[700,990];seq.forEach((f,i)=>setTimeout(()=>beep(f,.08,'triangle',.045),i*75));}
 function pop(t,x,c){if(!run)return;(run.pops||(run.pops=[])).push({t,x,c,life:1.3});}
 function king(d){if(!run)return;if(d>0)d*=1.35;const was=run.king;run.king=clamp(run.king+d,0,100);if(d>=.5)pop('+'+d.toFixed(1)+'👑',480,'#ffc23a');if(Math.floor(was/10)<Math.floor(run.king/10)&&run.king<100){jingle(3);toast(`👑 KING OF FORTNITE ${Math.floor(run.king/10)*10}%`,'#ffc23a');}if(was<100&&run.king>=100&&mode==='play')later(.5,kingWin);}
@@ -226,7 +228,7 @@ function walkTo(spot,fn){
  if(!free()){toast('GET UP first (costs 1 ❤ mid-match)','#ff8b8b');return false;}
  if(run.task){toast("Finish what you're doing first",'#ff8b8b');return false;}
  if(inMatch())run.afk=true;run.steve.target=SPOT[spot]??spot;run.steve.onArrive=fn;return true;}
-function hands(){
+function hands(){if(run.bath)return 0;
  let h=1;if(run.afk||run.steve.x!==SPOT.couch||!run.power)h=0;
  if(run.task)h=0;
  if(run.call&&run.call.live)h=Math.min(h,run.up.headset?.8:.45);
@@ -316,7 +318,7 @@ function renderPhone(){
  el.innerHTML=nb+snz+(snoozedN?`<div class="sec">😴 ${snoozedN} WAITING ON "GIMME A SEC"</div>`:'')+(urgent.length?'<div class="sec">HAPPENING NOW</div>'+urgent.map(row).join(''):'')+(texts.length?'<div class="sec">MESSAGES</div>'+texts.map(row).join(''):'')+(vms.length?'<div class="sec">ANSWERING MACHINE · '+vms.length+' NEW</div>'+vms.map(row).join(''):'');
 }
 window.snoozeAll=()=>{if(!run)return;run.snoozed=run.match+':'+run.phase;let fam=0;run.inbox.forEach(x=>{if(x.due!=null){x.due=Math.max(x.due,dueNow())+1;if(x.fam)fam++;}});if(fam)addMood(-2*fam,'Snoozed family');toast('😴 Everything snoozed until the next break','#b0a0ff');phoneDirty=true;};
-function dockPhone(){const w=$('cuWrap'),ph=$('phone'),pl=$('pill');const y=w.offsetTop+w.offsetHeight+8;ph.style.top=y+'px';ph.style.left=w.offsetLeft+'px';pl.style.top=y+'px';pl.style.left=(w.offsetLeft+2)+'px';}
+function dockPhone(){const w=$('cuWrap'),ph=$('phone'),pl=$('pill'),st=$('stage');const y=w.offsetTop+w.offsetHeight+8,r=Math.max(8,st.clientWidth-(w.offsetLeft+w.offsetWidth));ph.style.top=y+'px';ph.style.right=r+'px';ph.style.left='auto';pl.style.top=y+'px';pl.style.right=(r+2)+'px';pl.style.left='auto';}
 function phoneTick(){dockPhone();if(!run){setPhone(false);return;}
  {const ringing=run.call&&!run.call.live;if(view||(run.call&&run.call.live)||(ringing&&(run.ringer||'ring')==='ring')){if(!phoneOpen)setPhone(true);}else if(phoneOpen&&!run.inbox.some(x=>!(x.snoozeT>0))&&!ringing)setPhone(false);
   const pl=$('pill'),n=run.inbox.length;pl.textContent=ringing?'📞 '+run.call.from:'📱'+(n?' '+n:'');pl.classList.toggle('alert',!!ringing||run.inbox.some(x=>x.urgent));}
@@ -519,7 +521,7 @@ function sendNode(n,c,id){const nd=c.n[id],ct=CONTACTS.find(x=>x.n===n)||{i:n===
 // ================= events =================
 function momSilly(){bankText({icon:'👵',from:'Mom',fam:true},pick(MOM_Q));}
 function textEvent(){
- if(Math.random()<.45){const ppl=['Dad','Brother','Sister','Dan','Wife','Kid','Mom'].filter(n=>!(n==='Kid'&&run.kidAway));const n=pick(ppl);if(startConvo(n))return;}
+ if(Math.random()<.4&&!Object.values(run.convoOn||{}).some(Boolean)){const ppl=['Dad','Brother','Sister','Dan','Wife','Kid','Mom'].filter(n=>!(n==='Kid'&&run.kidAway));const n=pick(ppl);if(startConvo(n))return;}
  if(Math.random()<.05){momSilly();return;}
  const r=Math.random();
  if(r>=.25&&r<.42&&run.up.spam&&Math.random()<.75){toast('🚫 Spam blocker ate a call','#9aa0b0');return;}
@@ -591,12 +593,19 @@ function nightTick(before,dt){
  if(before<6&&h>=6&&before<h){run.day++;run.tired=run.nightPlay>40;run.nightPlay=0;run.board=run.board.filter(j=>!j.done);while(run.board.length<6)run.board.push(makeJob(run.board.length+run.day*7));run.board.forEach((j,i)=>j.id=i);
   run.party=run.party.filter(n=>n!=='Wife'&&n!=='Kid');toast(`☀ Day ${run.day}. `+(run.tired?'Steve is exhausted. Aim is worse today.':'New jobs on the board.'),'#ffd25a');if(run.tired){addMood(-15,'You played all night');}}
  if(isNight()&&inMatch()&&!run.afk&&!run.party.includes('Wife'))run.wife.mood-=.08*dt;}
+function snackRun(){if(run.bath||run.task)return;if(!walkTo('stove',()=>{const drink=Math.random()<.5;const it=drink?pick(['a soda','an iced coffee','a sports drink','a big glass of water']):pick(['chips','a slice of leftover pizza','a cookie','string cheese']);
+  run.buffs=run.buffs.filter(b=>b.k!=='snack');run.buffs.push({k:'snack',name:drink?'Drink':'Snack',t:40});addFun(6,'Grabbed '+it);run.flow=Math.min(100,run.flow+10);jingle(1);run.bladder+=drink?35:10;say(pick(['ahh','perfect','ok NOW I can play','refueled']),2);if(inMatch())sendHome();}))return;}
+function needsTick(dt){run.bladder+=dt*(run.buffs.some(b=>b.k==='snack')?.18:.08);
+ if(run.bath){run.bath.t-=dt;if(run.bath.t<=0){run.bath=null;run.bladder=0;run.steve.x=SPOT.couch;run.afk=false;toast('Steve is back. Washed his hands. Probably.','#9aa0b0');}return;}
+ const okNow=!run.task&&!view&&!(run.call&&run.call.live)&&run.steve.target==null;
+ if(okNow&&(run.bladder>100&&(run.phase==='lobby'||(inMatch()&&M.phase!=='play'))||run.bladder>150)){
+  if(inMatch()&&!run.afk)feed('Steve: brb, bathroom','#9aa0b0');run.bath={t:rnd(7,11)};run.afk=inMatch();toast('🚽 Steve went to the bathroom','#9aa0b0');beep(300,.08,'sine');}}
 function stoveUpdate(dt){
  const sv=run.stove;
  if(sv.st==='cooking'){sv.t-=dt;if(sv.t<=0){if(sv.served){sv.st='off';toast('Wife: "Dinner prep is done!"','#ff9ac0');addMood(2);}
    else if(Math.abs(run.wife.x-SPOT.kitchen)<6){sv.served=true;sv.t=15;}
    else{sv.st='boiling';sv.t=90;sv.it=urgentItem({icon:'🍲',from:'Kitchen',msg:'The pot is boiling over!',onTap:()=>walkTo('stove',fixStove)});beep(300,.2,'sine');}}}
- else if(sv.st==='boiling'){sv.t-=dt;if(sv.t<=0){clearUrgent(sv.it);sv.st='burning';sv.t=12;toast('🔥 You left it WAY too long. SMOKE ALARM *BEEP BEEP BEEP*','#ff7070');addFun(-4);addMood(-6);}}
+ else if(sv.st==='boiling'){sv.t-=dt;if(sv.t<=0){clearUrgent(sv.it);sv.st='burning';sv.t=12;toast('🔥 You left it WAY too long. SMOKE ALARM *BEEP BEEP BEEP*','#ff7070');crownDip(3,'Burnt dinner');addFun(-4);addMood(-6);}}
  else if(sv.st==='burning'){sv.t-=dt;if(Math.random()<dt*3)beep(2200,.04,'square',.02);if(sv.t<=0){sv.st='off';toast('Wife aired out the kitchen. She is not thrilled.','#ff9ac0');}}}
 function assistantTick(){
  const sv=run.stove;if(sv.st==='boiling'||sv.st==='burning'){fixStove();toast('🤖 Assistant handled the stove','#7fe0a0');return;}
@@ -701,7 +710,7 @@ function familyUpdate(dt){
  else if(w.t<=0){w.t=rnd(10,18);
   if(w.mood>70&&(w.cookieT-=15)<=0){w.cookieT=60;w.st='cookies';w.tx=SPOT.couch+14;}
   else{w.st='walk';w.tx=pick([SPOT.kitchen,SPOT.craft,SPOT.craft,90]);}}
- if(!w.job&&Math.abs(w.x-SPOT.kitchen)<2&&run.stove.st==='off'&&w.st!=='cooking'&&Math.random()<dt*.5){run.stove={st:'cooking',t:rnd(20,32),served:false};w.st='cooking';toast('Wife put a pot on the stove... then wandered off','#ff9ac0');w.t=2;}
+ if(!w.job&&Math.abs(w.x-SPOT.kitchen)<2&&run.stove.st==='off'&&w.st!=='cooking'&&Math.random()<dt*.03&&(run.potCD||0)<=0){run.potCD=240;const stays=Math.random()<.75;run.stove={st:'cooking',t:rnd(70,110),served:stays};w.st='cooking';toast(stays?'Wife is cooking something good':'Wife put a pot on the stove... then wandered off','#ff9ac0');w.t=stays?40:2;}
  w.x+=clamp(w.tx-w.x,-30*dt,30*dt);if(!w.job&&w.st==='walk'&&Math.abs(w.x-w.tx)<1)w.st=Math.abs(w.x-SPOT.craft)<2?'craft':'idle';
  // kid
  k.t-=dt;
@@ -776,7 +785,7 @@ function newMatch(){
  pz.forEach(n=>{if(n!=='Dan')rel(n,3);});
  const dir=Math.random()<.5;const bus={x:dir?-20:MW+20,y:rnd(100,MH-100),dx:dir?1:-1,dy:rnd(-.3,.3)};
  const target=pick(world.pois);
- M={phase:'bus',t:0,T:80,mode:modeName,...world,squad,bus,target,cam:{x:bus.x,y:bus.y},enemies:[],fx:[],feed:[],msgs:[],kills:0,roll:0,ended:false,
+ run.k0=run.king;M={phase:'bus',t:0,T:80,best:null,mode:modeName,...world,squad,bus,target,cam:{x:bus.x,y:bus.y},enemies:[],fx:[],feed:[],msgs:[],kills:0,roll:0,ended:false,
   gun:run.up.loot?2:0,players:100,others:0,chests:[],rares:[],cars:[],storm:{cx:MW/2+rnd(-150,150),cy:MH/2+rnd(-150,150),r:700,from:700,to:700,k:0},stage:0,
   way:null,flyCD:0,fly:0,car:null,view3d:null,last3d:-99,reviving:null,confetti:[],jetTip:false};
  // loot + vehicles
@@ -844,8 +853,8 @@ function updateBR(dt){
    else{M.act=pickAct(me);if(!M.act){if(M.flyCD<=0&&Math.random()<dt*.35)takeOff();moveTo(me,s.cx+Math.sin(M.t*.3)*s.r*.4,s.cy+Math.cos(M.t*.3)*s.r*.4,M.fly>0?60:22,dt);}}}
   if(target&&M.flyCD<=0&&Math.random()<dt*.2)takeOff(true);
   // auto-fire is weak; clicking does the real work
-  if(!target&&M.gun>=2&&!M.act?.started){M.snipeCD=(M.snipeCD||3)-dt;if(M.snipeCD<=0){M.snipeCD=rnd(2.6,4.2);const far=M.enemies.filter(e=>!e.hidden&&dist(e,me)>95&&dist(e,me)<280&&losOK(me,e))[0];if(far){M.view3d={style:'chase',e:far,t:0,scope:true};M.last3d=M.t;feed('Steve: *scoped in*','#9fe07f');setTimeout(()=>{if(!M||M.ended||!M.enemies.includes(far))return;beep(160,.25,'sawtooth',.05);if(Math.random()<.45+run.flow/250){hitEnemy(far,72+M.gun*8,me);M.fx.push({t:'shot',x1:me.x,y1:me.y,x2:far.x,y2:far.y,life:.12,c:'#fff36a'});feed(far.hp<=0?'SNIPED!':'Steve: hit him!','#fff36a');}else feed('Steve: missed by a mile','#9aa0b0');},900);}}}
-  if(M.fly>0&&Math.random()<dt*.6){const tr=M.trees.find(q=>dist(q,me)<7);if(tr){M.fly=0;M.flyCD=3;M.fx.push({t:'boom',x1:me.x,y1:me.y,life:.5});feed(pick(['Steve flew straight into a tree 🌲','BONK. Tree.','Steve: who put that tree there']),'#ffb060');beep(140,.15,'sawtooth',.05);M.view3d={style:'low',p:me,t:0,replay:true,a0:rnd(0,6)};}}
+  if(!target&&M.gun>=2&&!M.act?.started){M.snipeCD=(M.snipeCD||3)-dt;if(M.snipeCD<=0){M.snipeCD=rnd(2.6,4.2);const far=M.enemies.filter(e=>!e.hidden&&dist(e,me)>95&&dist(e,me)<280&&losOK(me,e))[0];if(far){M.view3d={style:'chase',e:far,t:0,scope:true};M.last3d=M.t;feed('Steve: *scoped in*','#9fe07f');setTimeout(()=>{if(!M||M.ended||!M.enemies.includes(far))return;beep(160,.25,'sawtooth',.05);if(Math.random()<.45+run.flow/250){hitEnemy(far,72+M.gun*8,me);M.fx.push({t:'shot',x1:me.x,y1:me.y,x2:far.x,y2:far.y,life:.12,c:'#fff36a'});feed(far.hp<=0?'SNIPED!':'Steve: hit him!','#fff36a');if(far.hp<=0){M.best=M.best||{};M.best.snipe=far.name;}}else feed('Steve: missed by a mile','#9aa0b0');},900);}}}
+  if(M.fly>0&&Math.random()<dt*.6){const tr=M.trees.find(q=>dist(q,me)<7);if(tr){M.fly=0;M.flyCD=3;M.fx.push({t:'boom',x1:me.x,y1:me.y,life:.5});feed(pick(['Steve flew straight into a tree 🌲','BONK. Tree.','Steve: who put that tree there']),'#ffb060');M.best=M.best||{};M.best.tree=1;beep(140,.15,'sawtooth',.05);M.view3d={style:'low',p:me,t:0,replay:true,a0:rnd(0,6)};}}
   if(target){me.fire-=dt;if(me.fire<=0){me.fire=.55;M.flashT=.05;M.kick=5;M.fx.push({t:'shot',x1:me.x,y1:me.y,x2:target.x,y2:target.y,life:.06,c:'#fff36a'});if(Math.random()<(.45+.4*run.flow/100+run.king/500-(run.tired?.1:0)+(run.buffs.some(b=>b.k==='conf')?.12:0)+(run.up.tv?.08:0))*h)hitEnemy(target,GUNS[M.gun].d*.85,me);}}
   if(Math.random()<dt*.15*h){const hid=M.enemies.find(e=>e.hidden&&dist(e,me)<60);if(hid){hid.hidden=false;feed(`Steve spotted ${hid.name} in a bush`,'#fff36a');}}
   if(!M.way&&!foes.length){const r=M.rares.find(q=>!q.taken&&dist(q,me)<110);if(r&&Math.random()<dt*.5)M.way={x:r.x,y:r.y,rare:r};}
@@ -879,7 +888,7 @@ function updateBR(dt){
    if(M.t>M.T*.45||Math.hypot(e.home.x-s.cx,e.home.y-s.cy)>s.to*.8){e.home={x:s.cx+rnd(-s.to*.5,s.to*.5),y:s.cy+rnd(-s.to*.5,s.to*.5)};}}}
  for(const e of [...M.enemies])if(e.hp<=0){M.enemies.splice(M.enemies.indexOf(e),1);const k=e.by||{name:'The storm'};M.fx.push({t:'boom',x1:e.x,y1:e.y,life:.5});
   feed(`${k.name} eliminated ${e.name}`,k.me?'#fff36a':k.simba?'#ffb060':'#fff');
-  if(k.me){M.view3d={style:pick(['orbit','low','high','orbit']),p:{x:e.x,y:e.y},t:0,replay:true,a0:rnd(0,6)};M.last3d=M.t;M.kills++;run.kills++;M.roll++;king(.6);addFun(3);run.flow=Math.min(100,run.flow+6);beep(990,.05);setTimeout(()=>beep(1320,.06),60);if(M.roll===3)big('ON A ROLL!','#ffd25a');}
+  if(k.me){M.best=M.best||{};M.best.kill=(M.best.kill||0)+1;if(dist(e,me)>95)M.best.snipe=e.name;M.view3d={style:pick(['orbit','low','high','orbit']),p:{x:e.x,y:e.y},t:0,replay:true,a0:rnd(0,6)};M.last3d=M.t;M.kills++;run.kills++;M.roll++;king(.6);addFun(3);run.flow=Math.min(100,run.flow+6);beep(990,.05);setTimeout(()=>beep(1320,.06),60);if(M.roll===3)big('ON A ROLL!','#ffd25a');}
   else if(k.simba){run.simbaKills++;addFun(10,'SIMBA GOT A KILL?!');big('SIMBA GOT A KILL','#ffb060',2.5);}
   else if(k.name==='Mom'){feed('Mom: did I do that?? :D','#c99ae8');addFun(4,'Mom got a kill');}}
  // the rest of the lobby fights each other off screen
@@ -948,11 +957,12 @@ function shootAt(e,h,in3d){const me=M.squad[0];M.fx.push({t:'shot',x1:me.x,y1:me
 function endMatch(win,why){
  M.ended=true;M.win=win;M.place=win?1:Math.max(2,M.players);M.endT=3;M.view3d=null;
  if(win){run.wins++;king(7);addFun(22,'VICTORY');addMood(-4);M.confetti=Array.from({length:70},()=>({x:rnd(0,TW),y:rnd(-TH,0),v:rnd(20,50),c:pick(['#ffd25a','#ff5a7a','#5ab0ff','#7fe0a0'])}));[660,880,1320].forEach((f,i)=>setTimeout(()=>beep(f,.12),i*120));}
- else if(M.place<=5)addFun(4,'Top 5');else addFun(-5,'Early exit');}
+ else if(M.place<=5)addFun(4,'Top 5');else{addFun(-5,'Early exit');if(M.place>20)crownDip(2,'Out early');}}
 function startLobby(){
- run.phase='lobby';run.lobbyT=60;run.afk=false;run.partyWait=0;run.partyWarned=false;const won=M.win,place=M.place,k=M.kills,pw=M.power;M=lobbyScene();
+ run.phase='lobby';run.lobbyT=60;run.afk=false;run.partyWait=0;run.partyWarned=false;const won=M.win,place=M.place,k=M.kills,pw=M.power,bst=M.best||{};
+ if(!pw)run.recap={win:won,place,kills:k,crown:Math.round((run.king-(run.k0||run.king))*10)/10,best:bst.snipe?`Sniped ${bst.snipe}`:bst.kill>=3?`${bst.kill}-kill game`:bst.tree?'Flew into a tree (iconic)':M.fished?`Fished ${M.fished} time${M.fished>1?'s':''}`:k?'Got on the board':'Survived the bus ride',life:9};M=lobbyScene();
  if(pw){big('POWER OUT','#ff7070',3);return;}
- big(won?'#1 VICTORY ROYALE!':'Placed #'+place,won?'#ffd25a':'#fff',3);feed(`Last match: ${k} elims`,'#9aa0b0');
+feed(`Last match: ${k} elims`,'#9aa0b0');
  toast('PREP PHASE: the clock is stopped. Ready up when you are.','#7fe0a0');}
 function endLobby(){
  const k=run.match;let biz=0,fam=0;
@@ -965,7 +975,7 @@ function update(dt){
  if(run.phase!=='lobby'||!run.power){const before=hourNow();run.clock+=dt*2;nightTick(before,dt);}
  for(const t of [...run.timers]){t.d-=dt;if(t.d<=0){run.timers.splice(run.timers.indexOf(t),1);t.fn();}}
  const prog=Math.min(1,run.clock/600);
- run.nextText-=dt;if(run.nextText<=0){run.nextText=(rnd(50,190))*(run.easy?1.4:1)*(run.up.dnd?1.5:1)*(isNight()?2:1);if(run.inbox.length<8)textEvent();}
+ run.nextText-=dt;if(run.nextText<=0){run.nextText=(rnd(90,220))*(run.easy?1.4:1)*(run.up.dnd?1.5:1)*(isNight()?2:1);if(run.inbox.length<8)textEvent();}
  run.nextReal-=dt;if(run.nextReal<=0){run.nextReal=(rnd(45,80)-prog*10)*(run.easy?1.6:1);const r=Math.random();if(isNight()){if(r<.5)weirdNoise();else burglars();}else if(r<.3)delivery();else if(r<.6)gateVisit();else if(r<.82)weirdNoise();else if(run.clock>40)burglars();}
  if(run.door){run.door.t-=dt;if(run.door.t<=0){const pk=run.door.pk;clearUrgent(run.door.it);run.door=null;
   if(pk){run.pendTries[pk]=(run.pendTries[pk]||0)+1;if(run.pendTries[pk]>=3){run.pending.splice(run.pending.indexOf(pk),1);const u=UPS.find(x=>x.id===pk);addCash(Math.round(u.price*.5));toast(`📦 Missed it 3 times. ${u.name} went back to the warehouse (50% refund).`,'#ff7070');}else{toast(`📦 Missed the delivery. They'll try again later (${run.pendTries[pk]}/3).`,'#ffb27a');run.pkgT=rnd(40,90);}}
@@ -980,10 +990,10 @@ function update(dt){
  if(g){if(g.st==='approach'){g.x-=12*dt;if(g.x<=294){g.st='climb';g.climb=[2,8,14][run.fence];}}
   else if(g.st==='climb'){g.climb-=dt;if(g.climb<=0){if(run.fence>0&&Math.random()<.35*run.fence){g.st='flee';toast('The burglars gave up on the fence','#7fe0a0');}else g.st='in';}}
   else if(g.st==='in'){g.x-=14*dt;if(run.trap>0&&g.x<=272){run.trap--;g.st='flee';run.stops++;addFun(8,'PAINT CAN TO THE FACE');big('BONK! TRAP GOT THEM','#ffd25a',2.5);beep(150,.2,'sawtooth');}if(g.x<=236){if(Math.random()<.25){g.st='steal';g.steal=7;}else{g.st='flee';toast('The burglars chickened out at the garage door','#7fe0a0');}}}
-  else if(g.st==='steal'){g.steal-=dt;if(g.steal<=0){g.st='flee';const took=Math.round(run.cash*.12);run.cash-=took;toast(`😠 Burglars got inside and took $${took}`,'#ff7070');const owned=Object.keys(run.up).filter(k=>run.up[k]&&!['assistant'].includes(k));if(owned.length&&Math.random()<.4){const k=pick(owned);delete run.up[k];const u=UPS.find(x=>x.id===k);toast(`...and swiped your ${u?u.name:k}. You can buy it again.`,'#ff7070');}}}
+  else if(g.st==='steal'){g.steal-=dt;if(g.steal<=0){g.st='flee';const took=Math.round(run.cash*.12);run.cash-=took;crownDip(3,'Robbed');toast(`😠 Burglars got inside and took $${took}`,'#ff7070');const owned=Object.keys(run.up).filter(k=>run.up[k]&&!['assistant'].includes(k));if(owned.length&&Math.random()<.4){const k=pick(owned);delete run.up[k];const u=UPS.find(x=>x.id===k);toast(`...and swiped your ${u?u.name:k}. You can buy it again.`,'#ff7070');}}}
   else if(g.st==='flee'){g.x+=40*dt;if(g.x>470){if(g.it)clearUrgent(g.it);run.burglars=null;}}
   if(run.burglars&&g.st!=='flee'&&run.steve.x>=SPOT.bench&&!(inMatch()&&!run.afk))scare();}
- stoveUpdate(dt);if(run.cuFx){run.cuFx.t-=dt;if(run.cuFx.t<=0)run.cuFx=null;}
+ stoveUpdate(dt);if(run.potCD>0)run.potCD-=dt;needsTick(dt);if(run.cuFx){run.cuFx.t-=dt;if(run.cuFx.t<=0)run.cuFx=null;}
  {const tgt=clamp(run.steve.x-150,0,HWW-320);if(panHold>0)panHold-=dt;else camX+=(tgt-camX)*Math.min(1,dt*3);}
  taskUpdate(dt);simbaUpdate(dt);familyUpdate(dt);
  const st=run.steve;if(st.target!=null){st.x+=clamp(st.target-st.x,-120*dt,120*dt);if(Math.abs(st.target-st.x)<.5){st.x=st.target;st.target=null;const f=st.onArrive;st.onArrive=null;f&&f();}}
@@ -1234,7 +1244,8 @@ function drawHouse(){
   // kid
   const k=run.kid,kx=Math.round(k.x);if(!art('kid',kx+2,FLOOR)){R(kx,FLOOR-12,5,7,'#e8c33a');R(kx,FLOOR-17,5,5,'#e8b890');R(kx,FLOOR-18,5,2,'#e0c070');R(kx,FLOOR-5,2,5,'#333');R(kx+3,FLOOR-5,2,5,'#333');}
   const x=Math.round(run.steve.x);
-  if(x===SPOT.couch&&!run.afk&&art('steve_couch',x,214)){}
+  if(run.bath){}
+  else if(x===SPOT.couch&&!run.afk&&art('steve_couch',x,214)){}
   else if(x===SPOT.couch&&!run.afk){R(x-4,201,10,12,'#55613a');R(x-2,203,3,3,'#7a8250');R(x-3,193,9,9,'#d9a880');R(x-3,192,9,3,'#5a3e28');R(x+2,196,1,1,'#111');R(x+5,208,8,4,'#222');
    if(view||run.call&&run.call.live){R(x+6,198,3,5,'#222');R(x+7,199,1,3,'#7ac4ff');}}
   else if(!art('steve_walk',x,FLOOR,run.steve.target!=null&&run.steve.target<x))guy(x-3,FLOOR-12,'#55613a',{walk:run.steve.target!=null,t,camo:true,skin:'#d9a880'});
@@ -1286,6 +1297,7 @@ function Q(x,y,w,h,c){cx.fillStyle=c;cx.fillRect(Math.round(x),Math.round(y),Mat
 function cuFocus(){
  if(!run)return {k:'idle',t:'CLOSE-UP'};
  const g=run.burglars;if(g)return {k:'burglars',t:g.st==='flee'?'🏃 THEY\'RE RUNNING':'🚨 BURGLARS IN THE YARD',urgent:g.st!=='flee'};
+ if(run.bath)return {k:'bath',t:'● REC  CAM 6 · BATHROOM'};
  if(run.stove.st==='boiling'||run.stove.st==='burning')return {k:'stove',t:run.stove.st==='burning'?'🔥 THE KITCHEN IS SMOKING':'🍲 POT BOILING OVER',urgent:true};
  if(run.gate)return {k:'gate',t:'🚗 '+run.gate.who+' AT THE GATE',urgent:true};
  if(run.door)return {k:'door',t:'📦 DELIVERY AT THE FRONT DOOR',urgent:true};
@@ -1349,6 +1361,10 @@ function drawCU(){
   if(s.st==='sleep'){Q(30,66,80,18,tan);Q(96,56,26,22,tan);Q(100,50,6,10,dk);Q(114,50,6,10,dk);Q(116,64,6,4,'#222');Q(92,62,8,8,'#c4a8e0');Q(40,20,60,28,'#fff');Q(46,26,20,6,'#e8dcc0');Q(72,24,22,12,'#f4f1e8');cx.fillStyle='#555';cx.font='8px monospace';cx.fillText('z Z',120,40);}
   else{const w=Math.floor(t*10)%2;Q(40,50,64,26,tan);Q(44,76,6,10,tan);Q(56,76,6,10,tan);Q(84,76,6,10,tan);Q(96,76,6,10,tan);Q(96,30,28,26,tan);Q(98,16,6,16,dk);Q(116,16,6,16,dk);Q(118,40,8,8,'#3a2a1a');Q(122,40,3,3,'#111');Q(92,48,8,14,'#c4a8e0');Q(94,56,4,4,'#bfe64a');Q(30,44-w*4,12,5,tan);
    if(run.lamb.st==='simba'){Q(120,46,22,12,'#f4f1e8');Q(136,40,10,10,'#f4f1e8');Q(142,44,2,2,'#222');Q(140,50,4,2,'#e23b3b');}}
+ }else if(k==='bath'){Q(0,0,160,110,'#cfe4ec');for(let x=0;x<160;x+=10)for(let y=0;y<80;y+=10)Q(x+1,y+1,8,8,(x+y)%20?'#bcd4dc':'#c8dce4');Q(0,80,160,30,'#9aa8b0');
+  Q(54,14,52,76,'#8a6a4a');Q(58,18,44,68,'#a07a5a');Q(94,50,4,4,'#d9c27a');Q(62,22,36,12,'#fff');cx.fillStyle='#a02020';cx.font='7px monospace';cx.fillText('OCCUPIED',63,31);
+  if(Math.floor(t*1.5)%2)for(let i=0;i<3;i++)Q(108+i*6,60-((t*12+i*8)%30),3,3,'rgba(255,255,255,.7)');
+  if(run.simba.st!=='sleep'){const sx=20+Math.sin(t*2)*3;Q(sx,70,24,10,'#c98f4e');Q(sx+18,62,9,9,'#c98f4e');Q(sx+18,56,2,6,'#8a5a2e');Q(sx+24,56,2,6,'#8a5a2e');cx.fillStyle='#333';cx.fillText('sniff',sx+2,58);}
  }else if(k==='steve'){Q(0,0,160,110,'#e4ddd0');Q(0,86,160,24,'#7a7c80');Q(100,20,56,36,'#111');Q(102,22,52,32,inMatch()?'#3a8bd6':'#2a2350');Q(102,44,52,10,'#5fbf4a');
   Q(10,60,80,28,'#c79a5e');Q(6,48,14,40,'#b98a52');Q(36,36,28,30,'#55613a');Q(40,42,8,6,'#7a8250');Q(38,14,24,24,'#d9a880');Q(38,12,24,8,'#5a3e28');Q(56,22,3,3,'#111');Q(40,30,20,6,'#8c8577');
   if(view||run.call&&run.call.live){Q(60,30,8,14,'#222');Q(61,32,6,9,'#7ac4ff');}else{Q(56,52,26,8,'#222');Q(60,54,3,3,'#2a2');}
@@ -1565,6 +1581,11 @@ function drawHUD(){
   if(M.ended&&!M.power)txt(M.win?'#1 VICTORY ROYALE!':`ELIMINATED · #${M.place}`,L+W2/2,T+H2/2,M.win?'#ffd25a':'#ff7070',18,'center');}
  M.feed.forEach((f,i)=>txt(f.t,L+W2-10,T+(M.phase==='lobby'?100:56)+i*15,f.c,7,'right'));
  M.msgs.forEach((m,i)=>txt(m.t,L+W2/2,T+H2/2-26+i*28,m.c,15,'center'));
+ if(run.recap&&run.phase==='lobby'){const rc=run.recap;rc.life-=1/60;if(rc.life<=0)run.recap=null;else{const a=Math.min(1,rc.life/1,(9-rc.life)*3),cw=320,ch=150,cx=L+W2/2-cw/2,cy=T+46;ctx.globalAlpha=a;ctx.fillStyle='rgba(10,12,20,.92)';ctx.fillRect(cx,cy,cw,ch);ctx.strokeStyle=rc.win?'#ffd25a':'#5a6690';ctx.lineWidth=3;ctx.strokeRect(cx,cy,cw,ch);
+  txt(rc.win?'#1 VICTORY ROYALE':'MATCH RECAP · #'+rc.place,cx+cw/2,cy+24,rc.win?'#ffd25a':'#fff',11,'center');
+  txt(`☠ ${rc.kills} elims`,cx+20,cy+56,'#fff36a',9);txt(`👑 ${rc.crown>=0?'+':''}${rc.crown}`,cx+cw-20,cy+56,rc.crown>=0?'#ffc23a':'#ff7070',9,'right');
+  txt('BEST MOMENT',cx+cw/2,cy+86,'#9aa0b0',7,'center');txt(rc.best,cx+cw/2,cy+106,'#7fe0a0',9,'center');
+  txt(`👑 KING OF FORTNITE ${Math.floor(run.king)}%`,cx+cw/2,cy+136,'#ffc23a',7,'center');ctx.globalAlpha=1;}}
  if(run.tvMsg){const tm=run.tvMsg,str=`📺 MESSAGE FROM ${tm.from.toUpperCase()}: ${tm.t}`;ctx.font=`8px ${FONT}`;const w=ctx.measureText(str).width+20;ctx.fillStyle='rgba(10,20,40,.9)';ctx.fillRect(L+W2/2-w/2,T+H2-46,w,22);ctx.strokeStyle='#5ab0ff';ctx.strokeRect(L+W2/2-w/2,T+H2-46,w,22);txt(str,L+W2/2,T+H2-30,'#cfe9ff',8,'center');}
  const my=(TY+TH+7)*SC;ctx.fillStyle='rgba(12,14,20,.92)';ctx.fillRect(0,my-4,960,34);
  {const kx=(TX+60)*SC,kw=(TW-120)*SC,ky=TY*SC-14;ctx.fillStyle='#000';ctx.fillRect(kx-2,ky-2,kw+4,10);ctx.fillStyle='#3a2a10';ctx.fillRect(kx,ky,kw,6);ctx.fillStyle=run.king>=100?'#fff':'#ffc23a';ctx.fillRect(kx,ky,kw*run.king/100,6);txt(`👑 KING OF FORTNITE ${Math.floor(run.king)}%`,kx+kw/2,ky+16,'#ffd25a',7,'center');}
@@ -1573,10 +1594,10 @@ function drawHUD(){
  txt('LOT',224,my+14,'#fff',7);bar(252,my+7,70,8,run.lot/100,run.lot>40?'#5ab0ff':'#e23b3b');
  txt('WIFE',332,my+14,'#fff',7);bar(370,my+7,70,8,run.wife.mood/100,run.wife.mood>50?'#ff9ac0':run.wife.mood>25?'#f0b43c':'#e23b3b');
  txt('❤'.repeat(Math.max(0,run.hearts))+'♡'.repeat(Math.max(0,3-run.hearts)),452,my+15,'#ff5a7a',9);
- txt(clockStr()+(run.phase==='lobby'?'⏸':''),498,my+14,isNight()?'#b0a0ff':'#cfd3dd',7);if(run.buffs.some(b=>b.k==='conf'))txt('😎',560,my+15,'#fff',9);
+ txt(clockStr()+(run.phase==='lobby'?'⏸':''),498,my+14,isNight()?'#b0a0ff':'#cfd3dd',7);if(run.buffs.some(b=>b.k==='conf'))txt('😎',560,my+15,'#fff',9);if(run.bladder>70&&!run.bath)txt(run.bladder>100?'🚽!':'🚽',540,my+15,run.bladder>100?'#ff8b8b':'#cfd3dd',8);
  if(inMatch()){if(run.afk||run.steve.x!==SPOT.couch)btn('BACK TO GAME',580,my+1,170,22,'#2f8f50',()=>{if(run.task)return toast('Finish the job first','#ff8b8b');boardOpen=false;sendHome();});
-  else{btn('GET UP (AFK) -1❤',580,my+1,170,22,'#c06a1c',goAFK);}}
- else if(run.phase==='lobby'&&run.power){btn('SHOP',666,my+1,60,22,'#3a7bd5',openShop);btn('READY ▶',734,my+1,96,22,'#2f8f50',()=>endLobby());if(!run.party.includes('Randoms'))btn('FIND SQUAD',580,my+1,80,22,'#7a4ab0',()=>{joinParty('Randoms');feed('Taco: sup. Dano: hey','#ffb27a');});}
+  else{btn('GET UP (AFK) -1❤',580,my+1,170,22,'#c06a1c',goAFK);btn('🍕 SNACK',760,my+1,90,22,'#7a4ab0',()=>{goAFK();snackRun();});}}
+ else if(run.phase==='lobby'&&run.power){btn('SHOP',666,my+1,60,22,'#3a7bd5',openShop);btn('🍕',840,my+1,40,22,'#c06a1c',snackRun);btn('READY ▶',734,my+1,96,22,'#2f8f50',()=>endLobby());if(!run.party.includes('Randoms'))btn('FIND SQUAD',580,my+1,80,22,'#7a4ab0',()=>{joinParty('Randoms');feed('Taco: sup. Dano: hey','#ffb27a');});}
  const H=(s,x,y,c='#ffd25a')=>{const q=(x-camX)*SC;if(q>-40&&q<1000)txt(s,q,y*SC,c,7,'center');};
  const jobs=run.board.filter(j=>!j.done).length;if(jobs)H(`${jobs} jobs`,218+GX,154,'#3a3a5a');
  const vms=run.inbox.filter(x=>x.kind==='vm').length;if(vms)H(`📼${vms}`,143,210);
@@ -1634,7 +1655,8 @@ cv.addEventListener('pointerdown',e=>{
  if(l.st==='floor'&&Math.hypot(wx0-l.x,p.by-(l.y-2))<11&&s.st!=='sleep'){l.st='drag';run.drag=true;return;}
  if(Math.abs(wx0-(s.x+12))<16&&p.by>s.y-26&&p.by<s.y+6&&wx0<152){simbaClick();return;}
  const bx=wx0,by=p.by,w=run.wife,gx=wx0-GX;
- if(bx>174&&bx<198&&by>194&&by<220){walkTo('stove',fixStove);return;}
+ if(bx>174&&bx<198&&by>194&&by<220){if(run.stove.st==='boiling'||run.stove.st==='burning')walkTo('stove',fixStove);else snackRun();return;}
+ if(bx>200&&bx<222&&by>176&&by<234){snackRun();return;}
  if(bx>20&&bx<64&&by>200&&by<232&&run.steve.x!==SPOT.couch&&!run.task){boardOpen=false;run.steve.target=SPOT.couch;run.steve.onArrive=()=>{run.afk=false;};return;}
  if(bx>24&&bx<76&&by>204&&by<232&&run.drool.some(d=>!d.tv)){run.drool=run.drool.filter(d=>d.tv);toast('🧻 Wiped up the drool','#cfe9ff');jingle(1);return;}
  if(Math.abs(bx-(w.x+3))<7&&by>FLOOR-26){if(!run.power){walkTo(w.x,tryPower)||(!inMatch()&&tryPower());}else toast(w.mood>60?'Wife: "Go win one for me 😘"':w.mood>30?'Wife: "Mm-hm."':'Wife: "Don\'t."','#ff9ac0');return;}
