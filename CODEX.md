@@ -15,7 +15,7 @@ This folder is a fork of the game. `frozen/steves-day-off-v1.html` is the locked
 
 ## Characters and references
 
-- **Simba**: tan pit/shepherd mix (#c98f4e), big upright ears with darker inner color, black muzzle, lilac woven collar with a lime-green buckle. Reference photos are in the conversation that produced this game; the owner can supply them.
+- **Simba**: tan pit/shepherd mix (#c98f4e), big upright ears with darker inner color, black muzzle, lilac woven collar with a lime-green buckle. Reference photos are in `ref/` (local only, not committed): Simba in her holiday hoodie, lying on the rug, sitting and begging, and from behind showing the collar; the garage lot with the chain-link fence; and a photo outside the lot. Use them for colors and proportions only. Do not draw real people's faces from the photos.
 - **Steve**: olive camo hoodie, short brown hair, light beard. Holds a game controller on the couch.
 - **Wife**: pink hair in a bun, patterned glasses, denim overalls.
 - **Kid**: yellow shirt, blond hair.
