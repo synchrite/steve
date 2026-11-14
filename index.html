@@ -80,7 +80,7 @@ canvas{width:100%;display:block;image-rendering:pixelated;border:4px solid #000;
 .sbar button{font:inherit;font-size:8px;background:#222;color:#fff;border:2px solid #444;padding:2px 6px;cursor:pointer}
 @media(max-width:700px){#phone{height:440px!important;width:220px!important}#cuWrap{width:42%}}
 </style></head><body>
-<header><h1>STEVE'S DAY OFF</h1><div><button id="mute">SOUND: ON</button></div></header>
+<header><h1>STEVE'S DAY OFF</h1><div><button id="gfx">GRAPHICS: 16-BIT</button> <button id="mute">SOUND: ON</button></div></header>
 <div id="game">
  <div id="stage"><canvas id="c" width="960" height="720"></canvas><div id="ov"></div></div>
  <div id="side">
@@ -1558,7 +1558,11 @@ const ART={};ART_LIST.forEach(n=>{const im=new Image();im.onload=()=>{ART[n]=im;
 // 16-bit art is authored at 2x the buffer scale. It is queued here and drawn on the sharp main canvas
 // right after the buffer, so each art pixel is 1.5 screen pixels instead of 3 (twice the detail).
 const ART_Q=[];
-function art(n,x,y,flip){const im=ART[n];if(!im)return false;const t=b.getTransform(),clip=b._clip||null;ART_Q.push({im,x:x+t.e,y:y+t.f,flip,clip:clipNow()});return true;}
+// graphics mode: CLASSIC = the original blocky pixel art, 16-BIT = Codex's sprites where they exist
+let GFX='16';try{GFX=localStorage.getItem('steveGfx')||'16';}catch(e){}
+function setGfx(m){GFX=m;try{localStorage.setItem('steveGfx',m);}catch(e){}$('gfx').textContent='GRAPHICS: '+(m==='16'?'16-BIT':'CLASSIC');}
+$('gfx').onclick=()=>setGfx(GFX==='16'?'classic':'16');setGfx(GFX);
+function art(n,x,y,flip){if(GFX!=='16')return false;const im=ART[n];if(!im)return false;const t=b.getTransform(),clip=b._clip||null;ART_Q.push({im,x:x+t.e,y:y+t.f,flip,clip:clipNow()});return true;}
 function clipNow(){return {y0:HY-12};}
 function flushArt(){const k=SC/2;for(const a of ART_Q){const w=a.im.naturalWidth*k,h=a.im.naturalHeight*k,px=a.x*SC,py=a.y*SC;ctx.save();ctx.beginPath();ctx.rect(0,a.clip.y0*SC,cv.width,720);ctx.clip();if(a.flip){ctx.translate(Math.round(px),0);ctx.scale(-1,1);ctx.drawImage(a.im,Math.round(-w/2),Math.round(py-h),w,h);}else ctx.drawImage(a.im,Math.round(px-w/2),Math.round(py-h),w,h);ctx.restore();}ART_Q.length=0;}
 
