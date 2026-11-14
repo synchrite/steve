@@ -47,10 +47,10 @@ canvas{width:100%;display:block;image-rendering:pixelated;border:4px solid #000;
 .thread .who{background:#1b2030;padding:8px;font-size:9px;border-bottom:3px solid #2c3550;display:flex;justify-content:space-between;align-items:center}
 .thread .who button{font:inherit;font-size:7px;background:#333b55;color:#fff;border:2px solid #000;padding:4px 6px;cursor:pointer}
 .bub{max-width:85%;padding:8px;margin:8px 6px;font-size:9px;line-height:1.7;border:3px solid #000}
-.bub.them{background:#2c3140;align-self:flex-start}.bub.me{background:#2f64b8;align-self:flex-end;min-height:34px;min-width:30%}
+.bub.them{background:#2c3140;align-self:flex-start}.bub .photo{width:110px;height:76px;background:linear-gradient(#5a6a80,#3a4558);border:3px solid #fff;font-size:34px;display:flex;align-items:center;justify-content:center;margin-bottom:4px;transform:rotate(-2deg)}.bub.me{background:#2f64b8;align-self:flex-end;min-height:34px;min-width:30%}
 .sugg{display:flex;gap:6px;padding:8px 6px;background:#1b2030;border-top:3px solid #2c3550;flex-wrap:wrap;margin-top:auto}
 .sugg button{font:inherit;font-size:10px;background:#3a4258;color:#fff;border:3px solid #000;padding:10px;cursor:pointer;flex:1 1 auto}
-.sugg button:hover{background:#4d5878}.sugg button.send{background:#2f8f50}.sugg button.hint{background:#2f64b8;box-shadow:0 0 0 2px #7fb2ff}.sugg .big1{flex:1 1 100%!important;font-size:11px!important;padding:12px!important;text-align:center!important}.sugg .row2,.sugg .row3{display:flex;flex-wrap:wrap;gap:4px;width:100%}.sugg .row3 button{flex:1 1 auto;font-size:8px!important;padding:7px 4px!important;background:#2a2f3e}
+.sugg button:hover{background:#4d5878}.sugg button.send{background:#2f8f50}.sugg button.hint{background:#2f64b8;box-shadow:0 0 0 2px #7fb2ff}.sugg .big1{flex:1 1 100%!important;font-size:11px!important;padding:12px!important;text-align:center!important}.sugg .row2,.sugg .row3{display:grid;gap:4px;width:100%}.sugg .row2{grid-template-columns:repeat(3,1fr)}.sugg .row3{grid-template-columns:1fr 1fr 1fr 2fr 1fr 1fr}.sugg .row2 button,.sugg .row3 button{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-height:28px}.sugg .big1{min-height:40px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sugg{flex-shrink:0}.sugg .row3 button{flex:1 1 auto;font-size:8px!important;padding:7px 4px!important;background:#2a2f3e}
 .log{flex:1;overflow-y:auto;display:flex;flex-direction:column;padding-bottom:6px}.rcpt{align-self:flex-end;font-size:6px;color:#8a90a0;margin:-4px 8px 4px}
 .bub.draft{opacity:.85;border-style:dashed}.dots{display:flex;gap:4px;width:52px}.dots i{width:6px;height:6px;background:#9aa0b0;display:block;animation:dot 1s infinite}.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}@keyframes dot{0%,100%{opacity:.2}50%{opacity:1}}.sugg button.undo{background:#555;flex:0 0 auto}
 .ring{text-align:center;padding:20px 6px}
@@ -63,7 +63,7 @@ canvas{width:100%;display:block;image-rendering:pixelated;border:4px solid #000;
 #game{display:block!important;max-width:1500px}
 #stage{max-width:calc((100vh - 64px)*4/3);margin:0 auto;overflow:hidden}
 #side,#tabs{display:none!important}
-#phone{position:absolute!important;left:8px;right:auto!important;top:200px;bottom:auto!important;height:min(520px,calc(100% - 216px))!important;aspect-ratio:9/18;width:auto!important;max-width:44%;z-index:5;transition:transform .25s ease;display:flex!important}
+#phone{position:absolute!important;left:8px;right:auto!important;top:200px;bottom:auto!important;height:500px!important;width:250px!important;aspect-ratio:auto;max-width:none;z-index:5;transition:transform .25s ease;display:flex!important}
 #phone.min{transform:translateX(calc(-100% - 24px))}
 #cuWrap{position:absolute;left:8px;top:8px;width:min(220px,26%);z-index:4;display:flex!important;padding:4px!important;gap:3px!important;border-width:3px!important}
 #fpsWrap{position:absolute;inset:0;z-index:6;display:none;background:#000}#fps{width:100%;height:100%;display:block;image-rendering:pixelated;cursor:crosshair;touch-action:none}
@@ -78,7 +78,7 @@ canvas{width:100%;display:block;image-rendering:pixelated;border:4px solid #000;
 #pill{position:absolute;left:10px;top:200px;z-index:6;font:inherit;font-size:9px;background:#0a0a0d;color:#fff;border:3px solid #3b3e48;border-radius:16px;padding:8px 12px;cursor:pointer}
 #pill.hide{display:none}#pill.alert{border-color:#e23b3b;animation:buzz .5s infinite}
 .sbar button{font:inherit;font-size:8px;background:#222;color:#fff;border:2px solid #444;padding:2px 6px;cursor:pointer}
-@media(max-width:700px){#phone{max-width:70%}#cuWrap{width:42%}}
+@media(max-width:700px){#phone{height:440px!important;width:220px!important}#cuWrap{width:42%}}
 </style></head><body>
 <header><h1>STEVE'S DAY OFF</h1><div><button id="mute">SOUND: ON</button></div></header>
 <div id="game">
@@ -184,7 +184,7 @@ function newRun(){
   wife:{x:SPOT.kitchen,st:'craft',t:8,tx:SPOT.craft,mood:80,job:null,cookieT:40,warned:false},
   kid:{x:100,st:'wander',t:6,tx:90,job:null},
   simba:{x:90,y:FLOOR,st:'roam',t:10,tx:80,tired:0,pat:0,max:1,wig:0,tug:50,face:1},
-  lamb:{x:60,y:FLOOR,st:'simba',vx:0,vy:0},drag:false,party:[],partyWait:0,rel:{Wife:50,Kid:50,Mom:50,Dan:40,Dad:40,Brother:40,Sister:40,Simba:60},stove:{st:'off',t:0},deter:{lights:0,music:0,train:0}};camX=0;
+  lamb:{x:60,y:FLOOR,st:'simba',vx:0,vy:0},drag:false,threads:{},party:[],partyWait:0,rel:{Wife:50,Kid:50,Mom:50,Dan:40,Dad:40,Brother:40,Sister:40,Simba:60},stove:{st:'off',t:0},deter:{lights:0,music:0,train:0}};camX=0;
  for(let i=0;i<6;i++)run.board.push(makeJob(i));
  M=lobbyScene();
 }
@@ -249,7 +249,7 @@ function prepReplies(it){if(it.prepped)return;it.prepped=true;const base=it.repl
 window.openItem=id=>{const it=run.inbox.find(x=>x.id===id);if(!it)return;beep(900,.03,'sine',.03);
  if(it.kind==='vm'){toast('Voicemail: walk to the answering machine','#9aa0b0');return;}
  if(it.kind==='urgent'){it.onTap&&it.onTap();return;}
- prepReplies(it);view={type:'thread',openT:performance.now(),item:it,typed:[],hint:bestWords(it.replies),log:[{who:'them',t:it.msg}],stage:'compose',at:0};phoneDirty=true;};
+ prepReplies(it);const hn=relName(it.from),hist=hn&&run.threads&&run.threads[hn]?run.threads[hn].slice():[];view={type:'thread',openT:performance.now(),item:it,typed:[],hint:bestWords(it.replies),log:[...hist,{who:'them',t:it.msg}],stage:'compose',at:0};phoneDirty=true;};
 window.tapWord=i=>{beep(1200,.02,'sine',.02);if(!view||view.stage&&view.stage!=='compose')return;const {next}=options(view.type==='call'?view.replies:view.item.replies,view.typed);if(next[i]==null)return;view.typed.push(next[i]);beep(700+view.typed.length*70,.03);phoneDirty=true;};
 window.undoWord=()=>{if(view){view.typed.pop();phoneDirty=true;}};
 window.sendReply=()=>{if(!view)return;const v=view;const {complete}=options(v.type==='call'?v.replies:v.item.replies,v.typed);if(!complete)return;beep(990,.05);
@@ -259,7 +259,8 @@ window.sendReply=()=>{if(!view)return;const v=view;const {complete}=options(v.ty
  if(['k','yes','no'].includes(complete[0])&&!it.fam&&it.kind==='text'&&Math.random()<(complete[0]==='no'?.8:.35)){v.fail=true;}
  const k=run.inbox.indexOf(it);if(k>=0)run.inbox.splice(k,1);v.log.push({who:'me',t:complete[0]});say('💬 *texting* '+complete[0],2.5);v.result=complete;v.typed=[];v.stage='sent';v.at=0;phoneDirty=true;};
 window.closeView=()=>{if(view&&view.type==='thread'&&view.stage!=='compose'&&view.stage!=='done'){finishThread(view);}view=null;phoneDirty=true;};
-function finishThread(v){if(v.applied)return;v.applied=true;if(v.snooze)return;let [txt,sc]=v.result;if(v.fail){sc=-1;king(-1);}else if(!v.predict){if(sc>=2){king(2.4);jingle(2);}else if(sc===1){king(.8);jingle(1);}}if(!v.predict){rel(relName(v.item.from),sc>0?3:sc<0?-3:1);if(sc>=2&&v.openT&&performance.now()-v.openT<12000)confident();}v.item.onReply&&!v.fail?0:0;v.item.onReply&&v.item.onReply(sc,txt);v.after&&v.after();}
+function keepThread(v){const n=relName(v.item.from);if(!n||n==='Simba'||!run.threads)return;run.threads[n]=v.log.filter(m=>!/^\(new message/.test(m.t)).slice(-30);}
+function finishThread(v){if(v.applied)return;v.applied=true;setTimeout(()=>keepThread(v),2600);if(v.snooze)return;let [txt,sc]=v.result;if(v.fail){sc=-1;king(-1);}else if(!v.predict){if(sc>=2){king(2.4);jingle(2);}else if(sc===1){king(.8);jingle(1);}}if(!v.predict){rel(relName(v.item.from),sc>0?3:sc<0?-3:1);if(sc>=2&&v.openT&&performance.now()-v.openT<12000)confident();}v.item.onReply&&!v.fail?0:0;v.item.onReply&&v.item.onReply(sc,txt);v.after&&v.after();}
 window.quickShort=w=>{if(!view||view.type!=='thread'||view.stage!=='compose')return;view.typed=[w];sendReply();};
 window.predictReply=()=>{const v=view;if(!v||v.type!=='thread'||v.stage!=='compose')return;const it=v.item,k=run.inbox.indexOf(it);if(k>=0)run.inbox.splice(k,1);
  const t=pick(['I am the duck of the house','yes the potato is ducky','on my way to the moon lol','ok see you at the walrus','love you tacos','sounds good I am a car','haha yes the shoes are soup']);
@@ -284,20 +285,21 @@ function renderPhone(){
   el.innerHTML=`<div class="thread"><div class="who"><span>📊 Stats</span><button onclick="closeView()">BACK</button></div><div class="log" style="padding:4px">
   <div class="sec">RELATIONSHIPS</div>${REL_KEYS.map(k=>`<div style="display:flex;align-items:center;gap:6px;margin:6px 2px;font-size:8px"><span style="width:62px">${k}</span><span style="flex:1;height:8px;background:#222;border:2px solid #000"><i style="display:block;height:100%;width:${r[k]}%;background:${r[k]>65?'#ff9ac0':r[k]>35?'#f0b43c':'#e23b3b'}"></i></span><span style="width:52px;color:#9aa0b0;font-size:7px">${lab(r[k])}</span></div>`).join('')}
   <div class="sec">TODAY</div><div class="tx" style="padding:2px">Wins ${run.wins} · Elims ${run.kills} · Spotted ${run.spots}<br>Cars sold ${run.sales} · Jobs ${run.board.filter(j=>j.done).length}/${run.board.length}<br>Burglars stopped ${run.stops} · Simba elims ${run.simbaKills}<br>Party: ${run.party.length?run.party.join(', '):'solo'}</div></div></div>`;return;}
+ if(view&&view.type==='history'){const h=run.threads[view.name]||[];el.innerHTML=`<div class="thread"><div class="who"><span>${view.icon} ${view.name}</span><button onclick="openContacts()">BACK</button></div><div class="log" id="log">${h.map(m=>`<div class="bub ${m.who}">${/^\[photo:/.test(m.t)?`<div class="photo">🐕</div><i style="font-size:7px;opacity:.7">${m.t.slice(8,-1)}</i>`:m.t}</div>`).join('')}</div><div class="sugg"><button class="big1" onclick="window._newMsg=true;textContact(${view.i})">NEW MESSAGE</button></div></div>`;const lg=$('log');if(lg)lg.scrollTop=lg.scrollHeight;return;}
  if(view&&view.type==='contacts'){el.innerHTML=`<div class="thread"><div class="who"><span>📇 Contacts</span><button onclick="closeView()">BACK</button></div><div class="log">${CONTACTS.map((ct,i)=>`<div class="item" style="display:flex;align-items:center;gap:8px;cursor:default"><span style="font-size:18px">${ct.i}</span><span class="fr" style="flex:1;margin:0">${ct.n}${ct.n==='Dan'?' <span style="color:#7fb2ff;font-size:7px">(plays!)</span>':''}</span><button onclick="callContact(${i})" style="font:inherit;font-size:8px;background:#2f8f50;color:#fff;border:2px solid #000;padding:6px;cursor:pointer">📞</button><button onclick="textContact(${i})" style="font:inherit;font-size:8px;background:#2f64b8;color:#fff;border:2px solid #000;padding:6px;cursor:pointer">💬</button></div>`).join('')}</div></div>`;return;}
  if(view){const reps=view.type==='call'?view.replies:view.item.replies;const {next,complete}=options(reps,view.typed);
   const head=view.type==='call'?`<span>📞 ${c.from}${c.callback?' (calling back)':''}</span>`:`<span>${view.item.icon} ${view.item.from}</span><button onclick="closeView()">BACK</button>`;
   const v=view,isCall=v.type==='call',hintW=v.hint&&v.hint.slice(0,v.typed.length).join(' ')===v.typed.join(' ')?v.hint[v.typed.length]:null;
-  const bubbles=v.log.map((m,i)=>`<div class="bub ${m.who}">${isCall?(m.who==='them'?'🗣 ':'🎧 '):''}${m.t}</div>${!isCall&&m.who==='me'&&i===v.log.length-1&&v.stage!=='compose'?`<div class="rcpt">${v.stage==='sent'?'Delivered':'Read '+clockStr()}</div>`:''}`).join('');
+  const bubbles=v.log.map((m,i)=>`<div class="bub ${m.who}">${isCall?(m.who==='them'?'🗣 ':'🎧 '):''}${/^\[photo:/.test(m.t)?`<div class="photo">${m.t.includes('Simba')?'🐕':m.t.includes('cookie')?'🍪':m.t.includes('race car')?'🏎️':'🛋️'}</div><i style="font-size:7px;opacity:.7">${m.t.slice(8,-1)}</i>`:m.t}</div>${!isCall&&m.who==='me'&&i===v.log.length-1&&v.stage!=='compose'?`<div class="rcpt">${v.stage==='sent'?'Delivered':'Read '+clockStr()}</div>`:''}`).join('');
   const typingThem=(!isCall&&v.stage==='typing')||(isCall&&v.at<-1.6&&v.stage!=='bye')?'<div class="bub them dots"><i></i><i></i><i></i></div>':'';
   const composing=(isCall?v.typed.length&&v.stage!=='bye':v.stage==='compose')?`<div class="bub me draft">${v.typed.join(' ')}<span style="opacity:.5">${complete?'':' _'}</span></div>`:'';
   let foot='';
   if(isCall)foot=`<div class="sugg"><div style="font-size:7px;color:#9aa0b0;padding:6px">${v.stage==='bye'?'Call ending…':'On the call. Steve is talking.'}</div></div>`;
   else if(v.stage==='compose'){const onIdeal=v.hint&&v.hint.slice(0,v.typed.length).join(' ')===v.typed.join(' '),idealDone=onIdeal&&v.typed.length===v.hint.length;
    const main=idealDone?`<button class="send big1" onclick="sendReply()">SEND ▶</button>`:onIdeal?`<button class="hint big1" onclick="tapWord(${next.indexOf(hintW)})">${hintW} ▸</button>`:complete?`<button class="send big1" onclick="sendReply()">SEND ▶</button>`:`<button class="big1" onclick="undoWord()">⌫ back on track</button>`;
-   const others=next.filter(w=>w!==hintW||!onIdeal).map(w=>`<button onclick="tapWord(${next.indexOf(w)})">${w}</button>`).join('');
-   foot=`<div class="sugg">${main}<div class="row2">${others}${!idealDone&&complete&&onIdeal?'':''}</div><div class="row3">${['k','yes','no'].map(w=>`<button onclick="quickShort('${w}')">${w}</button>`).join('')}<button onclick="quickShort('gimme a sec')">gimme a sec</button><button title="predictive text" onclick="predictReply()">🔮</button>${v.typed.length?'<button onclick="undoWord()">⌫</button>':''}</div></div>`;}
-  else foot=`<div class="sugg"><div style="font-size:7px;color:#9aa0b0;padding:6px">${v.stage==='done'?'Conversation over.':'Waiting for a reply…'}</div></div>`;
+   const ow=next.filter(w=>w!==hintW||!onIdeal).slice(0,3);while(ow.length<3)ow.push(null);const others=ow.map(w=>w?`<button onclick="tapWord(${next.indexOf(w)})">${w}</button>`:'<button disabled>&nbsp;</button>').join('');
+   foot=`<div class="sugg">${main}<div class="row2">${others}${!idealDone&&complete&&onIdeal?'':''}</div><div class="row3">${['k','yes','no'].map(w=>`<button onclick="quickShort('${w}')">${w}</button>`).join('')}<button onclick="quickShort('gimme a sec')">gimme a sec</button><button title="predictive text" onclick="predictReply()">🔮</button><button ${v.typed.length?'':'disabled'} onclick="undoWord()">⌫</button></div></div>`;}
+  else foot=`<div class="sugg" style="min-height:126px;align-content:flex-start"><div style="font-size:7px;color:#9aa0b0;padding:6px">${v.stage==='done'?'Conversation over.':'Waiting for a reply…'}</div></div>`;
   el.innerHTML=`<div class="thread"><div class="who">${head}</div><div class="log" id="log">${bubbles}${typingThem}${composing}</div>${foot}</div>`;
   const lg=$('log');if(lg)lg.scrollTop=lg.scrollHeight;return;}
  const nb=`<div style="display:flex;gap:6px;margin-bottom:6px"><button onclick="openContacts()" style="flex:2;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📇 NEW CALL / MSG</button><button onclick="openStats()" style="flex:1;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📊 STATS</button></div>`;
@@ -309,7 +311,7 @@ function renderPhone(){
  el.innerHTML=nb+snz+(snoozedN?`<div class="sec">😴 ${snoozedN} WAITING ON "GIMME A SEC"</div>`:'')+(urgent.length?'<div class="sec">HAPPENING NOW</div>'+urgent.map(row).join(''):'')+(texts.length?'<div class="sec">MESSAGES</div>'+texts.map(row).join(''):'')+(vms.length?'<div class="sec">ANSWERING MACHINE · '+vms.length+' NEW</div>'+vms.map(row).join(''):'');
 }
 window.snoozeAll=()=>{if(!run)return;run.snoozed=run.match+':'+run.phase;let fam=0;run.inbox.forEach(x=>{if(x.due!=null){x.due=Math.max(x.due,dueNow())+1;if(x.fam)fam++;}});if(fam)addMood(-2*fam,'Snoozed family');toast('😴 Everything snoozed until the next break','#b0a0ff');phoneDirty=true;};
-function dockPhone(){const w=$('cuWrap'),ph=$('phone'),pl=$('pill');const y=w.offsetTop+w.offsetHeight+8;ph.style.top=y+'px';ph.style.height=`min(520px, calc(100% - ${y+8}px))`;ph.style.left=w.offsetLeft+'px';pl.style.top=y+'px';pl.style.left=(w.offsetLeft+2)+'px';}
+function dockPhone(){const w=$('cuWrap'),ph=$('phone'),pl=$('pill');const y=w.offsetTop+w.offsetHeight+8;ph.style.top=y+'px';ph.style.left=w.offsetLeft+'px';pl.style.top=y+'px';pl.style.left=(w.offsetLeft+2)+'px';}
 function phoneTick(){dockPhone();if(!run){setPhone(false);return;}
  {const ringing=run.call&&!run.call.live;if(view||(run.call&&run.call.live)||(ringing&&(run.ringer||'ring')==='ring')){if(!phoneOpen)setPhone(true);}else if(phoneOpen&&!run.inbox.some(x=>!(x.snoozeT>0))&&!ringing)setPhone(false);
   const pl=$('pill'),n=run.inbox.length;pl.textContent=ringing?'📞 '+run.call.from:'📱'+(n?' '+n:'');pl.classList.toggle('alert',!!ringing||run.inbox.some(x=>x.urgent));}
@@ -338,7 +340,7 @@ window.openContacts=()=>{view={type:'contacts'};phoneDirty=true;};
 window.callContact=i=>{if(run.call)return;const ct=CONTACTS[i];const c={from:ct.n,icon:ct.i,lines:ct.lines,step:0,score:0,live:true,outgoing:true,
   onDone:s=>{rel(ct.n,4);if(ct.n==='Dan')danJoins();else if(ct.n==='Mom')joinParty('Mom');else addFun(3,'Nice chat with '+ct.n);}};
  run.call=c;view={type:'call',replies:c.lines[0].r,typed:[],auto:bestWords(c.lines[0].r),at:-3.2,log:[{who:'them',t:'📞 Ringing... ringing...'},{who:'them',t:c.lines[0].q}]};phoneDirty=true;beep(440,.3,'sine');};
-window.textContact=i=>{const ct=CONTACTS[i];const msg=ct.n==='Dan'?'u on?':pick(['hey','whats up','hows it going']);
+window.textContact=i=>{const ct=CONTACTS[i];if(run.threads[ct.n]&&run.threads[ct.n].length&&!window._newMsg){view={type:'history',name:ct.n,icon:ct.i,i};phoneDirty=true;return;}window._newMsg=false;const msg=ct.n==='Dan'?'u on?':pick(['hey','whats up','hows it going']);
  view={type:'thread',item:{icon:ct.i,from:ct.n,msg:'(new message)',replies:[[msg,1]],react:()=>ct.n==='Dan'?'hopping on now!! mic might be weird':pick(['all good! the dog threw up on the rug','who is this','lol ok','did you see the game last night','im at costco'])},typed:[],hint:msg.split(' '),log:[],stage:'compose',at:0,after:()=>{if(ct.n==='Dan')later(4,danJoins);}};phoneDirty=true;};
 function joinParty(n){if(!run.party.includes(n)){run.party.push(n);toast(`${n} joined your party`,'#7fb2ff');}run.partyWait=0;}
 function danJoins(){joinParty('Dan');
@@ -360,30 +362,62 @@ const L_WIFE=[{q:'Are you seriously still playing?',r:[['last game babe',1],['la
 const L_MOM=[{q:"Steve? I'm in the game! Can you hear me?",r:[['yes mom',1],['yes mom just talk in the party',1],['k',0]]},{q:'How do I pick up the gun?',r:[['hold square',1],['just follow me',1],['brb',0]]}];
 const L_KID=[{q:'Dad. Dad. Dad. Dad.',r:[['what buddy',1],['im right here',0],['k',-1]]},{q:'Can Simba have my sandwich?',r:[['no she will drool',1],['ask mom',0],['k',-1]]}];
 
+
+// each message: what they say, the ideal reply, an okay reply, and what they say back
+const MOM_Q=[
+ {m:'How do I make the letters bigger on my phone?',i:'settings then display then text size',o:'i will show you sunday',r:['oh! it worked!','now everything is huge']},
+ {m:'Is it safe to put my phone in rice? It is not wet I just wanted to know',i:'only if it gets wet mom',o:'it is fine mom',r:['ok good, I already did it','the rice is fine too']},
+ {m:'What does LOL mean? I thought it meant lots of love',i:'it means laughing out loud',o:'it means funny',r:['oh no. I said it at a funeral','well I still mean love']},
+ {m:'Does Simba like carrots?',i:'yes she loves carrots',o:'she likes everything',r:['I am bringing a bag','good girl']},
+ {m:'Can you hear me on the Fortnight?',i:'its fortnite and yes mom',o:'yes mom',r:['ok good. Hi everyone!','I pressed something']},
+ {m:'Why does my TV say no signal?',i:'press input on the remote',o:'try turning it off and on',r:['IT WORKED','I pressed every button']},
+ {m:'Is the cloud a real cloud?',i:'no its just computers somewhere',o:'kind of',r:['so where are my pictures','ok but where']},
+];
+const KID_PICS=[
+ {m:'[photo: Simba wearing your hat]',i:'lol she looks better in it',o:'nice',r:['she wants to keep it','HAHA']},
+ {m:'[photo: Simba asleep upside down on her bed]',i:'shes dreaming about treats',o:'lol',r:['her leg is twitching','she snored']},
+ {m:'[photo: a drawing of you as a race car]',i:'i love it buddy',o:'cool drawing',r:['im putting it on the fridge','its a fast car']},
+ {m:'[photo: Simba with the lamb toy on her head]',i:'shes the lamb queen',o:'lol',r:['she did it herself','she wont let me have it']},
+ {m:'[photo: you, from behind the couch, playing]',i:'stop spying on me',o:'lol',r:['im a ninja','mom said to']},
+ {m:'[photo: mom holding a giant cookie]',i:'save me one',o:'nice',r:['too late','she said no']},
+];
+const KID_Q=[
+ {m:'dad where is the charger',i:'its on the kitchen counter',o:'ask mom',r:['found it','its not there']},
+ {m:'can i have a snack',i:'grab a cheese stick',o:'after dinner',r:['ok','can i have two']},
+ {m:'dad the wifi is broken',i:'unplug the router and plug it back in',o:'ill check after this match',r:['it works now','what is a router']},
+ {m:'simba ate my sock',i:'check the dog bed for it',o:'oh no',r:['found it. gross','she ate the other one']},
+ {m:'can i get vbucks',i:'only if you clean your room',o:'maybe later',r:['deal','its already clean (its not)']},
+];
+const WIFE_Q=[
+ {m:'Can you take the trash out?',i:'taking it out after this match',o:'yep',r:['thank you ❤️','ok']},
+ {m:'Did you call the furnace guy yet?',i:'calling him right after this',o:'not yet',r:['please do','ok']},
+ {m:'Are you still playing?? 🙄',i:'last game i promise',o:'almost done',r:['mm hm','famous last words']},
+ {m:'Can you grab milk tomorrow?',i:'yep adding it to my list',o:'sure',r:['thank you','and eggs']},
+];
+function bankText(o,b){text({...o,msg:b.m,replies:[[b.i,2],[b.o,1]],react:sc=>sc>0?pick(b.r):pick(['ok','...','k'])});}
+
 // ================= events =================
-function momSilly(){text({icon:'👵',from:'Mom',fam:true,msg:pick(['How do I make the letters bigger on my phone?','Is it safe to put my phone in rice? It is not wet I just wanted to know','What does LOL mean? I thought it meant lots of love','Does Simba like carrots?','Can you hear me on the Fortnight?','Why does my TV say no signal','Is the cloud a real cloud?']),
- replies:[['press and hold it',1],['ask dad',0],['k',0],['i will show you sunday',1],['yes mom',1]],react:sc=>pick(['ok thank you honey','that did not work','oh! I did it!','ok I will ask your father','love you'])});}
+function momSilly(){bankText({icon:'👵',from:'Mom',fam:true},pick(MOM_Q));}
 function textEvent(){
  if(Math.random()<.05){momSilly();return;}
  const r=Math.random();
  if(r>=.25&&r<.42&&run.up.spam&&Math.random()<.75){toast('🚫 Spam blocker ate a call','#9aa0b0');return;}
- if(r<.25){const car=pick(CARS),who=pick(BUYERS);text({app:'Marketplace',icon:'🛒',from:who,msg:`${pick(['Is the','hi is the','Still got the'])} ${car} still available?`,replies:R_BUYER,
+ if(r<.25){const car=pick(CARS),who=pick(BUYERS);text({app:'Marketplace',icon:'🛒',from:who,msg:`${pick(['Is the','hi is the','Still got the'])} ${car} still available?`,replies:[['yes its available come see it today',2],['yes its available',1]],react:sc=>sc>0?pick(['great, coming at 4','sweet, on my way later']):'ok',
   onReply:v=>{if(v>0){addLot(2);if(Math.random()<.6)later(rnd(10,25),()=>gateVisit(car,who));}else if(v<0)addLot(-2,'Lost a buyer');}});}
  else if(r<.42&&!isNight()){const car=pick(CARS),n=`(360) 555-0${ri(100,199)}`;ringCall({from:n,icon:'❓',sub:'Unknown number. Buyer? Car warranty people?',lines:L_BUYER(car),vm:`"Hi, calling about the ${car}..."`,
   onDone:s=>{if(s>=2){addCash(200,'Deposit on the '+car);addLot(4);}else if(s>=0)addLot(1);else addLot(-3,'Buyer hung up');}});}
  else if(r<.55)wifeEvent();
  else if(r<.67)kidEvent();
  else if(r<.75)ringCall({from:'Mom',icon:'👵',fam:true,sub:M&&M.mode==='duo'?"She's in your party right now.":'Probably wants to play.',lines:L_MOM,vm:'"Steve, it\'s Mom. Are you playing today?"',onDone:s=>addFun(s>0?5:1,'Love you too Mom')});
- else if(r<.87){const car=pick(CARS);text({app:"Mike's Auto",icon:'🛠️',from:"Mike's Auto",msg:`Brakes on the ${car} came to $420. Go ahead?`,replies:R_MIKE,onReply:v=>later(12,()=>{addCash(v>0?220:120,car+" fixed at Mike's");addLot(2);})});}
- else text({app:'Email',icon:'📧',from:'Licensing office',msg:`Title for the ${pick(CARS)} needs a signature.`,replies:R_OFFICE,onReply:v=>addLot(v>0?4:1)});
+ else if(r<.87){const car=pick(CARS);text({app:"Mike's Auto",icon:'🛠️',from:"Mike's Auto",msg:`Brakes on the ${car} came to $420. Go ahead?`,replies:[['go ahead thanks mike',2],['go ahead',1]],react:sc=>sc>0?'you got it':'ok',onReply:v=>later(12,()=>{addCash(v>0?220:120,car+" fixed at Mike's");addLot(2);})});}
+ else text({app:'Email',icon:'📧',from:'Licensing office',msg:`Title for the ${pick(CARS)} needs a signature.`,replies:[['i will sign it today',2],['ok',1]],react:()=>'Thank you.',onReply:v=>addLot(v>0?4:1)});
 }
 function wifeEvent(){
  const w=run.wife;
  if(w.mood>65&&Math.random()<.5){const o=pick([['Want nachos? 🧀','snack','Nachos'],['Making cookies 🍪 want some?','snack','Cookies'],["I'll come sit and watch you play",'cheer','Wife cheering']]);
   text({icon:'❤️',from:'Wife (next room)',fam:true,good:true,msg:o[0],replies:[['yes please',1],['yes please thank you babe',1],['k',0],['soon',0]],onReply:v=>{run.buffs.push({k:o[1],name:o[2],t:30});addFun(8,o[2]);addMood(v>0?3:0);}});return;}
  if(Math.random()<.35){ringCall({from:'Wife',icon:'❤️',fam:true,sub:'Calling from the kitchen. 20 feet away.',lines:L_WIFE,vm:'"It\'s me. From the kitchen. Call me back."',onDone:s=>{if(s>=1)addMood(6,'Good answer');else addMood(-8,'She noticed');}});return;}
- const ask=pick(['Can you take the trash out?','Did you call the furnace guy yet?','Are you still playing?? 🙄','Trash. Please.']);
- text({icon:'❤️',from:'Wife (she can see you)',fam:true,msg:ask,replies:R_WIFE_ASK,onReply:v=>{if(v<0)addMood(-8,'"k"?? really?');else if(v>0)addMood(4);}});
+ bankText({icon:'❤️',from:'Wife (she can see you)',fam:true,onReply:v=>{if(v<0)addMood(-6,'"k"?? really?');else if(v>0)addMood(4);}},pick(WIFE_Q));
 }
 function kidEvent(){
  if(Math.random()<.35&&inMatch()&&M.phase==='play'&&!M.squad.some(s=>s.kid)){
@@ -391,7 +425,8 @@ function kidEvent(){
    onReply:v=>{if(v>0&&inMatch()){addSquadmate('Kid','#e8c33a',.5,true);addFun(10,'Kid joined');rel('Kid',8);run.buffs.push({k:'kid',name:'Kid playing',t:50});}}});
   later(14,()=>{const k=run.inbox.find(x=>x.from.startsWith('Kid (sitting'));if(k){run.inbox.splice(run.inbox.indexOf(k),1);phoneDirty=true;}});return;}
  if(Math.random()<.35){ringCall({from:'Kid',icon:'🧒',fam:true,sub:'Calling you. From the couch. Next to you.',lines:L_KID,vm:'"Dad. Dad. Dad."',onDone:s=>addFun(s>0?3:-2)});return;}
- text({icon:'🧒',from:'Kid (same room)',fam:true,msg:pick(['DAD where is the charger','can i have a snack','dad the wifi is broken','simba ate my sock','can i get vbucks']),replies:R_KID,onReply:v=>{if(v>0)addFun(1);}});
+ if(Math.random()<.65)bankText({icon:'🧒',from:Math.random()<.4?'Kid (same room)':'Kid',fam:true,pic:true,onReply:v=>{if(v>0)addFun(2);}},pick(KID_PICS));
+ else bankText({icon:'🧒',from:'Kid (same room)',fam:true,onReply:v=>{if(v>0)addFun(1);}},pick(KID_Q));
 }
 function urgentItem(o){o.kind='urgent';o.urgent=true;return text(o);}
 function clearUrgent(it){const k=run.inbox.indexOf(it);if(k>=0){run.inbox.splice(k,1);phoneDirty=true;}}
@@ -626,7 +661,9 @@ function newMatch(){
  // loot + vehicles
  M.grid=buildGrid(M);M.ang=null;
  M.pois.forEach(p=>{for(let i=0;i<3;i++)M.chests.push({x:p.x+rnd(-36,36),y:p.y+rnd(-26,26),open:false});});
- for(let i=0;i<3;i++)M.rares.push({x:rnd(60,MW-60),y:rnd(60,MH-60),tier:Math.random()<.6?3:4,taken:false});
+ for(let i=0;i<5;i++)M.rares.push({x:M.cx0+rnd(-330,330),y:M.cy0+rnd(-330,330),tier:Math.random()<.6?3:4,taken:false});
+ M.vends=M.pois.map(p=>({x:p.x+rnd(-30,30),y:p.y+rnd(18,30),used:false}));
+ M.fishSpots=[0,1,2,3,4,5].map(i=>{const a=i/6*Math.PI*2;return {x:M.lake.x+Math.cos(a)*52,y:M.lake.y+Math.sin(a)*38,face:a+Math.PI};});
  M.roads.forEach(rd=>{M.cars.push({x:rd.x,y:rd.y,col:pick(['#c8202a','#e8e8e8','#2d5fa8','#a6c93a'])});});
  // other players: some sit in bushes and wait
  const n=9+run.match*2;
@@ -678,10 +715,16 @@ function updateBR(dt){
   if(M.way){if(moveTo(me,M.way.x,M.way.y,sp,dt)){if(M.way.rare&&!M.way.rare.taken){M.way.rare.taken=true;if(M.way.rare.tier>M.gun){M.gun=M.way.rare.tier;big(GUNS[M.gun].n.toUpperCase()+'!',GUNS[M.gun].c,2);addFun(4,'Rare gun');beep(1100,.08);}}
     if(M.way.carHop){M.car=M.way.carHop;toast('Driving. Wheee.','#9aa0b0');M.way={x:s.cx,y:s.cy};}else{M.way=null;M.fly=0;if(M.car){M.car=null;}}}}
   else if(foes.length){target=foes[0];const d=dist(target,me);if(d>55)moveTo(me,target.x,target.y,26,dt);else{me.x+=-me.vy*Math.sin(M.t*2)*12*dt;me.y+=me.vx*Math.sin(M.t*2)*12*dt;}}
-  else if(inStorm(me)||dist(me,{x:s.cx,y:s.cy})>s.to*.85){const tx=s.cx,ty=s.cy;if(dist(me,{x:tx,y:ty})>70&&M.flyCD<=0)takeOff();moveTo(me,tx,ty,M.fly>0?75:30,dt);}
-  else{const c=M.chests.filter(c=>!c.open).sort((a,c2)=>dist(a,me)-dist(c2,me))[0];if(c&&dist(c,me)<140)moveTo(me,c.x,c.y,30,dt);else{if(M.flyCD<=0&&Math.random()<dt*.25)takeOff();moveTo(me,s.cx+Math.sin(M.t*.3)*s.r*.4,s.cy+Math.cos(M.t*.3)*s.r*.4,M.fly>0?60:22,dt);}}
+  else if((inStorm(me)||dist(me,{x:s.cx,y:s.cy})>s.to*.85)&&!(M.act&&!M.act.done&&Math.hypot(M.act.o.x-s.cx,M.act.o.y-s.cy)<Math.min(s.r,s.to+40)*.9)){const tx=s.cx,ty=s.cy;if(dist(me,{x:tx,y:ty})>70&&M.flyCD<=0)takeOff();moveTo(me,tx,ty,M.fly>0?75:30,dt);}
+  else{const a=M.act;
+   if(a&&!a.done&&Math.hypot(a.o.x-s.cx,a.o.y-s.cy)>s.to+40&&!a.started)a.done=1;
+   if(a&&!a.done){if(a.k==='chest'&&a.o.open)a.done=1;else if(a.k==='rare'&&a.o.taken)a.done=1;else if(dist(me,a.o)>5){if(dist(me,a.o)>110&&M.flyCD<=0)takeOff();moveTo(me,a.o.x,a.o.y,M.fly>0?72:30,dt);}
+    else{if(!a.started){a.started=1;actStart(a);}a.t-=dt;if(a.t<=0){a.done=1;actReward(a);}}}
+   else{M.act=pickAct(me);if(!M.act){if(M.flyCD<=0&&Math.random()<dt*.35)takeOff();moveTo(me,s.cx+Math.sin(M.t*.3)*s.r*.4,s.cy+Math.cos(M.t*.3)*s.r*.4,M.fly>0?60:22,dt);}}}
   if(target&&M.flyCD<=0&&Math.random()<dt*.2)takeOff(true);
   // auto-fire is weak; clicking does the real work
+  if(!target&&M.gun>=2&&!M.act?.started){M.snipeCD=(M.snipeCD||3)-dt;if(M.snipeCD<=0){M.snipeCD=rnd(2.6,4.2);const far=M.enemies.filter(e=>!e.hidden&&dist(e,me)>95&&dist(e,me)<280&&losOK(me,e))[0];if(far){M.view3d={style:'chase',e:far,t:0,scope:true};M.last3d=M.t;feed('Steve: *scoped in*','#9fe07f');setTimeout(()=>{if(!M||M.ended||!M.enemies.includes(far))return;beep(160,.25,'sawtooth',.05);if(Math.random()<.45+run.flow/250){hitEnemy(far,72+M.gun*8,me);M.fx.push({t:'shot',x1:me.x,y1:me.y,x2:far.x,y2:far.y,life:.12,c:'#fff36a'});feed(far.hp<=0?'SNIPED!':'Steve: hit him!','#fff36a');}else feed('Steve: missed by a mile','#9aa0b0');},900);}}}
+  if(M.fly>0&&Math.random()<dt*.6){const tr=M.trees.find(q=>dist(q,me)<7);if(tr){M.fly=0;M.flyCD=3;M.fx.push({t:'boom',x1:me.x,y1:me.y,life:.5});feed(pick(['Steve flew straight into a tree 🌲','BONK. Tree.','Steve: who put that tree there']),'#ffb060');beep(140,.15,'sawtooth',.05);M.view3d={style:'low',p:me,t:0,replay:true,a0:rnd(0,6)};}}
   if(target){me.fire-=dt;if(me.fire<=0){me.fire=.55;M.flashT=.05;M.kick=5;M.fx.push({t:'shot',x1:me.x,y1:me.y,x2:target.x,y2:target.y,life:.06,c:'#fff36a'});if(Math.random()<(.45+.4*run.flow/100+run.king/500-(run.tired?.1:0)+(run.buffs.some(b=>b.k==='conf')?.12:0)+(run.up.tv?.08:0))*h)hitEnemy(target,GUNS[M.gun].d*.85,me);}}
   if(Math.random()<dt*.15*h){const hid=M.enemies.find(e=>e.hidden&&dist(e,me)<60);if(hid){hid.hidden=false;feed(`Steve spotted ${hid.name} in a bush`,'#fff36a');}}
   if(!M.way&&!foes.length){const r=M.rares.find(q=>!q.taken&&dist(q,me)<110);if(r&&Math.random()<dt*.5)M.way={x:r.x,y:r.y,rare:r};}
@@ -715,7 +758,7 @@ function updateBR(dt){
    if(M.t>M.T*.45||Math.hypot(e.home.x-s.cx,e.home.y-s.cy)>s.to*.8){e.home={x:s.cx+rnd(-s.to*.5,s.to*.5),y:s.cy+rnd(-s.to*.5,s.to*.5)};}}}
  for(const e of [...M.enemies])if(e.hp<=0){M.enemies.splice(M.enemies.indexOf(e),1);const k=e.by||{name:'The storm'};M.fx.push({t:'boom',x1:e.x,y1:e.y,life:.5});
   feed(`${k.name} eliminated ${e.name}`,k.me?'#fff36a':k.simba?'#ffb060':'#fff');
-  if(k.me){M.kills++;run.kills++;M.roll++;king(.6);addFun(3);run.flow=Math.min(100,run.flow+6);beep(990,.05);setTimeout(()=>beep(1320,.06),60);if(M.roll===3)big('ON A ROLL!','#ffd25a');}
+  if(k.me){M.view3d={style:pick(['orbit','low','high','orbit']),p:{x:e.x,y:e.y},t:0,replay:true,a0:rnd(0,6)};M.last3d=M.t;M.kills++;run.kills++;M.roll++;king(.6);addFun(3);run.flow=Math.min(100,run.flow+6);beep(990,.05);setTimeout(()=>beep(1320,.06),60);if(M.roll===3)big('ON A ROLL!','#ffd25a');}
   else if(k.simba){run.simbaKills++;addFun(10,'SIMBA GOT A KILL?!');big('SIMBA GOT A KILL','#ffb060',2.5);}
   else if(k.name==='Mom'){feed('Mom: did I do that?? :D','#c99ae8');addFun(4,'Mom got a kill');}}
  // the rest of the lobby fights each other off screen
@@ -727,7 +770,7 @@ function updateBR(dt){
  // 3D close-up during some fights
  if(!M.view3d&&target&&M.t-M.last3d>7&&Math.random()<dt*.8){M.view3d={e:target,t:0};M.last3d=M.t;}
  if(M.view3d&&M.view3d.air&&target){M.view3d.e=target;M.view3d.air=false;}
- if(M.view3d){const v=M.view3d;v.t+=dt;if(v.air?(v.t>3.5):(!M.enemies.includes(v.e)||v.t>8)||me.down)M.view3d=null;}
+ if(M.view3d){const v=M.view3d;v.t+=dt;const lim=v.replay?3.2:v.air?3:v.act?5:v.scope?2:7;if(v.t>lim||(v.e&&!v.replay&&!M.enemies.includes(v.e))||me.down||(v.act&&M.act&&M.act.done))M.view3d=null;}
  if(Math.random()<dt*.04&&M.mode!=='solo')feed('Mom: '+pick(MOMCHAT),'#c99ae8');
  if(Math.random()<dt*.035)feed('Steve: '+pick(['ok ok ok','he is one shot','I need shields','going up','this guy...','let\'s gooo','where is everybody','storm is coming','ugh, the dog']),'#9fe07f');
  if(Math.random()<dt*.025&&M.mode==='squad')feed(pick(['Taco: mark him! MARK HIM','Dano: steve ping the guy','Taco: why dont you ever mark stuff']),'#ffb27a'),later(1.5,()=>feed('Steve: nah, marking is for nerds','#9fe07f'));
@@ -738,7 +781,24 @@ function updateBR(dt){
 function takeOff(fight){if(!inMatch())return;const me=M.squad[0];const nade=Math.random()<.6;M.fly=fight?2.5:5;M.flyCD=6;M.jumpT=1;
  if(nade){M.fx.push({t:'nade',x1:me.x,y1:me.y+3,life:.6});feed(pick(['Steve: *grenade jump*','Steve: *boom-jump*','Steve: nade under the feet, wings out']),'#7fe0a0');beep(120,.15,'sawtooth',.05);}
  else feed('Steve: *wings out*','#7fe0a0');
- if(!M.view3d&&M.t-M.last3d>4&&Math.random()<.55){M.view3d={e:null,t:0,air:true};M.last3d=M.t;}}
+ if(!M.view3d&&M.t-M.last3d>3&&Math.random()<.6){M.view3d={style:'flyby',t:0,air:true};M.last3d=M.t;}}
+function pickAct(me){const s=M.storm,inside=o=>Math.hypot(o.x-s.cx,o.y-s.cy)<s.to*.7,opts=[];
+ const c=M.chests.filter(c=>!c.open&&dist(c,me)<170).sort((a,b)=>dist(a,me)-dist(b,me))[0];if(c)opts.push([3,{k:'chest',o:c,t:.4}]);
+ const v=M.vends.filter(v=>!v.used&&dist(v,me)<300&&inside(v))[0];if(v)opts.push([2,{k:'vend',o:v,t:2.6}]);
+ const f=M.fishSpots.filter(f=>dist(f,me)<320&&inside(f)).sort((a,b)=>dist(a,me)-dist(b,me))[0];if(f&&(M.fished||0)<3)opts.push([2.2,{k:'fish',o:f,t:rnd(3.5,5.5)}]);
+ const r=M.rares.filter(r=>!r.taken&&dist(r,me)<320&&inside(r))[0];if(r)opts.push([2.5,{k:'rare',o:r,t:.3}]);
+ if(!opts.length)return null;let tot=opts.reduce((a,o)=>a+o[0],0),x=Math.random()*tot;for(const o of opts){x-=o[0];if(x<=0)return o[1];}return opts[0][1];}
+function actStart(a){const me=M.squad[0];
+ if(a.k==='fish'){feed(pick(['Steve: fishing break','Steve: gonna catch something good','Steve: shhh, fishing']),'#9fe07f');if(!M.view3d)M.view3d={style:'orbit',p:me,t:0,act:true,a0:rnd(0,6)};}
+ if(a.k==='vend'){feed('Steve: ooh, a vending machine','#9fe07f');beep(500,.05);if(!M.view3d)M.view3d={style:'low',p:me,t:0,act:true,a0:rnd(0,6)};}}
+function actReward(a){
+ if(a.k==='fish'){M.fished=(M.fished||0)+1;const r=Math.random();
+  if(r<.3){M.gun=Math.min(4,Math.max(M.gun+1,2));feed(`Steve fished up a ${GUNS[M.gun].n}!`,GUNS[M.gun].c);big('FISHED UP A GUN!',GUNS[M.gun].c,1.4);jingle(2);}
+  else if(r<.7){M.squad[0].sh=50;M.squad[0].hp=Math.min(100,M.squad[0].hp+25);feed('Steve caught a floppy fish (+shields)','#5ab0ff');jingle(1);}
+  else feed(pick(['Steve caught... an old boot','Steve caught a tire','Steve caught nothing. The fish laughed.']),'#9aa0b0');}
+ if(a.k==='vend'){a.o.used=true;const r=Math.random();
+  if(r<.5&&M.gun<4){M.gun++;feed(`Vending machine: ${GUNS[M.gun].n}`,GUNS[M.gun].c);jingle(2);}else{M.squad[0].sh=50;feed('Vending machine: shield soda','#5ab0ff');jingle(1);}}
+ if(a.k==='rare'&&!a.o.taken){a.o.taken=true;if(a.o.tier>M.gun){M.gun=a.o.tier;big(GUNS[M.gun].n.toUpperCase()+'!',GUNS[M.gun].c,1.4);feed(`Steve found a ${GUNS[M.gun].n}`,GUNS[M.gun].c);jingle(2);}}}
 function tvClick(bx,by){
  if(inMatch()&&M.phase==='play'&&!M.spect&&!M.squad[0].down){const h=hands();if(h<.3){big(run.simba.st==='gamer'?'SIMBA HAS THE CONTROLLER':"STEVE ISN'T HOLDING THE CONTROLLER",'#ff7070',1);return;}
   const me=M.squad[0],foe=M.enemies.filter(e=>!e.hidden&&dist(e,me)<130&&losOK(me,e)).sort((a,c)=>dist(a,me)-dist(c,me))[0];
@@ -840,7 +900,7 @@ function guy(x,y,col,o={}){
 function lambToy(x,y){if(art('lamb_toy',x+5,y+6))return;R(x,y,8,5,'#f4f1e8');R(x+1,y-1,6,1,'#fff');R(x+6,y-3,4,4,'#f4f1e8');R(x+5,y-4,2,2,'#f4f1e8');R(x+9,y-2,1,1,'#222');R(x+8,y,2,1,'#e23b3b');R(x+1,y+5,2,1,'#e8e0d0');R(x+5,y+5,2,1,'#e8e0d0');}
 // Steve's skin: a space ranger. Top-down, 7x7.
 function ranger(x,y,o={}){
- if(o.fly){R(x-5,y+1,4,3,'#7a8a9a');R(x+8,y+1,4,3,'#7a8a9a');R(x-4,y+1,3,1,'#ffb030');R(x+8,y+1,3,1,'#ffb030');}
+ R(x+1,y+6,5,3,'#ff8a2a');R(x+2,y+6,3,1,'#c0c4ca');if(o.fly){R(x-5,y+1,4,3,'#7a8a9a');R(x+8,y+1,4,3,'#7a8a9a');R(x+2,y+9,3,2+Math.floor(performance.now()/80)%2,'#ffd25a');}
  R(x,y,7,7,'#f4f4f4');R(x+1,y+2,5,3,'#2d5fa8');R(x+3,y+5,1,2,'#ff8a2a');R(x+2,y+3,1,1,'#e23b3b');R(x+4,y+3,1,1,'#5ab0ff');
  R(x+2,y-2,3,2,'#e8b890');b.strokeStyle='rgba(220,240,255,.9)';b.strokeRect(x+.5,y-4.5,6,5);R(x+1,y-4,2,1,'#fff');
  if(o.gun)R(x+6,y+3,4,2,o.gun);}
@@ -853,6 +913,8 @@ function drawTopDown(t){
  b.drawImage(mapC,sx,sy,TW,TH,TX,TY,TW,TH);
  const P=(o)=>W2S(o.x,o.y);
  // loot
+ (M.vends||[]).forEach(v=>{const p=P(v);R(p.x-3,p.y-6,6,8,v.used?'#7a3030':'#c02020');R(p.x-2,p.y-5,3,4,'#3ad0ff');R(p.x-3,p.y-7,6,1,'#fff');});
+ if(M.act&&M.act.k==='fish'&&M.act.started&&!M.act.done){const me=M.squad[0],p=P(me),bx=p.x+Math.cos(M.act.o.face)*14,by=p.y+Math.sin(M.act.o.face)*10;b.strokeStyle='#ddd';b.beginPath();b.moveTo(p.x+2,p.y-4);b.lineTo(bx,by);b.stroke();R(bx-1,by-1+Math.round(Math.sin(t*4)),3,3,'#e23b3b');}
  M.chests.forEach(ch=>{if(ch.open)return;const p=P(ch);R(p.x-3,p.y-2,6,4,'#b07a20');R(p.x-3,p.y-2,6,1,'#ffd25a');if(Math.floor(t*4+ch.x)%4==0)R(p.x+2,p.y-4,1,1,'#fff');});
  M.rares.forEach(r=>{if(r.taken)return;const p=P(r),k=Math.floor(t*6+r.x)%6;R(p.x-2,p.y-1,5,2,GUNS[r.tier].c);if(k<3){R(p.x-1-k,p.y,1,1,'#fff');R(p.x+3+k,p.y,1,1,'#fff');R(p.x+1,p.y-2-k,1,1,'#fff');}});
  M.cars.forEach(cr=>{if(cr===M.car)return;const p=P(cr);R(p.x-6,p.y-3,12,6,cr.col);R(p.x-2,p.y-2,5,4,'#33404a');});
@@ -1242,7 +1304,14 @@ function fpsShoot(me){M.fireCD=[.34,.24,.2,.11,.26][M.gun];M.kick=7;M.flashT=.05
  if(best){const head=M.pitch>Math.min(18,250/bd)-6;const d=GUNS[M.gun].d*(head?1.6:1)*(1+(run.buffs.some(b=>b.k==='conf')?.2:0)+run.king/300);hitEnemy(best,d,me);best.alert=6;best.flinch=.35;M.hitT=.15;M.headT=head?.2:0;beep(head?1100:760,.03);}
 }
 function ensureCine(){if(fpsC)return;fpsC=document.createElement('canvas');fpsC.width=FW;fpsC.height=FH;fctx=fpsC.getContext('2d');fimg=fctx.createImageData(FW,FH);fbuf=new Uint32Array(fimg.data.buffer);}
-function cineRender(){ensureCine();const me=M.squad[0],v=M.view3d,e=v&&v.e;const want=e?Math.atan2(e.y-me.y,e.x-me.x)+Math.sin(M.t*.7)*.15:Math.atan2((me.vy||0)+.001,(me.vx||0)+.001);if(M.ang==null)M.ang=want;let d=Math.atan2(Math.sin(want-M.ang),Math.cos(want-M.ang));M.ang+=d*.12;M.pitch=0;M.firing=false;fpsRender();}
+function cineRender(){ensureCine();const me=M.squad[0],v=M.view3d,st=v.style||'chase',P=v.p||me;let cx=me.x,cy=me.y,look=M.ang||0;
+ if(st==='chase'){const e=v.e,tg=e||{x:me.x+(me.vx||1)*10,y:me.y+(me.vy||0)*10},a=Math.atan2(tg.y-me.y,tg.x-me.x)+Math.sin(M.t*.6)*.1;cx=me.x-Math.cos(a)*(v.scope?2:16);cy=me.y-Math.sin(a)*(v.scope?2:16);look=a;M.pitch=0;}
+ else if(st==='orbit'){const a=(v.a0||0)+v.t*.75;cx=P.x+Math.cos(a)*36;cy=P.y+Math.sin(a)*36;look=Math.atan2(P.y-cy,P.x-cx);M.pitch=-6;}
+ else if(st==='low'){const a=(v.a0||0)+v.t*.3;cx=P.x+Math.cos(a)*20;cy=P.y+Math.sin(a)*20;look=Math.atan2(P.y-cy,P.x-cx);M.pitch=28;}
+ else if(st==='high'){const a=(v.a0||0)+v.t*.25;cx=P.x+Math.cos(a)*64;cy=P.y+Math.sin(a)*64;look=Math.atan2(P.y-cy,P.x-cx);M.pitch=-38;}
+ else if(st==='flyby'){const a=Math.atan2(me.vy||0,me.vx||1)+Math.PI/2+Math.sin(v.t)*.3;cx=me.x+Math.cos(a)*28;cy=me.y+Math.sin(a)*28;look=Math.atan2(me.y-cy,me.x-cx);M.pitch=-4+(M.fly>0?8:0);}
+ if(solidAt(cx,cy)>0){cx=me.x;cy=me.y;}
+ M.ang=look;const sx=me.x,sy=me.y;me.x=cx;me.y=cy;M.camOff=(st==='chase'&&v.scope)?null:{x:sx,y:sy};fpsRender();me.x=sx;me.y=sy;M.camOff=null;}
 function fpsRender(){
  if(!fpsC||!M)return;
  const me=M.squad[0],W=FW,H=FH,buf=fbuf,ang=M.ang,t=performance.now()/1000;
@@ -1279,35 +1348,43 @@ function fpsRender(){
  for(const o of M.rares)if(!o.taken&&near(o,200))spr.push({o,k:'rare',h:.5,w:1});
  for(const o of M.enemies)if(!o.hidden&&near(o,320))spr.push({o,k:'enemy',h:1.15,w:.42});
  for(const o of M.squad)if(!o.me&&!o.out&&near(o,320))spr.push({o,k:'ally',h:1.1,w:.42});
+ if(M.camOff)spr.push({o:{x:M.camOff.x,y:M.camOff.y},k:'steve',h:1.15+(M.fly>0?.0:0),w:.42,lift:M.fly>0?.5:0});
+ if(M.vends)for(const o of M.vends)if(near(o,250))spr.push({o,k:'vend',h:1.3,w:.6});
  const invDet=1/(plX*dirY-dirX*plY);
  for(const s of spr){const dx=s.o.x/TILE-px,dy=s.o.y/TILE-py;s.tx=invDet*(dirY*dx-dirX*dy);s.ty=invDet*(-plY*dx+plX*dy);}
  spr.sort((a,b)=>b.ty-a.ty);
- for(const s of spr){if(s.ty<.15)continue;const scx=W/2*(1+s.tx/s.ty),sh=H/s.ty*s.h,sw=H/s.ty*s.w*(s.k==='enemy'||s.k==='ally'?2.2:1),bot=hz+H*.5/s.ty,top=bot-sh;
+ for(const s of spr){if(s.ty<.15)continue;const scx=W/2*(1+s.tx/s.ty),sh=H/s.ty*s.h,sw=H/s.ty*s.w*(s.k==='enemy'||s.k==='ally'||s.k==='steve'?2.2:1),bot=hz+H*.5/s.ty-(s.lift||0)*H/s.ty,top=bot-sh;
   const x0=Math.floor(scx-sw/2),x1=Math.ceil(scx+sw/2),fog=Math.min(.9,s.ty/34),o=s.o;
-  let pal=null;if(s.k==='enemy'){const sk=o.skin||SKINS[0];pal={b:o.flash>0?0xffffff:hexC(sk.b),h:hexC(sk.h),a:hexC(sk.a)};}if(s.k==='ally')pal={b:hexC(o.col),h:0xe8b890,a:0x222222};
+  let pal=null;if(s.k==='steve')pal={b:0xf4f4f4,h:0xe8b890,a:0x2d5fa8};if(s.k==='enemy'){const sk=o.skin||SKINS[0];pal={b:o.flash>0?0xffffff:hexC(sk.b),h:hexC(sk.h),a:hexC(sk.a)};}if(s.k==='ally')pal={b:hexC(o.col),h:0xe8b890,a:0x222222};
   const wig=s.k==='bush'&&s.hid&&Math.floor(t*3+o.x)%5===0?2:0,walk=(s.k==='enemy'||s.k==='ally')?Math.floor(t*8+o.x)%2:0;
   for(let x=Math.max(0,x0);x<Math.min(W,x1);x++){if(zbuf[x]<s.ty)continue;const u=(x-x0-wig)/(x1-x0);
    for(let y=Math.max(0,Math.floor(top));y<Math.min(H,Math.ceil(bot));y++){const v=(y-top)/(bot-top);let c=-1;
     if(s.k==='tree'){if(v>.62&&u>.43&&u<.57)c=0x5a3a20;else{const dd=Math.hypot(u-.5,(v-.32)*1.3);if(dd<.48)c=dd<.3&&u<.45?0x3f8a4a:0x24603a;}}
     else if(s.k==='bush'){const dd=Math.hypot(u-.5,(v-.55)*1.4);if(dd<.5)c=dd<.25&&u<.5?0x5ab848:0x3f9a3a;}
     else if(s.k==='chest'){if(v>.1&&u>.08&&u<.92)c=v<.35?0xffd25a:0xb07a20;if(v>.35&&v<.55&&u>.42&&u<.58)c=0xfff2a8;if(v<.1&&Math.floor(t*6+o.x)%3===0&&Math.abs(u-.5)<.05)c=0xffffff;}
+    else if(s.k==='vend'){if(u>.1&&u<.9){c=v<.12?0xffffff:0xc02020;if(v>.18&&v<.6&&u>.2&&u<.62)c=Math.floor(v*12)%2?0x3ad0ff:0x2a8ac0;if(v>.2&&v<.5&&u>.7&&u<.82)c=0xffd25a;if(v>.7&&v<.82&&u>.2&&u<.8)c=0x222222;}}
     else if(s.k==='rare'){const g=hexC(GUNS[o.tier].c);if(v>.45&&v<.7&&u>.15&&u<.85)c=g;if(Math.floor(t*8)%2&&Math.abs(u-.5)<.04)c=0xffffff;}
     else{ // a person
      if(v<.26){if(u>.32&&u<.68)c=pal.h;if(v>.1&&v<.16&&(Math.abs(u-.42)<.04||Math.abs(u-.58)<.04))c=0x111111;}
      else if(v<.66){if(u>.22&&u<.78)c=pal.b;else if((u>.1&&u<.22)||(u>.78&&u<.9))c=shadeC(pal.b,.8);if(v>.4&&v<.46&&u>.4&&u<.6)c=pal.a;if(v>.42&&v<.5&&u>.78&&u<1)c=0x222222;}
-     else{if((u>.26&&u<.46&&!(walk&&v>.85))||(u>.54&&u<.74&&!(!walk&&v>.85)))c=0x2a2a30;}}
+     else{if((u>.26&&u<.46&&!(walk&&v>.85))||(u>.54&&u<.74&&!(!walk&&v>.85)))c=s.k==='steve'?0xd8d8d8:0x2a2a30;}
+     if(s.k==='steve'){if(v<.28&&(u<.26||u>.74)&&v>.02)c=0xcfe9ff;if(v>.3&&v<.6&&u>.0&&u<.12)c=0xff8a2a;if(v>.3&&v<.36&&u<.12)c=0xc0c4ca;if(s.lift&&v>.6&&v<.8&&u<.1)c=Math.floor(t*12)%2?0xffd25a:0xff6a2a;}}
     if(c>=0)buf[y*W+x]=ABGR(mixC(c,fogCol,fog));}}
   if(s.k==='enemy'&&o.state==='fight'&&s.ty<30){const bw=Math.max(6,sw*.6),bx=Math.floor(scx-bw/2),by=Math.floor(top-4);for(let x=0;x<bw;x++){const X=bx+x;if(X<0||X>=W||by<0||zbuf[X]<s.ty)continue;buf[by*W+X]=ABGR(x<bw*o.hp/100?0xe23b3b:0x222222);if(o.sh>0&&by>0)buf[(by-1)*W+X]=ABGR(x<bw*o.sh/50?0x5ab0ff:0x222222);}}}
  if(M.hurtT>0){for(let i=0;i<W*H;i+=1){const x=i%W,y=(i/W)|0;if(x<10||x>W-10||y<8||y>H-8)buf[i]=ABGR(0xc02020);}}
  fctx.putImageData(fimg,0,0);
- // viewmodel: gloved hand and gun
- const g=fctx,bob=Math.sin(M.bob||0)*2,kick=M.kick||0,gx=W*.62+bob,gy=H-34+Math.abs(bob)+kick*.6;
+ const g=fctx;if(!M.camOff&&!(M.view3d&&!M.view3d.scope)){
+ const bob=Math.sin(M.bob||0)*2,kick=M.kick||0,gx=W*.62+bob,gy=H-34+Math.abs(bob)+kick*.6;
  g.fillStyle=GUNS[M.gun].c;g.fillRect(gx,gy,46,10);g.fillStyle='#222';g.fillRect(gx+30,gy+10,8,14);g.fillRect(gx-6,gy+2,8,5);g.fillStyle='#555';g.fillRect(gx,gy,46,2);
  g.fillStyle='#f4f4f4';g.fillRect(gx+20,gy+8,14,12);g.fillStyle='#2d5fa8';g.fillRect(gx+20,gy+18,14,8);
  if(M.flashT>0){g.fillStyle='#fff36a';g.fillRect(gx-12,gy-2,10,12);g.fillStyle='#fff';g.fillRect(gx-8,gy+1,5,6);}
  // crosshair + hit marker
  const cx0=W/2,cy0=H/2;g.fillStyle='#fff';g.fillRect(cx0-5,cy0,3,1);g.fillRect(cx0+3,cy0,3,1);g.fillRect(cx0,cy0-5,1,3);g.fillRect(cx0,cy0+3,1,3);
  if(M.hitT>0){g.fillStyle=M.headT>0?'#ffd25a':'#fff';for(let i=2;i<6;i++){g.fillRect(cx0-i,cy0-i,1,1);g.fillRect(cx0+i,cy0-i,1,1);g.fillRect(cx0-i,cy0+i,1,1);g.fillRect(cx0+i,cy0+i,1,1);}}
+ }
+ // camera labels, letterbox, scope
+ {const v=M.view3d;if(v){g.fillStyle='#000';g.fillRect(0,0,W,12);g.fillRect(0,H-12,W,12);g.font='7px monospace';g.fillStyle=v.replay?'#ff5a5a':'#ffd25a';g.fillText(v.replay?'● REPLAY':v.scope?'SCOPED IN':v.air?'AIRBORNE':v.act?(M.act&&M.act.k==='fish'?'GONE FISHING':'VENDING MACHINE'):'CLOSE QUARTERS',6,9);
+  if(v.scope){g.fillStyle='#000';g.beginPath();g.rect(0,0,W,H);g.arc(W/2,H/2,H*.42,0,Math.PI*2,true);g.fill('evenodd');g.fillStyle='#000';g.fillRect(W/2-.5,H*.1,1,H*.8);g.fillRect(W*.25,H/2-.5,W*.5,1);}}}
  // HUD
  g.font='6px monospace';g.fillStyle='rgba(0,0,0,.5)';g.fillRect(4,H-16,62,12);g.fillStyle='#5ab0ff';g.fillRect(6,H-14,58*me.sh/50,3);g.fillStyle=me.down?'#e23b3b':'#46c46e';g.fillRect(6,H-9,58*me.hp/100,3);
  g.fillStyle='#fff';g.fillText(`👤${M.players}  ☠${M.kills}`,4,9);g.fillText(GUNS[M.gun].n,W-4-g.measureText(GUNS[M.gun].n).width,H-4);
@@ -1341,7 +1418,7 @@ function drawHUD(){
   else txt('Invite someone from your phone contacts, or FIND A SQUAD.',L+W2/2,T+74,'#cfd3dd',7,'center');}
  else{
   txt(`👤${M.players}`,L+10,T+22,'#fff',11);txt(`☠${M.kills}`,L+110,T+22,'#fff36a',11);txt(M.mode.toUpperCase(),L+180,T+22,'#cfd3dd',8);
-  if(M.phase==='play'){txt(`${GUNS[M.gun].n}${M.flyCD>0?'':' · wings ready'}`,L+10,T+40,GUNS[M.gun].c,7);if(M.view3d)txt(M.view3d.e?'CLOSE QUARTERS · CLICK HIM':'AIRBORNE',L+W2/2,T+20,'#ffd25a',8,'center');}
+  if(M.phase==='play'){txt(`${GUNS[M.gun].n}${M.flyCD>0?'':' · wings ready'}`,L+10,T+40,GUNS[M.gun].c,7);}
   M.squad.forEach((a,i)=>{const y=T+H2-12-(M.squad.length-1-i)*16;txt(a.name+(a.down&&!a.out?' DOWN':a.out?' OUT':''),L+10,y,a.out?'#666':a.me?'#9fe07f':a.name==='Mom'?'#d9b0ff':a.kid?'#ffd25a':'#cfe0ff',7);
    if(!a.out){bar(L+150,y-8,56,3,a.sh/50,'#5ab0ff');bar(L+150,y-3,56,3,a.hp/100,a.down?'#e23b3b':'#46c46e');}
    if(a.down&&!a.out&&!a.me){const on=M.reviving===a;btn(on?'REVIVING':'REVIVE',L+216,y-12,86,14,on?'#2f8f50':'#e23b3b',()=>{if(hands()<.5){big('NEED BOTH HANDS','#ff7070',1.2);return;}M.reviving=a;a.rev=0;});}});
