@@ -1549,11 +1549,16 @@ function fpsRender(){
 
 
 // ================= art assets (optional PNGs in /assets, drawn instead of the built-in pixels) =================
-// Each file is native pixel size at the 320x240 buffer scale. Missing files fall back to the procedural art.
+// Each file is drawn at 2x the 320x240 buffer scale (16-bit detail). Sizes are listed in CODEX.md. Missing files fall back to the procedural art.
 const ART_LIST=['simba_stand','simba_sit','simba_sleep','simba_lap','lamb_toy','steve_couch','steve_walk','wife','kid','burglar_short','burglar_tall','car_lift','lobby_shack','house_bg','tv_frame'];
 const ART={};ART_LIST.forEach(n=>{const im=new Image();im.onload=()=>{ART[n]=im;};im.onerror=()=>{};im.src='assets/'+n+'.png';});
 // draw by anchor: x = center, y = feet (bottom). flip mirrors horizontally.
-function art(n,x,y,flip){const im=ART[n];if(!im)return false;const w=im.naturalWidth,h=im.naturalHeight;b.save();if(flip){b.translate(Math.round(x),0);b.scale(-1,1);b.drawImage(im,Math.round(-w/2),Math.round(y-h));}else b.drawImage(im,Math.round(x-w/2),Math.round(y-h));b.restore();return true;}
+// 16-bit art is authored at 2x the buffer scale. It is queued here and drawn on the sharp main canvas
+// right after the buffer, so each art pixel is 1.5 screen pixels instead of 3 (twice the detail).
+const ART_Q=[];
+function art(n,x,y,flip){const im=ART[n];if(!im)return false;const t=b.getTransform(),clip=b._clip||null;ART_Q.push({im,x:x+t.e,y:y+t.f,flip,clip:clipNow()});return true;}
+function clipNow(){return {y0:HY-12};}
+function flushArt(){const k=SC/2;for(const a of ART_Q){const w=a.im.naturalWidth*k,h=a.im.naturalHeight*k,px=a.x*SC,py=a.y*SC;ctx.save();ctx.beginPath();ctx.rect(0,a.clip.y0*SC,cv.width,720);ctx.clip();if(a.flip){ctx.translate(Math.round(px),0);ctx.scale(-1,1);ctx.drawImage(a.im,Math.round(-w/2),Math.round(py-h),w,h);}else ctx.drawImage(a.im,Math.round(px-w/2),Math.round(py-h),w,h);ctx.restore();}ART_Q.length=0;}
 
 // ================= HUD =================
 function txt(s,x,y,c='#fff',sz=8,al='left'){ctx.font=`${sz}px ${FONT}`;ctx.textAlign=al;ctx.fillStyle='#000';ctx.fillText(s,x+2,y+2);ctx.fillStyle=c;ctx.fillText(s,x,y);ctx.textAlign='left';}
@@ -1640,7 +1645,7 @@ function drawHUD(){
  run.toast.forEach((q,i)=>txt(q.t,480,(HY+20)*SC-i*18-q.y,q.c,8,'center'));}
 
 // ================= frame / input =================
-function draw(){b.imageSmoothingEnabled=false;drawHouse();drawTV();if(run)drawPanel();ctx.imageSmoothingEnabled=false;ctx.drawImage(B,0,0,cv.width,720);if(run)drawHUD();cuRot+=1/60;drawCU();}
+function draw(){b.imageSmoothingEnabled=false;drawHouse();drawTV();if(run)drawPanel();ctx.imageSmoothingEnabled=false;ctx.drawImage(B,0,0,cv.width,720);flushArt();if(run)drawHUD();cuRot+=1/60;drawCU();}
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;try{if(mode==='play')update(dt);draw();if(phoneDirty){renderPhone();phoneDirty=false;}phoneTick();}catch(e){const el=$('err');el.style.display='block';el.textContent='Something broke: '+e.message+'\n'+(e.stack||'').split('\n').slice(0,3).join('\n')+'\nSend this to Claude.';}requestAnimationFrame(loop);}
 function pos(e){const r=cv.getBoundingClientRect();const x=(e.clientX-r.left)*cv.width/r.width,y=(e.clientY-r.top)*720/r.height;return {x,y,bx:x/SC,by:y/SC};}
 const inTV=(x,y)=>x>=TX&&x<=TX+TW&&y>=TY&&y<=TY+TH;

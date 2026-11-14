@@ -1,49 +1,65 @@
-# Art brief for Codex: Steve's Day Off
+# Art brief for Codex: Steve's Day Off (16-bit pass)
 
-This folder is a fork of the game. `frozen/steves-day-off-v1.html` is the locked version and must not change. Work on `index.html` and `assets/`.
+This repo is a pixel-art game in one file, `index.html`. `frozen/steves-day-off-v1.html` is a locked earlier version: do not edit it. Your job is the art in `assets/`.
 
-`index.html` already loads PNGs from `assets/` by file name. Each image that exists is drawn instead of the built-in rectangle art. A missing file falls back to the built-in art, so assets can be added one at a time.
+## Target look
 
-## Rules
+16-bit console era: richer than the current blocky art, still clearly pixel art.
 
-- Pixel art, hard edges, no anti-aliasing, transparent background (PNG with alpha).
-- Draw at **native size** (the sizes below). The game renders a 320x240 buffer and scales it up 3x, so a 20-pixel-tall dog is 20 actual pixels.
-- Anchor: the game places each sprite by **bottom-center** (feet on the floor). Leave no empty rows under the feet.
-- Side view, facing **right**. The game mirrors sprites when a character faces left.
-- Palette: warm and muted, close to the existing colors in `index.html` (`R(...)` calls show the hex values). Keep outlines dark brown or near-black, 1 px.
-- Original designs only. Do not imitate characters from other games, films or brands.
+- **Detail:** every sprite is drawn at **2x** the game's base grid (sizes below). The game shows each of your pixels at 1.5 screen pixels.
+- **Color:** up to about 16 colors per sprite, including the outline. Use 2 to 4 shades per material (skin, fabric, fur, metal) with a consistent light source from the top left.
+- **Outlines:** 1 px, dark and tinted toward the color they border (dark brown around tan fur, deep blue around blue fabric). No pure black outlines except on very dark objects.
+- **Shading:** hard-edged shading, light ordered dithering is fine on large surfaces. No anti-aliasing, no gradients, no blur, no semi-transparent edges.
+- **Background:** transparent PNG (alpha 0 or 255 only).
+- **Facing:** side view, facing **right**. The game mirrors sprites for left.
+- **Anchor:** the game places sprites by **bottom-center** (feet on the floor). No empty rows below the feet; keep empty columns balanced left and right.
+- **Originality:** original designs only. Do not imitate characters from other games, films, toys or brands. Steve's in-game avatar is an original astronaut (white suit, blue chest panel, clear bubble helmet, orange-and-silver rocket pack). Keep it that way.
 
-## Characters and references
+## Characters
 
-- **Simba**: tan pit/shepherd mix (#c98f4e), big upright ears with darker inner color, black muzzle, lilac woven collar with a lime-green buckle. Reference photos are in `ref/` (local only, not committed): Simba in her holiday hoodie, lying on the rug, sitting and begging, and from behind showing the collar; the garage lot with the chain-link fence; and a photo outside the lot. Use them for colors and proportions only. Do not draw real people's faces from the photos.
-- **Steve**: olive camo hoodie, short brown hair, light beard. Holds a game controller on the couch.
-- **Wife**: pink hair in a bun, patterned glasses, denim overalls.
-- **Kid**: yellow shirt, blond hair.
-- **Burglars**: original bumbling pair. One short in a red beanie, one tall and lanky in a dark jacket.
-- **Lamb toy**: off-white plush lamb, red mouth.
+Reference photos are in `ref/` (local only, not committed). Use them for colors and proportions. Do not draw real people's faces from the photos; stylize everyone.
+
+- **Simba**: tan pit/shepherd mix. Fur base #c98f4e with lighter belly and darker back. Big upright ears with darker insides, black muzzle, warm brown eyes. Lilac woven collar with a lime-green buckle.
+- **Steve**: olive camo hoodie, short brown hair, light beard, jeans. Holds a game controller on the couch.
+- **Wife**: pink hair in a bun, patterned glasses, denim overalls over a black shirt.
+- **Kid**: yellow shirt, blond hair, about half Steve's height.
+- **Burglars**: an original bumbling pair. One short and round in a red beanie and striped shirt; one tall and lanky in a dark jacket and flat cap.
+- **Lamb toy**: off-white plush lamb with stubby legs and a red stitched mouth.
 
 ## Asset list
 
-| File | Size (w x h) | Notes |
-|---|---|---|
-| `simba_stand.png` | 26 x 22 | walking pose, lamb toy not included |
-| `simba_sit.png` | 20 x 24 | sitting, looking up, begging |
-| `simba_sleep.png` | 28 x 12 | curled up asleep |
-| `simba_lap.png` | 34 x 22 | lying across Steve's lap on the couch |
-| `lamb_toy.png` | 12 x 10 | plush lamb |
-| `steve_couch.png` | 16 x 24 | seated, side view, controller in hands |
-| `steve_walk.png` | 10 x 22 | standing/walking |
-| `wife.png` | 10 x 22 | standing |
-| `kid.png` | 7 x 18 | standing |
-| `burglar_short.png` | 10 x 18 | not wired yet |
-| `burglar_tall.png` | 8 x 24 | not wired yet |
-| `car_lift.png` | 48 x 22 | white compact car, side view, not wired yet |
-| `lobby_shack.png` | 60 x 44 | wooden beach shack, not wired yet |
-| `house_bg.png` | 660 x 96 | full house cross-section backdrop, not wired yet |
-| `tv_frame.png` | 312 x 142 | TV bezel, not wired yet |
+Sizes are width x height in pixels, already doubled for the 16-bit pass.
 
-"Not wired yet" files load but the game does not draw them. Claude will hook them up once they exist.
+| File | Size | Status | Notes |
+|---|---|---|---|
+| `simba_stand.png` | 52 x 44 | wired | walking pose, mouth empty |
+| `simba_sit.png` | 40 x 48 | wired | sitting, looking up, begging |
+| `simba_sleep.png` | 56 x 24 | wired | curled up asleep |
+| `simba_lap.png` | 68 x 44 | wired | lying across Steve's lap on the couch, looking at the TV |
+| `lamb_toy.png` | 24 x 20 | wired | plush lamb |
+| `steve_couch.png` | 32 x 48 | wired | seated side view, controller in hands, facing right toward the TV |
+| `steve_walk.png` | 20 x 44 | wired | standing |
+| `wife.png` | 20 x 44 | wired | standing |
+| `kid.png` | 14 x 36 | wired | standing |
+| `burglar_short.png` | 20 x 36 | not wired | |
+| `burglar_tall.png` | 16 x 48 | not wired | |
+| `car_lift.png` | 96 x 44 | not wired | white compact car, side view |
+| `lobby_shack.png` | 120 x 88 | not wired | wooden beach shack on sand |
+| `house_bg.png` | 1320 x 192 | not wired | full house cross-section: living room, kitchen, bathroom, two bedrooms, garage, yard and lot |
+| `tv_frame.png` | 624 x 284 | not wired | TV bezel, screen area transparent |
+
+"Wired" files show up in the game as soon as they exist in `assets/`. "Not wired" files load, but Claude still has to hook them up.
+
+Work in this order: Simba (all four), Steve (couch, walk), wife, kid, lamb toy, then the rest.
 
 ## Checking your work
 
-Open `index.html` through a local web server (images do not load from `file://` in some browsers), for example `python -m http.server` in this folder, then visit `http://localhost:8000`. Start a game and look for your sprite in the house view.
+Run a local web server in this folder (`python -m http.server`), open `http://localhost:8000`, start a game, and look for the sprite in the house view. Missing files fall back to the old art, so you can check one at a time.
+
+## Handing back
+
+Commit each finished asset on its own with a short message (`Add simba_sit.png (16-bit)`), then `git pull --rebase` and `git push`. Note anything unfinished or any question for the owner at the bottom of this file under "Notes from Codex".
+
+## Notes from Codex
+
+(none yet)
