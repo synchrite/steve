@@ -2,6 +2,32 @@
 
 This repo is a pixel-art game in one file, `index.html`. `frozen/steves-day-off-v1.html` is a locked earlier version: do not edit it. Your job is the art in `assets/`.
 
+## Pass 2 (current): build in 3D, render, then pixelize
+
+The first pass (hand-placed pixel maps) was rejected by the owner: too flat and stiff, wrong scale, clashed with the scene, and the characters didn't read as themselves. Pass 2 replaces it.
+
+**Method**
+
+1. In Blender, model each character as a simple, chunky low-poly figure (toy-like proportions, big readable silhouettes). Use flat colors per material, not textures.
+2. Light with one warm key light from the top left and a soft fill. Use a toon/flat shader with 3 shading steps so it pixelizes cleanly.
+3. Render with an **orthographic side camera**, transparent background, at 8x the final size (for example 320 x 384 for a 40 x 48 sprite), facing right.
+4. Downscale to the final size with nearest-neighbor or area sampling, then snap every pixel to a shared palette (see below), force alpha to 0 or 255, and add a 1 px outline tinted toward the neighboring color. Keep this step in a script (`tools/art/pixelize.py`) so every sprite goes through the same pipeline.
+5. Pose each character naturally (weight on one leg, slight lean, head tilted toward what they're doing). Simba especially needs life: ears up, tail mid-wag, looking up at Steve when begging.
+
+**Scale (fixes "wrong size")**
+
+Size everything against the house. The floor line is the bottom of each sprite, and these are the in-game heights at 2x: a door is 84 px, the couch seat is 28 px off the floor, the coffee table is 22 px. Steve standing should be about 46 px (just over half a door), the wife about 44, the kid about 32, Simba standing about 30 at the shoulder. Render a single "lineup" image with everyone next to a door and the couch, and check proportions before exporting individual sprites.
+
+**Matching the scene (fixes "doesn't match")**
+
+Use one shared 32-color palette for all characters, built from the colors already in `index.html` (wall cream #e4ddd0, floor gray #8a8580, couch tan #c79a5e, wood brown #4a2a1a, plus skin, fur and clothing tones). Every sprite is snapped to that palette, so characters and room share the same colors.
+
+**Likeness (fixes "characters look off")**
+
+Work from the photos in `ref/` for Simba (stocky tan pit/shepherd mix, big upright ears, black muzzle, lilac collar with lime buckle). People are stylized and original; match hair, clothing and build, not faces.
+
+**Deliverables:** the same file names and sizes as the table below, plus `tools/art/lineup.png` (everyone side by side with a door and the couch) for the owner to approve before anything is wired in. Keep the `.blend` file in `art-src/` (Git LFS if over a few MB).
+
 ## Target look
 
 16-bit console era: richer than the current blocky art, still clearly pixel art.
