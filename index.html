@@ -1880,7 +1880,15 @@ function layoutCols(){const mob=true,w=$('cuWrap');document.body.classList.toggl
  else{if(!fr($('menuBtn')))$('lcol').prepend($('menuBtn'));if(!w.classList.contains('float')&&!fr(w))$('lcol').appendChild(w);}setTimeout(()=>typeof fitTXK==='function'&&fitTXK(),50);}
 addEventListener('resize',layoutCols);
 function fitLayout(){const rc=$('rcol');if(!rc)return;const W=winW()-18,H=winH()-12,ui=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui'))||1,ar=cv.width/720,mr=230*ui;
- const cw=Math.max(200,Math.min(H*ar,W-mr)),rw=W-cw;rc.style.setProperty('flex-basis',(rw/ui)+'px','important');rc.classList.toggle('wide',rw/ui>500);}
+ const cw=Math.max(200,Math.min(H*ar,W-mr)),rw=W-cw;rc.style.setProperty('flex-basis',(rw/ui)+'px','important');rc.classList.toggle('wide',rw/ui>500);
+ requestAnimationFrame(sizePhone);}
+// the phone keeps real phone proportions (1:2); it never stretches
+function sizePhone(){const ph=$('phone'),rc=$('rcol');if(!ph||ph.classList.contains('free')||ph.classList.contains('zoomed'))return;
+ const wide=rc.classList.contains('wide'),cu=$('cuWrap'),rt=$('rtop'),gap=6;
+ const cuH=(!wide&&cu.parentNode===rc)?cu.offsetHeight+gap:0;
+ const availH=rc.clientHeight-rt.offsetHeight-gap-cuH,availW=wide?(rc.clientWidth-gap)/2:rc.clientWidth;
+ const w=Math.max(120,Math.min(availW,availH/2));ph.style.setProperty('width',w+'px','important');ph.style.setProperty('height',(w*2)+'px','important');ph.style.flex='0 0 auto';ph.style.alignSelf='center';ph.style.justifySelf='center';}
+addEventListener('resize',()=>setTimeout(sizePhone,30));
 addEventListener('resize',()=>setTimeout(fitLayout,0));setTimeout(fitLayout,0);
 
 let phoneOpen=true;function setPhone(o){phoneOpen=o;$('phone').classList.toggle('min',!o);$('pill').classList.toggle('hide',o);}
