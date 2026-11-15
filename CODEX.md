@@ -69,15 +69,15 @@ Sizes are width x height in pixels, already doubled for the 16-bit pass.
 
 | File | Size | Status | Notes |
 |---|---|---|---|
-| `simba_stand.png` | 52 x 44 | wired | walking pose, mouth empty |
-| `simba_sit.png` | 40 x 48 | wired | sitting, looking up, begging |
-| `simba_sleep.png` | 56 x 24 | wired | curled up asleep |
-| `simba_lap.png` | 68 x 44 | wired | lying across Steve's lap on the couch, looking at the TV |
-| `lamb_toy.png` | 24 x 20 | wired | plush lamb |
-| `steve_couch.png` | 32 x 48 | wired | seated side view, controller in hands, facing right toward the TV |
-| `steve_walk.png` | 20 x 44 | wired | standing |
-| `wife.png` | 20 x 44 | wired | standing |
-| `kid.png` | 14 x 36 | wired | standing |
+| `simba_stand.png` | 52 x 44 | wired; Pass 3 exported | walking pose, mouth empty |
+| `simba_sit.png` | 40 x 48 | wired; Pass 3 exported | sitting, looking up, begging |
+| `simba_sleep.png` | 56 x 24 | wired; Pass 3 exported | curled up asleep |
+| `simba_lap.png` | 68 x 44 | wired; Pass 3 exported | lying across Steve's lap on the couch, looking at the TV |
+| `lamb_toy.png` | 24 x 20 | wired; Pass 3 exported | plush lamb |
+| `steve_couch.png` | 32 x 48 | wired; Pass 3 exported | seated side view, controller in hands, facing right toward the TV |
+| `steve_walk.png` | 20 x 44 | wired; Pass 3 exported | standing |
+| `wife.png` | 20 x 44 | wired; Pass 3 exported | standing |
+| `kid.png` | 14 x 36 | wired; Pass 3 exported | standing |
 | `burglar_short.png` | 20 x 36 | not wired | |
 | `burglar_tall.png` | 16 x 48 | not wired | |
 | `car_lift.png` | 96 x 44 | not wired | white compact car, side view |
@@ -181,3 +181,27 @@ index.html and frozen/ were not touched.
 Visually reviewed the result; check_lineup.py passes palette membership,
 dimensions, binary alpha, anchors, exact 4x enlargement and deterministic
 regeneration. Confirmed all eight non-kid paintings remain pixel-identical.
+
+2026-11-14 (Pass 3, approved step 2): Owner approved the clean-cluster
+lineup. Exported all nine wired assets over the rejected pass-1 PNGs using
+tools/art/export_sprites.py and the same cluster_art.py / pixelize.py drawing
+pipeline. Seven existing poses match the approved native drawing output
+pixel for pixel. Seated Steve preserves the lineup's 4px shortened-leg
+adjustment, bottom-centered within the required 32 x 48 canvas, with no couch.
+Added original curled sleeping and reclining lap Simba poses with the same
+clean clusters, palette, coat shading and collar; lap Simba reuses the exact
+approved head painting and contains only the dog. All face right.
+No existing character needed additional scaling beyond the approved pipeline;
+new poses use its proportional nearest-neighbor fit within their table limits.
+Kid retains the approved 32px visible height within its 36px canvas. Seated
+Steve has 44px visible height within its 48px canvas. No proportions were
+changed to fill unused transparent rows.
+Exported tools/art/sheet.png (1104 x 872), showing all nine at exact 4x
+nearest-neighbor. Visually inspected the sheet and checked every saved asset
+for exact table dimensions, binary alpha, shared palette, floor contact and
+balanced horizontal bounds. Verified the seven existing exports against their
+approved drawing outputs and the sheet's exact 4x pixel replication.
+The approved tools/art/lineup.png and original drawing code remain unchanged.
+No git commands run; index.html and frozen/ were not touched. House-view
+integration review remains for the game-code handoff; this step reviews the
+requested exported asset sheet.
