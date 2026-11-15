@@ -1,6 +1,6 @@
 ﻿{
   "tool": "built-in image_gen",
-  "style": "Original mid-90s 16-bit console RPG environment pixel art, richly detailed dense set dressing, readable hard-edged pixel clusters, warm cozy atmosphere, strong light and shadow, sunbeams, textured materials. All percentages relative to canvas. Full bleed artwork, no borders or labels, no UI timestamps scanlines, no characters, no animation effects, no logos. Original design, do not imitate any specific game. Coherent walnut/cream/ochre/slate/olive/plum shared colors.",
+  "style": "Original cartoon RPG pixel art background. Chunky blocky shapes, bold clean dark outlines, simple readable forms, polished late-SNES/GBA cartoon interior, warm hand-placed shading ramps and soft ordered dithering. Crisp pixel clusters, no noisy texture or realism. Full bleed, no borders text logos UI scanlines timestamps characters animals cars flames smoke. Bottom 30 percent quiet lower contrast walking strip. Stove has proper dark burners, no pot. Original designs only.",
   "rooms": [
     [
       "living",
@@ -62,5 +62,9 @@
       "cctv_wife",
       "Security camera slightly elevated view into cozy craft corner 320:220 aspect. Pegboard upper left x9%-33% y9%-50%, craft dresser left x12%-30% y55%-83%, craft table right x60%-91% y59%-91%, supplies on table, shelves of books yarn fabric and jars across upper wall. Keep center x34%-59% y30%-90% unobstructed for runtime person. Warm cream floral wallpaper, window upper center, woodgrain floor y76%-100%, purple patterned rug bottom center, laundry basket far right, strong warm sunbeams."
     ]
-  ]
+  ],
+  "pass": 4,
+  "prompt_overrides": {
+    "living": "Original cartoon RPG pixel art background: cozy living room side view, chunky bold dark outlines, clean readable late SNES/GBA shapes, rich warm shading ramps, subtle dithering, no realism, no noise. Wide 304:192 framing. Floral cream wallpaper, window upper left, wooden door far left bottom, tan couch lower left, coffee table bottom center, cabinet lower right, blank dark television at x53%-80% y48%-75%. Warm light. No people animals text logos flames. Quiet low contrast walking strip at bottom. Save project source intended for tools/art/rooms_src/living.png."
+  }
 }

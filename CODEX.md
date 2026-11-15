@@ -479,3 +479,50 @@ Visually inspected the final contact sheet. Checks pass exact dimensions,
 opaque RGB, shared palette membership, captured wall fields, four dark screens,
 plain working zones and unchanged SHA-256 hashes for index.html and every file
 in frozen/. No git commands run. No edits to index.html, frozen/ or ref/.
+
+
+### Notes from Codex - 2026-11-14 (Pass 4 RPG)
+
+Replaced house_bg and all seven CCTV rooms with original built-in imagegen
+cartoon RPG art, BOX-downsampled and snapped to a deterministic 256-color
+room palette. Retained layout walls, screen footprints, clear stove pot
+airspace, lift bay and car spaces; painted fixed unlit burners and quieted
+the walking strip. Raw sources: tools/art/rooms_src/ (ignored); exact prompts
+in rooms_prompts.json and registration in rooms_crops.json.
+Added Hoops, Narc, Jug, Neonpunk, Glitch, Rollerqueen, Dad and Sunny: five
+64x96 frames each, binary alpha, tinted outlines, bottom-center floor anchors.
+New fighter prompts/sources and palette are retained; all 36 prior sprites
+are byte-identical. Updated 76-file manifest and both preview sheets.
+Rebuild: python tools/art/generated_rooms.py; python tools/art/lobby_fighters.py.
+Validate: python tools/art/check_pass4.py. Visually reviewed both sheets.
+This art pass made no writes to index.html, frozen/, ref/ or the realistic-mode
+archive. index.html changed externally during the pass; its initial hash
+snapshot is retained and validation reports it separately.
+No commit or push. Initial pull was blocked by existing unstaged changes.
+
+### Notes from Codex - 2026-11-14 (PDA and tips UI)
+
+Followed tools/art/brief_ui_pda.txt: added mode body classes and an original
+CSS STEVE PAD skin for RPG, keeping the CLASSIC phone appearance. One --ui
+factor now sizes the canvas, phone, CCTV, top controls, stats deck, shop and
+menus. Phone re-renders preserve independent inbox/view scroll and follow new
+messages only when already at the bottom. Zoom stays open until an outside tap;
+scroll gestures and existing controls do not activate touch zoom.
+
+Added the persistent ? TIPS toggle and twelve-card instructions dialog, with
+12 original imagegen pixel icons in assets/ui/tips/, finalized through the
+existing shared surface_pixelize pipeline without editing it. Replaced fixed
+phone/TV/3D help with contextual hover/first-touch tips, shown once per session
+with tips off and repeatable with tips on. Updated ASSETS.md. Preview and
+reproduction/check scripts are isolated under tools/ui/.
+
+Validation: extracted script passes node --check; actual scroll functions pass
+inbox, independent-view, thread-position and bottom-follow unit checks; shared
+scale mathematics fits all four requested viewports and both canvas aspects.
+All 12 art files exist and their contact sheet was visually reviewed. Live
+browser startup/console and viewport screenshot tests remain UNVERIFIED:
+Chrome exits with Access denied creating Mojo/Crashpad IPC, and Computer Use
+reports its native pipe unavailable. Run node tools/ui/check_pda.cjs on a host
+where Chrome can launch. Initial git pull --rebase was blocked by existing
+unstaged concurrent art changes. No commit or push; no edits to room/lobby art,
+frozen/, ref/, or gameplay rules.

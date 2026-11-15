@@ -176,6 +176,38 @@ body.mob #cuWrap{flex:0 0 auto}body.mob #cuBtns{display:none!important}body.mob 
 #cuTitle{font-size:10px!important}#cuBtns button{font-size:9px!important;padding:7px 4px!important}
 .thread .who{font-size:11px}.thread .who button{font-size:9px}.legend{font-size:9px}
 @media (max-height:500px){.legend,.notch{display:none}.sugg button{padding:7px}#menuBtn{font-size:13px;padding:9px}}
+
+/* Shared game/UI scale and mode-specific phone skin. */
+#game{align-items:center;justify-content:center}
+#stage{flex:0 0 auto!important;width:calc(var(--game-w)*var(--ui)*1px);height:calc(720px*var(--ui))}
+#rcol,body.mob #rcol{flex:0 0 360px!important;width:360px;height:720px;zoom:var(--ui)}
+#rcol.wide{display:flex!important}
+#rtop{flex-wrap:wrap;flex-shrink:0}#rtop button{font-size:10px!important;padding:10px 4px!important}
+#phone{flex:1 1 auto!important;width:100%!important;min-height:0;height:auto!important;transition:none;touch-action:pan-y}
+#screen,.log{min-height:0;overscroll-behavior:contain;overflow-anchor:none;touch-action:pan-y}
+#cuWrap{flex:0 0 auto!important}#cuWrap.float{zoom:var(--ui)}body.mob #cu{height:130px;width:auto;max-width:100%}
+body.mob #cuBtns{display:flex!important}
+#phone.zoomed{position:fixed!important;right:6px!important;top:6px!important;width:360px!important;height:calc(720px - 12px)!important;zoom:var(--ui)}
+#menu,#ishop,#deck,#tipsPage{zoom:var(--ui);width:calc(100dvw/var(--ui));height:calc(100dvh/var(--ui));inset:0 auto auto 0}
+#ov{zoom:var(--ui);width:calc(100%/var(--ui));height:calc(100%/var(--ui));inset:0 auto auto 0}
+body.gfx-rpg #phone{background:#8c9680;border-color:#535f4b;border-radius:18px 18px 30px 18px;padding:10px 12px 16px;box-shadow:inset 3px 3px #c2c9ad,inset -3px -3px #65715d,4px 4px #211b22}
+.padHeader{display:none}body.gfx-rpg .padHeader{display:flex;justify-content:space-between;color:#293b2b;font-size:9px;padding:6px 2px 10px;letter-spacing:2px}
+body.gfx-rpg .notch{display:none}body.gfx-rpg .sbar{color:#293b2b}
+body.gfx-rpg #screen{background:#b9c49a;color:#263a2b;border:4px solid #535f4b;border-radius:5px;padding:5px;box-shadow:inset 2px 2px #859272}
+body.gfx-rpg #screen :is(.tx,.fr,.hd,.sec,.empty,.due,.rcpt){color:#293b2b!important}
+body.gfx-rpg #screen :is(.item,.who,.sugg,.bub){background:#a6b58a!important;color:#263a2b!important;border-color:#617453!important;text-shadow:none}
+body.gfx-rpg #screen .bub.me{background:#cbd4af!important}
+body.gfx-rpg #phone button{border:2px solid #4d6147!important;border-radius:9px;background:#d0d6bc!important;color:#263a2b!important;box-shadow:inset 1px 1px #e4e9d4;min-height:28px}
+body.gfx-rpg #phone button:hover{background:#e0e6cb!important}body.gfx-rpg #phone button:disabled{opacity:.5}
+#tipsBtn{background:#586a42}#tipsBtn[aria-pressed=true]{background:#879a49;color:#111}
+#tipsPage{position:fixed;z-index:28;background:#171e28;color:#e4ddd0;padding:18px;overflow:auto;overscroll-behavior:contain}
+#tipsPage[hidden]{display:none}#tipsPage .tipsTop{display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:-18px;background:#171e28;padding:12px 0;z-index:1}
+#tipsPage h2{font-size:18px;margin:0 auto 0 0;color:#efd099}#tipsPage button{font:inherit;font-size:11px;padding:12px;color:#fff0d5;background:#40576a;border:3px solid #0c1018;cursor:pointer}
+.tipsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tipCard{border:3px solid #648092;background:#293948;padding:16px;font-size:11px;line-height:1.9}.tipCard img{width:96px;height:96px;image-rendering:pixelated;float:left;margin:0 14px 8px 0;border:2px solid #554137}.tipCard h3{font-size:12px;color:#efd099;margin:0 0 10px}
+#contextTip{position:fixed;z-index:40;max-width:min(320px,85vw);background:#fff0d5;color:#302d32;border:3px solid #554137;padding:10px;font-size:10px;line-height:1.8;pointer-events:none;box-shadow:3px 3px #211b22}
+#fpsHint{display:none}
+
 </style></head><body>
 <header><h1>STEVE'S DAY OFF</h1><div><button id="gfx">GRAPHICS: RPG</button> <button id="mute">SOUND: ON</button></div></header>
 <div id="game">
@@ -185,10 +217,10 @@ body.mob #cuWrap{flex:0 0 auto}body.mob #cuBtns{display:none!important}body.mob 
  <div id="tabs"><button data-t="phone" class="on">📱 PHONE <span class="badge" id="phB"></span></button><button data-t="cuWrap">🔍 CLOSE-UP <span class="badge" id="cuB"></span></button></div>
  <div id="cuWrap" class="pane"><div id="cuTitle">CLOSE-UP</div><canvas id="cu" width="160" height="110"></canvas><div id="cuBtns"></div></div>
  <div id="phone" class="pane on">
-  <div class="notch"></div>
+  <div class="notch"></div><div class="padHeader"><b>STEVE PAD</b><span>NOTEPAD</span></div>
   <div class="sbar"><span id="clock">2:00</span><span><button id="ringer" onclick="cycleRinger()">🔔 RING</button> <span id="batt">71</span>% <button onclick="minPhone()">▾</button></span></div>
   <div id="screen"></div>
-  <div class="legend">Texts and calls can wait until the break between matches. Tap words to reply.</div>
+
  </div>
  </div>
 </div>
@@ -196,7 +228,7 @@ body.mob #cuWrap{flex:0 0 auto}body.mob #cuBtns{display:none!important}body.mob 
 House: ◀ ▶ to look around · stove, front door, lift, work board, machine, gate · GET UP to go AFK (costs a squad heart mid-match, free in breaks) · click the lift, work board, answering machine, front door, gate, burglars, or your wife.<br>
 Simba: drag-fling the lamb toy · click her for tug-of-war, to wiggle her off your lap, or to put her to sleep when she's tired · scrub drool off the TV.</div>
 <div id="rcolTpl"></div>
-<div id="menu"><h2>PAUSED</h2><button class="go" onclick="closeMenu()">▶ RESUME</button><button id="mGfx" onclick="$('gfx').click();menuLabels()"></button><button id="mSnd" onclick="$('mute').click();menuLabels()"></button><button onclick="const h=$('menuSnd');h.style.display=h.style.display==='block'?'none':'block'">🔊 SOUND OPTIONS</button><div id="menuSnd"><label>MASTER<input type="range" min="0" max="1" step=".05" oninput="setVol('m',this.value)"></label><label>MUSIC<input type="range" min="0" max="1" step=".05" oninput="setVol('mu',this.value)"></label><label>EFFECTS<input type="range" min="0" max="1" step=".05" oninput="setVol('fx',this.value)"></label></div><button onclick="toggleFS()">⛶ FULL SCREEN</button><button id="mPz" onclick="UI.pz=!UI.pz;saveUI();menuLabels()"></button><button id="mLock" onclick="toggleUnlock()"></button><button onclick="resetUI()">↺ RESET LAYOUT</button><button onclick="const h=$('menuHelp');h.style.display=h.style.display==='block'?'none':'block'">? HOW TO PLAY</button><div id="menuHelp"></div><button onclick="if(confirm('Start over? This run will be lost.'))location.reload()">↺ NEW GAME</button></div>
+<div id="menu"><h2>PAUSED</h2><button class="go" onclick="closeMenu()">▶ RESUME</button><button id="mGfx" onclick="$('gfx').click();menuLabels()"></button><button id="mSnd" onclick="$('mute').click();menuLabels()"></button><button onclick="const h=$('menuSnd');h.style.display=h.style.display==='block'?'none':'block'">🔊 SOUND OPTIONS</button><div id="menuSnd"><label>MASTER<input type="range" min="0" max="1" step=".05" oninput="setVol('m',this.value)"></label><label>MUSIC<input type="range" min="0" max="1" step=".05" oninput="setVol('mu',this.value)"></label><label>EFFECTS<input type="range" min="0" max="1" step=".05" oninput="setVol('fx',this.value)"></label></div><button onclick="toggleFS()">⛶ FULL SCREEN</button><button id="mPz" onclick="UI.pz=!UI.pz;if(!UI.pz)unzoomPhone();saveUI();menuLabels()"></button><button id="mLock" onclick="toggleUnlock()"></button><button onclick="resetUI()">↺ RESET LAYOUT</button><button onclick="openTips()">? HOW TO PLAY</button><div id="menuHelp"></div><button onclick="if(confirm('Start over? This run will be lost.'))location.reload()">↺ NEW GAME</button></div>
 <div id="ishop"></div><div id="deck"></div><div id="rot">↻<br>Turn your phone sideways<br>to play</div>
 <div id="err"></div>
 <script>
@@ -433,7 +465,18 @@ function voicemail(c){text({kind:'vm',from:c.from,icon:'📼',msg:c.vm||'"Hey, c
 function playMachine(){const vms=run.inbox.filter(x=>x.kind==='vm');if(!vms.length){toast('No new messages. *beep*','#9aa0b0');return;}
  const v=vms[vms.length-1];run.inbox.splice(run.inbox.indexOf(v),1);toast('📼 '+v.from+': '+v.msg,'#cfd3dd');beep(1200,.2,'sine');
  const c=v.call;c.step=0;c.score=0;c.live=true;c.callback=true;run.call=c;view={type:'call',replies:c.lines[0].r,typed:[],auto:bestWords(c.lines[0].r),at:-2.8,log:[{who:'them',t:c.lines[0].q}]};phoneDirty=true;}
+const phoneScroll=new Map();let phoneScrollKey=null;
 function renderPhone(){
+ const screen=$('screen'),oldLog=screen.querySelector('.log');
+ if(phoneScrollKey)phoneScroll.set(phoneScrollKey,{top:screen.scrollTop,log:oldLog?.scrollTop||0,bottom:oldLog?oldLog.scrollHeight-oldLog.clientHeight-oldLog.scrollTop<4:false});
+ const key=run?.call&&!run.call.live?'ring':view?(view.type+':'+(view.item?.id??view.name??run?.call?.from??'')):'inbox';
+ try{paintPhone();}finally{
+  phoneScrollKey=key;const saved=phoneScroll.get(key),log=screen.querySelector('.log');
+  screen.scrollTop=saved?.top||0;
+  if(log)log.scrollTop=saved?(saved.bottom?log.scrollHeight:saved.log):((view?.type==='thread'||view?.type==='call'||view?.type==='history')?log.scrollHeight:0);
+ }
+}
+function paintPhone(){
  const el=$('screen');if(!run){el.innerHTML='<div class="empty">Phone is face down.</div>';return;}
  const c=run.call;
  if(c&&!c.live){el.innerHTML=`<div class="ring"><div class="fr">INCOMING CALL</div><div class="av">${c.icon||'📞'}</div><div class="fr">${c.from}</div><div class="tx">${c.sub||''}</div>
@@ -1408,7 +1451,7 @@ function drawTV(){
   const hx=TX+182,hy=iy-30;if(!art('lobby_shack',hx+25,hy+30)){R(hx,hy,50,30,'#9a6a3a');for(let i=0;i<5;i++)R(hx,hy+i*6,50,1,'#7a4a24');R(hx-4,hy-8,58,8,'#6a4a2a');R(hx-2,hy-10,54,3,'#8a5a30');R(hx+20,hy+12,10,18,'#4a2a14');R(hx+6,hy+8,9,7,'#3a2a1a');R(hx+36,hy+8,9,7,'#3a2a1a');R(hx+37,hy+9,7,5,'#ffd25a');R(hx+48,hy+4,2,26,'#7a4a24');R(hx-8,hy+26,20,4,'#8a6a3a');}
   // other players wandering, shooting at the sky, dancing (16-bit: arcade-fighter sprites)
   const LOBK=.36,lobDraw=(name,x,y,flip)=>{const im=LOBIM[name];if(GFX!=='16'||!im)return false;const w=im.naturalWidth*LOBK,h=im.naturalHeight*LOBK;b.save();if(flip){b.translate(x,0);b.scale(-1,1);b.drawImage(im,-w/2,y-h,w,h);}else b.drawImage(im,x-w/2,y-h,w,h);b.restore();return true;};
-  if(M&&!M.lob)M.lob=Array.from({length:7},(_,i)=>({x:TX+60+i*28,tx:TX+60+i*28,sk:pick(SKINS),act:pick(['walk','dance','shoot','dance','walk']),t:rnd(1,4),f:1}));
+  if(M&&!M.lob)M.lob=Array.from({length:9},(_,i)=>({x:TX+46+i*24,tx:TX+60+i*28,sk:pick(SKINS),act:pick(['walk','dance','shoot','dance','walk']),t:rnd(1,4),f:1}));
   const awayNow=!(run&&run.steve.x===SPOT.couch&&!run.task);
   for(const o of (M?M.lob:[])){b.globalAlpha=1;if(!o.fn)o.fn=pick(LOB_NAMES);o.t-=1/60;if(o.t<=0){o.t=rnd(2,5);o.act=awayNow?pick(['shoot','dance','shoot','walk']):pick(['walk','dance','shoot','dance','walk','emote']);o.tx=awayNow?(M.sx||TX+132)+rnd(-30,30):TX+50+Math.random()*200;o.f=o.tx>o.x?1:-1;if(awayNow)o.f=(M.sx||TX+132)>o.x?1:-1;}
    if(o.act==='walk'){o.x+=clamp(o.tx-o.x,-.5,.5);o.f=o.tx>o.x?1:-1;}
@@ -1707,6 +1750,7 @@ const hexC=h=>parseInt(h.slice(1,7),16);
 function setupFPS(){
  const st=$('stage'),w=document.createElement('div');w.id='fpsWrap';
  w.innerHTML=`<canvas id="fps" width="${FW}" height="${FH}"></canvas><button id="fpsExit">⏎ AUTOPLAY</button><div id="fpsHint">CLICK to aim · WASD move · SHIFT sprint · SPACE jump · hold CLICK to shoot · ESC then AUTOPLAY to hand it back</div><div id="tStick"><i></i></div><button id="tFire">FIRE</button><button id="tJump">JUMP</button><button id="tRun">RUN</button>`;
+ w.addEventListener('pointerenter',()=>contextTip(w,'fps',$('fpsHint').textContent));w.addEventListener('pointerdown',()=>contextTip(w,'fps',$('fpsHint').textContent),{passive:true});
  st.appendChild(w);fpsC=$('fps');fctx=fpsC.getContext('2d');fimg=fctx.createImageData(FW,FH);fbuf=new Uint32Array(fimg.data.buffer);
  $('fpsExit').onclick=e=>{e.stopPropagation();exitFPS();};
  fpsC.addEventListener('pointerdown',e=>{if(!M||!M.fps)return;e.preventDefault();
@@ -1918,7 +1962,7 @@ function fpsRender(){
 // ================= art assets (optional PNGs in /assets, drawn instead of the built-in pixels) =================
 // Each file is drawn at 2x the 320x240 buffer scale (16-bit detail). Sizes are listed in CODEX.md. Missing files fall back to the procedural art.
 const ART_LIST=['simba_stand','simba_sit','simba_sleep','simba_lap','lamb_toy','steve_couch','steve_walk','wife','kid','burglar_short','burglar_tall','car_lift','lobby_shack','house_bg','tv_frame'];
-const LOB_NAMES=['bront','serein','vesper','solaro','rivet','orion'],LOBIM={};
+const LOB_NAMES=['bront','serein','vesper','solaro','rivet','orion','hoops','narc','jug','neonpunk','glitch','rollerqueen','dad','sunny'],LOBIM={};
 [...LOB_NAMES.flatMap(n=>['idle0','idle1','dance0','dance1','shoot0'].map(f=>'fighter_'+n+'_'+f)),'fighter_steve_0','fighter_steve_1','fighter_steve_2','fighter_steve_3','fighter_steve_dance0','fighter_steve_dance1'].forEach(n=>{const im=new Image();im.onload=()=>{LOBIM[n]=im;};im.src='assets/lobby/'+n+'.png';});
 const ART={};ART_LIST.forEach(n=>{const im=new Image();im.onload=()=>{ART[n]=im;};im.onerror=()=>{};im.src='assets/'+n+'.png';});
 // draw by anchor: x = center, y = feet (bottom). flip mirrors horizontally.
@@ -1930,7 +1974,7 @@ function cineImg(){const ch=fpsC.width*TH/TW;b.drawImage(fpsC,0,(fpsC.height-ch)
 function hiImg(im,x,y,w,h){b.drawImage(im,x,y,w,h);}
 // graphics mode: CLASSIC = the original blocky pixel art, RPG = Codex's sprites where they exist
 let GFX='classic';try{GFX=localStorage.getItem('steveGfx')||'classic';}catch(e){}
-function setGfx(m){GFX=m;try{localStorage.setItem('steveGfx',m);}catch(e){}$('gfx').textContent='GRAPHICS: '+(m==='16'?'RPG':'CLASSIC');}
+function setGfx(m){GFX=m;document.body.classList.toggle('gfx-rpg',m==='16');document.body.classList.toggle('gfx-classic',m!=='16');try{localStorage.setItem('steveGfx',m);}catch(e){}$('gfx').textContent='GRAPHICS: '+(m==='16'?'RPG':'CLASSIC');}
 $('gfx').onclick=()=>setGfx(GFX==='16'?'classic':'16');setGfx(GFX);
 function art(n,x,y,flip){if(GFX!=='16')return false;const im=ART[n];if(!im)return false;const w=im.naturalWidth/2,h=im.naturalHeight/2;b.save();if(flip){b.translate(x,0);b.scale(-1,1);b.drawImage(im,-w/2,y-h,w,h);}else b.drawImage(im,x-w/2,y-h,w,h);b.restore();return true;}
 function clipNow(){return {y0:HY-12};}
@@ -1940,7 +1984,7 @@ function flushArt(){const k=SC/2;for(const a of ART_Q){if(a.raw){ctx.imageSmooth
 // every canvas text gets a black outline so it reads on any background
 {const P=CanvasRenderingContext2D.prototype,F=P.fillText;P.fillText=function(s,x,y,m){const fs=String(this.fillStyle).toLowerCase();if(fs!=='#000000'&&fs!=='#000'&&!this._noOutline){const px=parseFloat(this.font)||8;this.save();this.strokeStyle='#000';this.lineWidth=Math.max(2,px/3);this.lineJoin='round';this.miterLimit=2;m==null?this.strokeText(s,x,y):this.strokeText(s,x,y,m);this.restore();}return m==null?F.call(this,s,x,y):F.call(this,s,x,y,m);};}
 // canvas text grows when the game is shown small (phones), so it stays readable
-let TXK=1.2;function fitTXK(){const h=cv.getBoundingClientRect().height||720,k=Math.min(h/720,cv.getBoundingClientRect().width/cv.width||1);TXK=Math.min(2.3,Math.max(1.45,1.6/k*.62));}addEventListener('resize',fitTXK);setTimeout(fitTXK,50);
+let TXK=1.45;function fitTXK(){TXK=1.45;}
 function txt(s,x,y,c='#fff',sz=8,al='left'){ctx.font=`${Math.round(Math.max(7,sz)*TXK)}px ${FONT}`;ctx.textAlign=al;ctx.fillStyle=c;ctx.fillText(s,x,y);ctx.textAlign='left';}
 function led(x,y,w,h,f){const n=14,sw=w/n;f=clamp(f,0,1);for(let i=0;i<n;i++){const on=i<Math.round(f*n),c=i<n*.5?'#3aff8a':i<n*.8?'#ffd23a':'#ff4a3a';ctx.fillStyle=on?c:'#14201a';ctx.fillRect(x+i*sw,y,sw-2,h);if(on){ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(x+i*sw,y,sw-2,2);}}}
 function bar(x,y,w,h,f,c){ctx.fillStyle='#000';ctx.fillRect(x-2,y-2,w+4,h+4);ctx.fillStyle='#222';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,w*clamp(f,0,1),h);}
@@ -2005,7 +2049,6 @@ function drawHUD(){
   if(M.view3d&&M.view3d.e)M.fx.forEach(f=>{if(f.t==='txt'&&f.in3d){const r=e3dRect(M.view3d);txt(f.s,(r.x+r.w/2)*SC,(r.y-8-(.5-f.life)*16)*SC,'#fff36a',10,'center');}});
   if(M.phase==='bus')txt('BATTLE BUS · dropping at '+M.target.name,L+W2/2,T+H2-16,'#fff',8,'center');
   if(M.spect)txt('SPECTATING · '+(M.spect.k?M.spect.k.name:''),L+W2/2,T+H2-20,'#ff9a7a',9,'center');
-  if(M.phase==='play'&&!M.ended&&!M.spect&&!afk()&&run.simba.st!=='gamer'&&Math.floor(performance.now()/700)%2)txt('TAP FAST! shoot · combos · drops · pickaxe',L+W2/2,T+H2-30,'#fff36a',7,'center');
   if(M.phase==='play'&&!M.ended&&!M.spect){if(run.simba.st==='gamer')txt('SIMBA IS PLAYING · CLICK HER',L+W2/2,T+H2/2+40,'#ffb060',10,'center');else if(hands()<.3)txt('STEVE IS AFK',L+W2/2,T+H2/2+40,'#ff8b8b',11,'center');}
   if(M.roll>=3)txt(`ON A ROLL x${M.roll}`,L+W2-60,T+40,'#ffd25a',8,'right');
   txt(`💎 ${LOCK.bux}`,L+W2-10,T+22,'#7fe8ff',9,'right');
@@ -2119,23 +2162,29 @@ window.openMenu=()=>{menuLabels();if(mode==='play'){preMenu='play';mode='pause';
 window.closeMenu=()=>{$('menu').classList.remove('on');if(preMenu){mode=preMenu;preMenu=null;}};
 $('menuBtn').onclick=openMenu;layoutCols();
 // ===== UI: window scaling, forced landscape, phone zoom, movable panels =====
-let UI={pz:false,free:{}};try{UI=Object.assign(UI,JSON.parse(localStorage.getItem('steveUI')||'{}'));}catch(e){}
+let UI={pz:false,tips:false,free:{}};try{UI=Object.assign(UI,JSON.parse(localStorage.getItem('steveUI')||'{}'));}catch(e){}
 function saveUI(){try{localStorage.setItem('steveUI',JSON.stringify(UI));}catch(e){}}
 const isRot=()=>document.body.classList.contains('rot');
 const winH=()=>isRot()?innerWidth:innerHeight,winW=()=>isRot()?innerHeight:innerWidth;
-function scaleUI(){document.body.classList.toggle('rot',matchMedia('(orientation:portrait) and (pointer:coarse)').matches);
- const k=Math.max(.55,Math.min(1.7,winH()/720));document.documentElement.style.setProperty('--ui',k.toFixed(3));
- document.documentElement.style.setProperty('--pz',(winH()/560).toFixed(3));}
+function scaleUI(){
+ document.body.classList.toggle('rot',matchMedia('(orientation:portrait) and (pointer:coarse)').matches);
+ const k=Math.max(.1,Math.min((winW()-18)/(cv.width+360),(winH()-12)/720));
+ document.documentElement.style.setProperty('--ui',k);
+ document.documentElement.style.setProperty('--game-w',cv.width);
+ fitTXK();
+}
 addEventListener('resize',scaleUI);scaleUI();
-// phone zoom: hover (mouse) or first tap blows the phone up to the full window height
-{const ph=$('phone');let swallow=false;
- const zoomOn=()=>{if(!UI.pz||ph.classList.contains('zoomed')||document.body.classList.contains('unlock'))return false;ph.classList.add('zoomed');return true;};
- const zoomOff=()=>ph.classList.remove('zoomed');
+// Zoom is stable until an outside tap; scrolling and controls never trigger it.
+{const ph=$('phone');let gesture=null,placeholder=null,swallowClick=false;
+ const zoomOn=()=>{if(!UI.pz||ph.classList.contains('zoomed')||document.body.classList.contains('unlock'))return false;placeholder=document.createElement('div');placeholder.style.cssText='flex:1;min-height:0';ph.replaceWith(placeholder);document.body.appendChild(ph);ph.classList.add('zoomed');return true;};
+ window.unzoomPhone=()=>{ph.classList.remove('zoomed');if(placeholder){placeholder.replaceWith(ph);placeholder=null;}};
  ph.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')zoomOn();});
- ph.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')zoomOff();});
- ph.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'&&zoomOn()){swallow=true;e.preventDefault();e.stopPropagation();}},true);
- ph.addEventListener('click',e=>{if(swallow){swallow=false;e.preventDefault();e.stopPropagation();}},true);
- document.addEventListener('pointerdown',e=>{if(!ph.contains(e.target))zoomOff();},true);}
+ ph.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse')gesture={x:e.clientX,y:e.clientY,target:e.target};});
+ ph.addEventListener('pointerup',e=>{if(gesture&&Math.hypot(e.clientX-gesture.x,e.clientY-gesture.y)<8&&!gesture.target.closest('button,.item,input,a,.log')){swallowClick=zoomOn();if(swallowClick){e.preventDefault();setTimeout(()=>swallowClick=false,500);}}gesture=null;});
+ ph.addEventListener('click',e=>{if(swallowClick){swallowClick=false;e.preventDefault();e.stopImmediatePropagation();}},true);
+ for(const event of ['click','dblclick','pointerdown','pointerup','pointermove','wheel','touchstart','touchmove','touchend'])ph.addEventListener(event,e=>e.stopPropagation(),{passive:true});
+ document.addEventListener('pointerdown',e=>{if(!ph.contains(e.target))unzoomPhone();},true);
+}
 // movable panels: unlock UI in the menu, drag the yellow bar, resize from the corner; layout is saved
 const FREE_IDS=['cuWrap','phone','rtop','menuBtn'];
 function freeEl(id,r){const el=$(id);if(!el)return;el.classList.add('free');$('game').appendChild(el);
@@ -2161,15 +2210,8 @@ function layoutCols(){const mob=true,w=$('cuWrap');document.body.classList.toggl
  const rt=$('rtop');const fr=x=>x.classList.contains('free');if(mob){if(!fr($('menuBtn')))rt.prepend($('menuBtn'));if(!w.classList.contains('float')&&!fr(w))$('rcol').appendChild(w);}
  else{if(!fr($('menuBtn')))$('lcol').prepend($('menuBtn'));if(!w.classList.contains('float')&&!fr(w))$('lcol').appendChild(w);}setTimeout(()=>typeof fitTXK==='function'&&fitTXK(),50);}
 addEventListener('resize',layoutCols);
-function fitLayout(){const rc=$('rcol');if(!rc)return;const W=winW()-18,H=winH()-12,ui=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui'))||1,ar=cv.width/720,mr=230*ui;
- const cw=Math.max(200,Math.min(H*ar,W-mr)),rw=W-cw;rc.style.setProperty('flex-basis',(rw/ui)+'px','important');rc.classList.toggle('wide',rw/ui>500);
- requestAnimationFrame(sizePhone);}
-// the phone keeps real phone proportions (1:2); it never stretches
-function sizePhone(){const ph=$('phone'),rc=$('rcol');if(!ph||ph.classList.contains('free')||ph.classList.contains('zoomed'))return;
- const wide=rc.classList.contains('wide'),cu=$('cuWrap'),rt=$('rtop'),gap=6;
- const cuH=(!wide&&cu.parentNode===rc)?cu.offsetHeight+gap:0;
- const availH=rc.clientHeight-rt.offsetHeight-gap-cuH,availW=wide?(rc.clientWidth-gap)/2:rc.clientWidth;
- const w=Math.max(120,Math.min(availW,availH/2));ph.style.setProperty('width',w+'px','important');ph.style.setProperty('height',(w*2)+'px','important');ph.style.flex='0 0 auto';ph.style.alignSelf='center';ph.style.justifySelf='center';}
+function fitLayout(){scaleUI();$('rcol').classList.remove('wide');requestAnimationFrame(sizePhone);}
+function sizePhone(){const ph=$('phone');if(!ph||ph.classList.contains('free'))return;ph.style.removeProperty('width');ph.style.removeProperty('height');}
 addEventListener('resize',()=>setTimeout(sizePhone,30));
 addEventListener('resize',()=>setTimeout(fitLayout,0));setTimeout(fitLayout,0);
 
@@ -2177,6 +2219,50 @@ let phoneOpen=true;function setPhone(o){phoneOpen=o;$('phone').classList.toggle(
 window.minPhone=()=>{view=null;phoneDirty=true;setPhone(false);};
 window.cycleRinger=()=>{if(!run)return;run.ringer={ring:'vibrate',vibrate:'silent',silent:'ring'}[run.ringer||'ring'];$('ringer').textContent={ring:'🔔 RING',vibrate:'📳 VIBRATE',silent:'🔕 SILENT'}[run.ringer];toast('Phone set to '+run.ringer.toUpperCase(),'#9aa0b0');};
 document.querySelectorAll('#tabs button').forEach(bt=>bt.onclick=()=>{document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===bt));['phone','cuWrap'].forEach(id=>$(id).classList.toggle('on',id===bt.dataset.t));});
+// Content is UI-only; game actions continue to use the existing handlers.
+const TIP_CARDS=[
+ ['tv','TV game and tapping','Tap enemies to shoot, the ground to move, bushes to spot hidden players and sparkles for loot. READY starts the next match; breaks give you time for the house.'],
+ ['combos','Combos and weapons','Keep landing hits to build combos. Pick up weapon drops and try their different firing styles. Watch the TV HUD for your current weapon and squad health.'],
+ ['pickaxe','Pickaxe','Fast TV taps build combos that can send Steve to a nearby building with his pickaxe. Smashing buildings earns materials and bux. An equipped shop pickaxe hits harder.'],
+ ['shop','Item shop','Open ITEMS from the TV lobby. Spend earned bux on skins, gliders, wraps, emotes and pickaxes. Owned items can be equipped without buying them again.'],
+ ['phone','Phone and replies','Texts and calls can wait until the break between matches. Open a message and tap words to build a reply, then SEND. Contacts, calls, inbox and conversation history share this device.'],
+ ['pizza','Pizza and pranks','Order from Tony’s Pizza on the phone when you have enough cash. Someone must answer the front door. The Movie Night skill and a VCR unlock a door prank; the Big Finale also uses firecrackers.'],
+ ['skills','Skills and strain','Jobs and wins earn skill points. Open SKILLS on the phone to unlock tiers and favors. Demanding too many favors raises strain and can put family members on strike.'],
+ ['bills','Bills','The phone shows the bill amount and countdown. Keep enough cash to pay; unpaid bills can turn the internet off. Use PAY on the phone when service is cut.'],
+ ['simba','Simba and the lamb','Drag and fling the lamb for Simba. Tap her for tug, to wiggle her off your lap or to help her sleep when tired. Hold and scrub drool off the TV.'],
+ ['house','House and deliveries','Use the house arrows to look around. Tap the stove, door, lift, work board and gate to interact. Watch CCTV for visitors and deliveries. Getting up mid-match costs a squad heart.'],
+ ['stats','Stats deck','Open STATS for relationships and today’s progress. The stats deck’s hi-fi, music player, docked phone and handheld offer more ways to inspect your afternoon.'],
+ ['graphics','Graphics modes','Choose CLASSIC or RPG from MENU. CLASSIC keeps the original phone; RPG adds the green-screen STEVE PAD. Both modes use the same controls and game rules.']
+];
+const tipsPage=document.createElement('section');tipsPage.id='tipsPage';tipsPage.hidden=true;tipsPage.setAttribute('role','dialog');tipsPage.setAttribute('aria-modal','true');tipsPage.setAttribute('aria-label','How to play');document.body.appendChild(tipsPage);
+const tipsBtn=document.createElement('button');tipsBtn.id='tipsBtn';tipsBtn.className='colbtn';$('menuBtn').after(tipsBtn);
+let tipsResume=null,tipsFocus=null;
+function tipsLabel(){tipsBtn.textContent='? TIPS '+(UI.tips?'ON':'OFF');tipsBtn.setAttribute('aria-pressed',String(UI.tips));}
+function paintTips(){tipsPage.innerHTML='<div class="tipsTop"><h2>STEVE’S FIELD GUIDE</h2><button onclick="UI.tips=!UI.tips;saveUI();tipsLabel();paintTips()">TOOLTIPS: '+(UI.tips?'ON':'OFF')+'</button><button onclick="closeTips()">CLOSE ×</button></div><div class="tipsGrid">'+TIP_CARDS.map(([id,title,text])=>`<article class="tipCard"><img src="assets/ui/tips/${id}.png" alt="" width="96" height="96"><h3>${title}</h3><p>${text}</p></article>`).join('')+'</div>';}
+function openTips(){if(!tipsPage.hidden)return;tipsFocus=document.activeElement;if(mode==='play'){tipsResume=mode;mode='pause';}paintTips();tipsPage.hidden=false;tipsPage.querySelector('button').focus();}
+function closeTips(){tipsPage.hidden=true;if(tipsResume){mode=tipsResume;tipsResume=null;}tipsFocus?.focus();}
+tipsBtn.onclick=()=>{UI.tips=!UI.tips;saveUI();tipsLabel();if(UI.tips)openTips();else closeTips();};tipsLabel();
+tipsPage.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();closeTips();}if(e.key==='Tab'){const b=[...tipsPage.querySelectorAll('button')],first=b[0],last=b.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
+const tipSeen=new Set(),tipBubble=document.createElement('div');tipBubble.id='contextTip';tipBubble.hidden=true;tipBubble.setAttribute('role','tooltip');document.body.appendChild(tipBubble);let tipTimer;
+function contextTip(el,key,text){
+ if(!UI.tips&&tipSeen.has(key))return;tipSeen.add(key);clearTimeout(tipTimer);tipBubble.textContent=text;tipBubble.hidden=false;
+ const r=el.getBoundingClientRect();tipBubble.style.left=Math.max(6,Math.min(innerWidth-tipBubble.offsetWidth-6,r.left))+'px';tipBubble.style.top=Math.max(6,Math.min(innerHeight-tipBubble.offsetHeight-6,r.top+24))+'px';
+ tipTimer=setTimeout(()=>tipBubble.hidden=true,6500);
+}
+for(const [id,key] of [['phone','phone'],['cuWrap','house'],['c','tv'],['deck','stats'],['ishop','shop']]){
+ const el=$(id),text=TIP_CARDS.find(t=>t[0]===key)[2];
+ el.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')contextTip(el,key,text);});
+ el.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse')contextTip(el,key,text);},{passive:true});
+ el.addEventListener('focusin',()=>contextTip(el,key,text));
+}
+// Existing secondary phone explanations become contextual tips as well.
+function phoneHints(){for(const el of $('screen').querySelectorAll('.ring>.tx:last-child,.thread>.log>.tx:first-child')){
+ if(!/Ignored calls|Earn SP|Delivered hot/.test(el.textContent))continue;
+ const text=el.textContent,host=el.parentElement;el.hidden=true;
+ host.onpointerenter=()=>contextTip(host,text,text);host.ontouchstart=()=>contextTip(host,text,text);
+}}
+new MutationObserver(phoneHints).observe($('screen'),{childList:true});
+
 // ================= menus =================
 const ov=$('ov');function show(h){ov.innerHTML=h;ov.classList.remove('hide');}function hide(){ov.classList.add('hide');}
 // in-game item shop: skins, wings, tracers, emotes and pickaxes, paid with bux earned on the TV

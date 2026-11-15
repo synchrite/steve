@@ -1,0 +1,17 @@
+UI pass for Steve's Day Off (index.html, single file). Read ASSETS.md and CODEX.md first. Another Codex job is painting rooms and lobby sprites in assets/ and tools/art/ at the same time: do not touch those files.
+
+1. Phone becomes a mode-styled device, same functions.
+ - In RPG mode (GFX==='16') the phone (#phone and its screen #screen, rendered by renderPhone()) is styled as a vintage 1990s pen-based PDA inspired by the Apple Newton era: grey-green plastic body, greenish monochrome-ish LCD look, stylus-friendly rounded buttons, a small "notepad" header strip. Original design, no Apple logo or name; call it "STEVE PAD". CLASSIC mode keeps the current phone look.
+ - Use CSS classes keyed off a body class (e.g. body.gfx-rpg / body.gfx-classic) set in setGfx(), so future graphics modes can add their own phone skin. Paint any small art (bezel texture, icons) with your image generation or Python and put it in assets/ui/<mode>/.
+ - Keep every existing function: inbox, threads, word-tap replies, calls, contacts, stats, skills, pizza ordering, bills. Do not change game logic.
+ - Fix the weird interactions: taps and scrolls inside the phone must not trigger game clicks or phone zoom unexpectedly; the zoom-on-hover/first-tap (UI.pz) should only zoom once and stay usable; scroll positions should not jump when the phone re-renders (renderPhone replaces innerHTML; preserve scroll of .log and the inbox list).
+
+2. UI scaling. Phone, CCTV panel, top buttons (MENU, FULL SCREEN), the stats deck, item shop and menus must scale together with the game canvas. Look at scaleUI(), fitLayout(), sizePhone(), the --ui CSS variable and fitTXK(). Make one scale factor drive all of them so panel text and buttons stay proportional to the game at any window size, desktop and mobile landscape. Test at 1280x720, 1920x1080, 800x600 and 844x390.
+
+3. Tips. Remove the fixed help text from the phone area (e.g. "Texts and calls can wait until the break between matches. Tap words to reply.") and similar always-on hints; show them as small tooltips instead (on hover or first tap of that area, shown once per session unless tips are on).
+ - Add a "? TIPS" toggle button next to the MENU button. On: tooltips show. It also opens a big instructions page: one card per feature (TV game and tapping, combos and weapons, pickaxe, item shop, phone and replies, pizza and pranks, skills and strain, bills, Simba and the lamb, the house and deliveries, stats deck, graphics modes). Each card gets cute small original pixel art made with your image generation, saved in assets/ui/tips/. Same look in both modes is fine, but match the current pixel theme.
+ - Persist the tips toggle in the existing UI settings (localStorage steveUI).
+
+4. Update ASSETS.md (phone skin row, tips art) and add a short note to CODEX.md.
+
+Verify: index.html script parses (node --check on the extracted script), no console errors when starting a game in both modes. Do not commit or push. Print a summary of changes at the end.

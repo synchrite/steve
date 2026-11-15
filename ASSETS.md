@@ -39,7 +39,9 @@ Status key: **replaced** = the mode has its own art and it is drawn. **loaded, n
 | TV game: 3D people | textured boxes from `charAtlas` (code) | none | falls back; still low-poly and primitive |
 | HUD, meters, buttons, READY button | code | none (READY is restyled per mode in code) | partly styled per mode |
 | Stats deck (hi-fi, Zune, docked phone, handheld) | HTML/CSS | none | same in all modes |
-| Item shop, phone, menus | HTML/CSS | none | same in all modes |
+| Phone skin | original HTML/CSS phone | mode CSS: `body.gfx-rpg #phone` | replaced: original grey-green STEVE PAD, notepad strip, LCD and rounded pen-friendly controls; CLASSIC unchanged |
+| Tips instruction art (12 cards) | `assets/ui/tips/{tv,combos,pickaxe,shop,phone,pizza,skills,bills,simba,house,stats,graphics}.png` | same files | replaced: original generated 64 x 64 icons, shared palette, nearest-neighbor display |
+| Item shop, menus, tips guide | HTML/CSS | shared HTML/CSS | shared `--ui` scale with canvas, phone, CCTV and stats deck; tips setting stored in `steveUI` |
 
 ## Known gaps in RPG mode
 

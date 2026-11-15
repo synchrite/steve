@@ -7,6 +7,7 @@ from pixelize import pixelize, PAL
 ROOT=Path(__file__).resolve().parent
 OUT=ROOT.parent.parent/'assets'/'lobby'
 NAMES=['steve','bront','serein','vesper','solaro','rivet','orion']
+NEW_NAMES=['hoops','narc','jug','neonpunk','glitch','rollerqueen','dad','sunny']
 
 def frames(name):
     return ['0','1','2','3','dance0','dance1'] if name=='steve' else ['idle0','idle1','dance0','dance1','shoot0']
@@ -23,7 +24,7 @@ def split(im,n):
     cuts.append(im.width)
     return [im.crop((cuts[i],0,cuts[i+1],im.height)) for i in range(n)]
 
-def main():
+def legacy_main():
     OUT.mkdir(parents=True,exist_ok=True)
     sheet=Image.new('RGB',(6*82+12,7*125+26),'#e4ddd0')
     d=ImageDraw.Draw(sheet);font=ImageFont.load_default()
@@ -68,5 +69,55 @@ def main():
     sheet.resize((sheet.width*3,sheet.height*3),Image.Resampling.NEAREST).save(ROOT/'sheet_lobby.png')
     print(f'{len(manifest)} PNGs: exact 64x96, binary alpha, shared palette, balanced bottom anchors; sheet exact 3x.')
     (ROOT/'lobby_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+
+def main():
+    # Preserve all 36 approved originals byte-for-byte; only finalize new studies.
+    import pixelize as shared
+    samples=Image.new('RGB',(256*len(NEW_NAMES),256),'#302d32')
+    for i,name in enumerate(NEW_NAMES):
+        src=Image.open(ROOT/'lobby_sources'/f'{name}.png').convert('RGBA')
+        tile=Image.new('RGB',src.size,'#302d32');tile.paste(src,mask=src.getchannel('A'))
+        samples.paste(tile.resize((256,256),Image.Resampling.BOX),(i*256,0))
+    q=samples.quantize(colors=192,method=Image.Quantize.MEDIANCUT,dither=Image.Dither.NONE)
+    palette=PAL+[tuple(q.getpalette()[i:i+3]) for i in range(0,576,3)]
+    shared.PAL=palette
+    for name in NEW_NAMES:
+        src=Image.open(ROOT/'lobby_sources'/f'{name}.png').convert('RGBA')
+        for frame,pose in zip(frames(name),split(src,5)):
+            sprite=shared.pixelize(pose,(64,96))
+            # Discard tiny isolated generation flecks, keeping deliberate clusters.
+            pixels=sprite.load();seen=set()
+            for yy in range(96):
+                for xx in range(64):
+                    if (xx,yy) in seen or not pixels[xx,yy][3]:continue
+                    stack=[(xx,yy)];component=[];seen.add((xx,yy))
+                    while stack:
+                        x,y=stack.pop();component.append((x,y))
+                        for nx,ny in [(x-1,y),(x+1,y),(x,y-1),(x,y+1)]:
+                            if 0<=nx<64 and 0<=ny<96 and (nx,ny) not in seen and pixels[nx,ny][3]:
+                                seen.add((nx,ny));stack.append((nx,ny))
+                    if len(component)<(40 if name=='jug' else 8):
+                        for x,y in component:pixels[x,y]=(0,0,0,0)
+            crop=sprite.crop(sprite.getbbox());sprite=Image.new('RGBA',(64,96))
+            sprite.paste(crop,((64-crop.width)//2,96-crop.height))
+            sprite.save(OUT/f'fighter_{name}_{frame}.png')
+    names=NAMES+NEW_NAMES
+    sheet=Image.new('RGB',(504,len(names)*125+26),'#e4ddd0');d=ImageDraw.Draw(sheet)
+    d.text((8,7),'ORIGINAL RPG LOBBY FIGHTERS / 64x96 / PASS 4',fill='#302d32')
+    manifest=[]
+    for row,name in enumerate(names):
+        for col,frame in enumerate(frames(name)):
+            path=OUT/f'fighter_{name}_{frame}.png';sprite=Image.open(path).convert('RGBA')
+            assert sprite.size==(64,96)
+            assert set(sprite.getchannel('A').getdata())<={0,255}
+            box=sprite.getbbox();assert box[3]==96 and abs(box[0]-(64-box[2]))<=1
+            assert all(p[:3] in palette for p in sprite.getdata() if p[3])
+            x=12+col*82;y=29+row*125
+            d.rectangle((x-2,y-2,x+65,y+96),fill='#648092');sheet.paste(sprite,(x,y),sprite)
+            d.text((x,y+99),name,fill='#302d32');d.text((x,y+111),frame,fill='#302d32');manifest.append(path.name)
+    sheet.resize((sheet.width*3,sheet.height*3),Image.Resampling.NEAREST).save(ROOT/'sheet_lobby.png')
+    (ROOT/'lobby_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+    (ROOT/'lobby_palette_pass4.json').write_text(json.dumps(palette)+'\n')
+    print('PASS:',len(manifest),'sprites; exact size, palette, binary alpha, balanced floor anchors.')
 
 if __name__=='__main__':main()

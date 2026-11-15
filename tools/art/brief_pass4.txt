@@ -1,0 +1,23 @@
+Pass 4 for Steve's Day Off. Two jobs. Read CODEX.md, tools/art/generated_rooms.py, tools/art/rooms_crops.json, tools/art/house_layout.json, tools/art/lobby_fighters.py and tools/art/lobby_manifest.json first.
+
+The graphics mode is now called RPG (it was "16-bit"). An earlier realistic 90s attempt was rejected for RPG mode and is kept aside for a future mode (tools/art/rooms_src_real/, tools/art/rooms_prompts_real.json). Do not use or overwrite those.
+
+JOB 1: RPG room backgrounds, cartoony.
+Redo assets/house_bg.png (1320x192) and assets/cctv_{yard,stove,door,couch,bath,kid,wife}.png. Same exact sizes, filenames and layout as pass 3 (house_layout.json), so no code change is needed.
+Style: cartoony and blocky like the current pass-3 art, NOT realistic. Same chunky shapes, bold readable silhouettes, clean dark outlines, simple forms. Improve it with higher fidelity (cleaner detail, crisper pixel clusters, no noisy mush) and better colour depth (up to 256 colours, smooth hand-placed shading ramps, warm light, soft dithering). Think a polished late-SNES / GBA cartoon RPG interior. Original art only.
+Keep the TV screen, stove pot area, lift bay and car spaces clear like pass 3. Paint a proper stovetop with burners. Keep the floor strip where characters walk lower in contrast so sprites read.
+Use your built-in image generation, then downscale and palette-snap. Raw generations go in tools/art/rooms_src/ (git-ignored). Update generated_rooms.py and rooms_prompts.json so it is reproducible.
+
+JOB 2: more lobby player characters (arcade-fighter style sprites like the existing assets/lobby/fighter_*).
+Add 8 new original characters, each with the same 5 frames and the same canvas size, framing and feet baseline as the existing ones: fighter_<name>_{idle0,idle1,dance0,dance1,shoot0}.png in assets/lobby/. Much more colourful variety: neon colours, wild hair. Characters:
+ 1. hoops: a tall basketball player in a bright jersey and headband.
+ 2. narc: a generic friendly cartoon police mascot (trench coat, badge, big chin). Generic, not any real mascot.
+ 3. jug: a big round cartoon juice-jug mascot with arms and legs, cherry red drink inside, smiling face on the glass. Original design: do not copy any brand mascot, no logo, no brand name.
+ 4. neonpunk: neon pink and green mohawk, leather jacket.
+ 5. glitch: a gamer with electric blue spiky hair, LED hoodie.
+ 6. rollerqueen: roller skater, rainbow afro, sweatband.
+ 7. dad: an ordinary-looking guy in cargo shorts and a polo, sunglasses.
+ 8. sunny: a surfer with neon orange hair and a wetsuit.
+Keep them in the same polished 16-bit fighter look as the existing sprites. Update lobby_manifest.json, regenerate tools/art/sheet_lobby.png.
+
+Both: add a short Pass 4 note to CODEX.md. Do not edit index.html, frozen/ or ref/. Do not commit or push. When done, print the list of new files.

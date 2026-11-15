@@ -1,0 +1,18 @@
+Theme art pass for Steve's Day Off. Read ASSETS.md, CODEX.md, tools/art/house_layout.json, tools/art/rooms_crops.json, tools/art/lobby_manifest.json first. Another Codex job is editing index.html right now: do NOT touch index.html. Only write under assets/<theme>/ and tools/art/.
+
+Graphics themes (each its own folder, same filenames and pixel sizes as the existing files so code can swap folders):
+- classic: drawn in code, no files. Leave alone.
+- 16bit: assets/16bit/ = pass-3 art. Complete it.
+- rpg: assets/rpg/ = pass-4 cartoony rooms. Complete it.
+- gritty: assets/gritty/ NEW. Gritty early-90s arcade beat-em-up look: chunky outlined sprites, grimy city colours, graffiti, neon signs through windows, harsh shadows, dramatic palette. The house is still the same house and layout, just dressed and lit in that style. Original art only.
+- modern: assets/modern/ NEW. Aims for realism but stays very stylized and artistic, high detail, painterly lighting, rich colour. Not photographic.
+- halloween: assets/halloween/ NEW. Uses modern's style and the same layout, decorated for Halloween: jack-o-lanterns, cobwebs, orange and purple light, fog in the yard, spooky props. Night-leaning palette but the walk strip must stay readable.
+
+For EVERY theme folder (16bit, rpg, gritty, modern, halloween) make sure all of these exist at the listed sizes (copy the size of the file in assets/ or assets/16bit/):
+ house_bg.png, cctv_{yard,stove,door,couch,bath,kid,wife}.png,
+ steve_couch.png, steve_walk.png, wife.png, kid.png, simba_{stand,sit,sleep,lap}.png, lamb_toy.png,
+ burglar_short.png, burglar_tall.png, car_lift.png, tv_frame.png, lobby_shack.png,
+ tex/island_bg.png, tex/tex_{grass,sand,snow,desert,rock,cliff,building,water0,water1}.png, tex/sky_day.png, tex/sky_dusk.png, tex/bb_{tree,palm,bush,chest,vend,steve,ally,enemy}.png,
+ NEW (missing everywhere, add them): pizza_driver.png (36x60, red cap and jacket, holding a pizza box), pizza_driver_fall.png (60x28, lying on his back), lawn_statue.png (16x30 stone garden statue), pizza_box.png (24x10), and top-down TV-game sprites in tex/: td_steve.png, td_enemy.png, td_ally.png (16x16 each), td_chest.png, td_vend.png, td_drop.png (16x16), weapon icons wpn_{shotgun,rocket,laser,bubble,mini,snow,pick,pistol}.png (24x10).
+Rules: rpg reuses 16bit character sprites unless you improve them; halloween reuses modern files except where Halloween dressing matters (rooms, cctv, tv_frame, sky, island_bg, lobby_shack, statue). Characters keep their identities everywhere (Steve: space-ranger suit; kid in a cap, black hair, slightly darker skin; Simba a tan dog; wife; burglars). Do not draw real people's faces. Use your built-in image generation, then downscale and palette-snap (16bit: 64 colours, rpg: 256, gritty: 128, modern/halloween: 256 with careful dithering). Keep transparent backgrounds for sprites.
+Write tools/art/themes_manifest.json: for each theme, each file, "made" | "copied from <theme>" | "missing". Make a contact sheet per theme at tools/art/sheet_theme_<name>.png. Add a Themes section to CODEX.md. Do not commit or push. Print a summary at the end.
