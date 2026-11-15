@@ -19,7 +19,7 @@ HEX = (
     '293948','40576a','648092','93a8a5',
     '353c2d','505b3c','758052','9a9e6b',
     '69435c','a76080','d98ba3','efb4bc',
-    '776080','b6a0c6','b6ce4c','b24943','b9ad98')
+    '776080','b6a0c6','b6ce4c','b24943','b9ad98','f4cf24')
 PAL = [tuple(bytes.fromhex(c)) for c in HEX]
 BAYER = ((0,8,2,10),(12,4,14,6),(3,11,1,9),(15,7,13,5))
 MATS = {'fur':(6,7,8,9,10),'cream':(31,0,11),'wood':(3,6,7,2,9),
@@ -134,15 +134,22 @@ def main():
     sheet=Image.new('RGBA',(404,150),PAL[0]+(255,));d=ImageDraw.Draw(sheet)
     font=ImageFont.load_default_imagefont()
     d.text((10,7),'STEVE\'S DAY OFF / PASS 3 / CLEAN CLUSTER STUDY',fill=PAL[3],font=font)
-    d.text((10,20),'DELIBERATE CLUSTERS / TOP-LEFT LIGHT / 32 COLORS',fill=PAL[6],font=font)
+    d.text((10,20),'DELIBERATE CLUSTERS / TOP-LEFT LIGHT / 33 COLORS',fill=PAL[6],font=font)
     floor=119;d.rectangle((0,floor,403,149),fill=PAL[1]);d.line((0,floor,403,floor),fill=PAL[31]);d.line((0,floor-2,403,floor-2),fill=PAL[31])
     items=[('DOOR',door(),11),('STAND',dog(),61),('SIT',dog(True),121),('STEVE',human(),172),('WIFE',human('wife'),210),('KID',human('kid'),247),('COUCH / STEVE',couch(),288),('LAMB',lamb(),265)]
     for label,sprite,x in items:
         if label=='LAMB': continue
         w,h=sprite.size;d.ellipse((x+2,floor-2,x+w-2,floor+2),fill=PAL[31]);sheet.alpha_composite(sprite,(x,floor-h))
         d.text((x,127),label,fill=PAL[3],font=font)
-    # Seated Steve's shoes meet the same floor. Couch seat is 28px above floor.
-    sheet.alpha_composite(human(seated=True),(314,floor-48))
+    # Sink hips 4px into the cushion; shorten the lower-leg rows so shoes
+    # keep their floor anchor rather than moving below the couch.
+    seated=human(seated=True)
+    seated=seated.crop((0,0,32,38)).copy()
+    legs=human(seated=True).crop((0,42,32,48))
+    seated_full=Image.new('RGBA',(32,44))
+    seated_full.alpha_composite(seated,(0,0))
+    seated_full.alpha_composite(legs,(0,38))
+    sheet.alpha_composite(seated_full,(314,floor-44))
     toy=lamb();sheet.alpha_composite(toy,(264,floor-20));d.text((260,138),'LAMB',fill=PAL[3],font=font)
     # Palette strip makes shared material constraints directly reviewable.
     for i,c in enumerate(PAL):d.rectangle((10+i*4,140,13+i*4,144),fill=c)
@@ -150,10 +157,10 @@ def main():
     palette=Image.new('P',(1,1));palette.putpalette([v for c in PAL for v in c]+[0]*(768-len(PAL)*3))
     sheet=sheet.convert('RGB').quantize(palette=palette,dither=Image.Dither.NONE).convert('RGBA')
     output=sheet.resize((1616,600),Image.Resampling.NEAREST);output.save(ROOT/'lineup.png')
-    assert len(output.getcolors(100000))<=32
+    assert len(output.getcolors(100000))<=33
     assert set(output.getchannel('A').getdata())=={255}
     assert output.resize(sheet.size,Image.Resampling.NEAREST).resize(output.size,Image.Resampling.NEAREST).tobytes()==output.tobytes()
-    print('lineup.png: 1616x600, exact 4x nearest-neighbor, <=32 colors, binary alpha; anchors verified.')
+    print('lineup.png: 1616x600, exact 4x nearest-neighbor, <=33 colors, binary alpha; anchors verified.')
 
 if __name__=='__main__':main()
 

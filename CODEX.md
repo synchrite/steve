@@ -59,7 +59,7 @@ Reference photos are in `ref/` (local only, not committed). Use them for colors 
 - **Simba**: tan pit/shepherd mix. Fur base #c98f4e with lighter belly and darker back. Big upright ears with darker insides, black muzzle, warm brown eyes. Lilac woven collar with a lime-green buckle.
 - **Steve**: olive camo hoodie, short brown hair, light beard, jeans. Holds a game controller on the couch.
 - **Wife**: pink hair in a bun, patterned glasses, denim overalls over a black shirt.
-- **Kid**: yellow shirt, blond hair, about half Steve's height.
+- **Kid**: saturated yellow T-shirt with sleeves and shorts, black hair under a cap with a little visible at the sides; gender-ambiguous, about half Steve's height.
 - **Burglars**: an original bumbling pair. One short and round in a red beanie and striped shirt; one tall and lanky in a dark jacket and flat cap.
 - **Lamb toy**: off-white plush lamb with stubby legs and a red stitched mouth.
 
@@ -154,3 +154,18 @@ sprite limits, balanced bottom anchors, four standing leg separations,
 reviewed the final sheet. Only the approval lineup is exported; individual
 assets remain pending owner approval. No git commands run; index.html,
 assets/ and frozen/ were not edited. Reference photos remain local only.
+
+2026-11-14 (targeted approval-lineup corrections): Updated the kid in
+cluster_art.py with a blue baseball cap covering most of the black hair,
+small visible black side locks, a saturated yellow T-shirt with distinct
+sleeves, and shorts. Kept the existing size and pixel-cluster style.
+Shortened and squared off both Simba muzzles; lowered seated Steve into
+the couch cushion by 4 native pixels while retaining his floor contact.
+Re-rendered tools/art/lineup.png only; no individual assets exported.
+Added one saturated yellow to the original palette (33 total), a narrow
+exception to the 32-color brief to keep all existing material colors intact.
+Updated the kid description above and palette-count validation/docs.
+Visually reviewed the lineup; check_lineup.py passes dimensions, palette,
+binary alpha, bottom-center anchors, four standing leg separations, exact
+4x nearest-neighbor enlargement and byte-identical regeneration.
+No git commands run; index.html, assets/ and frozen/ were not edited.
