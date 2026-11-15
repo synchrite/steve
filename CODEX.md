@@ -443,3 +443,39 @@ fixed wall coordinates against house_layout.json, protected-zone pixel checks,
 and byte-identical regeneration of all eight exports and the contact sheet.
 No git commands run. No writes to index.html, frozen/ or ref/. Game code and
 wiring remain unchanged; no live in-game review was performed for this repaint.
+
+
+### Notes from Codex - 2026-11-14 (image-generated room replacement)
+
+Used the built-in image generation tool for fifteen separate original sources:
+living room, kitchen, bathroom, master bedroom, kid bedroom, garage, yard, lot,
+and all seven CCTV views. Raw generations are saved locally in the ignored
+tools/art/rooms_src/ directory. These generated raster paintings replace the
+rejected procedural room art, adding floral wallpaper, dense shelves, carved
+wood, textiles, ceramics, layered gardens and strong warm sunbeams. Original
+designs; no particular game's imagery was copied or requested.
+
+Replaced assets/house_bg.png at 1320 x 192, all seven assets/cctv_*.png at
+320 x 220, and tools/art/sheet_rooms.png. Added generated_rooms.py for exact
+aspect crops, BOX area downsampling, measured furniture registration grids,
+shared palette conversion and compositing. Wall fields are checked against
+house_layout.json; drawHouse() and drawCU() were read. Captured structural
+strips, door and TV footprints remain registered. Stove working surfaces,
+empty lift, blank work board and empty lot car spots are protected for runtime
+drawing. CCTV screens remain uniformly dark. No people, moving cars, flames,
+timestamps or scanlines were baked into the art. Set dressing follows each
+generated camera view; no live in-game review was performed.
+
+Expanded the shared palette from 48 to the authorized 64 colors, retaining all
+existing entries/indices. Added #211b22 #38251e #603b26 #956138 #ce9959 #f7d98a
+#fff6d9 #a34832 #693d39 #c56e53 #315664 #528d9b #82b7c2 #304b38 #58804c #a9b776.
+Fixed surface quantizer padding to repeat a valid palette entry instead of
+admitting unintended pure black. No existing sprites or textures regenerated.
+Prompt set: tools/art/rooms_prompts.json. Crop/registration manifest:
+tools/art/rooms_crops.json. Rebuild with Pillow:
+python tools/art/generated_rooms.py (requires the local raw-source directory).
+
+Visually inspected the final contact sheet. Checks pass exact dimensions,
+opaque RGB, shared palette membership, captured wall fields, four dark screens,
+plain working zones and unchanged SHA-256 hashes for index.html and every file
+in frozen/. No git commands run. No edits to index.html, frozen/ or ref/.

@@ -1,0 +1,66 @@
+﻿{
+  "tool": "built-in image_gen",
+  "style": "Original mid-90s 16-bit console RPG environment pixel art, richly detailed dense set dressing, readable hard-edged pixel clusters, warm cozy atmosphere, strong light and shadow, sunbeams, textured materials. All percentages relative to canvas. Full bleed artwork, no borders or labels, no UI timestamps scanlines, no characters, no animation effects, no logos. Original design, do not imitate any specific game. Coherent walnut/cream/ochre/slate/olive/plum shared colors.",
+  "rooms": [
+    [
+      "living",
+      "Wide 304:192 orthographic living room; floral cream wallpaper, walnut shelves of objects, window x26%-43% y25%-46%, door x1%-9% y56%-100%, tan couch x14%-41% y69%-96%, coffee table x30%-49% y89%-100%, cabinet x46%-87% y77%-100%, blank TV x53%-80% y48%-75%, warm sunbeams and textured rug."
+    ],
+    [
+      "kitchen",
+      "Side-view orthographic cutaway, narrow portrait aspect 132:192. Cream patterned wallpaper, window upper left, wooden base cabinets lower left x6%-67% y79%-100%, stove at x30%-58% y71%-79%, tall cream refrigerator right x73%-97% y42%-100%. Shelves of jars, hanging pans, ceramic backsplash, sunbeams. Keep stove airspace empty, no pot."
+    ],
+    [
+      "bathroom",
+      "Side-view orthographic cutaway, tall narrow portrait aspect 72:192. Blue glazed patterned tiles, mirror centered x28%-67% y40%-56%, toilet bottom left x8%-36% y79%-100%, vanity sink bottom right x50%-94% y83%-100%. Towels, bottles, flowers, small high window, rich reflected sunlight."
+    ],
+    [
+      "master",
+      "Side-view orthographic cutaway, portrait aspect 92:192. Lavender floral wallpaper, walnut double bed across x4%-87% at y75%-100%, quilt and pillows, tiny bedside table right at y71%-100%, picture at x26%-61% y35%-48%. Window above bed with golden sunbeams, shelf of keepsakes, books, rug."
+    ],
+    [
+      "kid",
+      "Side-view orthographic cutaway, tall portrait aspect 72:192. Golden patterned wallpaper, wood bunk bed x6%-83% y54%-100%, upper red mattress at y58%, lower blue mattress at y78%, ladder right. Blank dark TV x11%-78% y31%-47%, small black console below at y49%-53%. Shelves of toys, original space poster, sunlight, no characters."
+    ],
+    [
+      "garage",
+      "Side-view orthographic cutaway wide aspect 224:192. Corrugated workshop walls, craft table far left x2%-16% y79%-100%, craft pinboard above. Two red car lift posts at x20% and x66% from y44%-100%, EMPTY central lift bay x22%-66% y44%-94% plain concrete wall and floor NO CAR NO TOOLS in this bay; platform near bottom. Blank cream work board x36%-71% y19%-44%. Workbench far right x73%-97% y79%-100% with red toolbox, shelves of tools and parts above. Warm afternoon sun through high workshop windows, dense details around edges, no people."
+    ],
+    [
+      "yard",
+      "Side-view exterior strip, portrait aspect 100:192. Garage edge left, garden lawn at bottom, sunny blue sky, layered shrubs, pots and wildflowers along edges, rustic mailbox, large tree trunk near center rising out of top, warm sunlit grass, plain open lawn bottom right for gameplay. NO cars or people or signs with text."
+    ],
+    [
+      "lot",
+      "Side-view exterior car lot, wide aspect 280:192. Sunny sky, distant trees, weathered blank cream rectangular sign x7%-57% y10%-23% on two metal legs down to y38%, chainlink fence y69%-100%, open gravel floor. Entire bottom third must be clear empty gravel with NO cars NO objects, runtime car spots. Lush distant shrubbery, tiny flowers only at sides, warm light, no text."
+    ],
+    [
+      "cctv_yard",
+      "Security camera slightly elevated oblique view of sunny cozy yard, 320:220 aspect. Garage side occupies leftmost 15% from y27%-64%, window x3%-11% y35%-45%. Chainlink base fence across x44%-81% y40%-67%, lawn starts y64%, empty lawn foreground. Dense garden details at edges, flowers, leafy trees behind fence, stone path at bottom left. No cars or people."
+    ],
+    [
+      "cctv_stove",
+      "Security camera slightly elevated view into kitchen 320:220 aspect. Patterned cream wall, glazed backsplash, shelves of jars densely arranged upper corners, walnut cabinetry across lower third. Empty stove counter x19%-81% y56%-65%, two unlit burners at x25%-38% and x63%-75% y53%-56%. CRITICAL keep entire middle rectangle x19%-81% y20%-65% as plain backsplash, no pots or hanging objects there because runtime pot. Window and sunbeams from left edge."
+    ],
+    [
+      "cctv_door",
+      "Security camera slightly elevated view into cozy entrance 320:220 aspect. Paneled wooden front door exactly x13%-44% y18%-76%, brass knob at x38% y49%. Cream floral wallpaper, entry table right x56%-81% y69%-91%, plant far right, shelves full of books and keepsakes on upper right, framed art, patterned welcome rug bottom left, woodgrain floor beginning y73%, window and warm sunbeams."
+    ],
+    [
+      "cctv_couch",
+      "Security camera slightly elevated view into living room 320:220 aspect. Tan sofa left x4%-58% y44%-85%, blank dark television right x63%-98% y18%-51%, walnut TV cabinet below x61%-99% y59%-79%, coffee table lower center x34%-71% y83%-97%. Cream rose patterned wallpaper, shelves of books upper center, window top left, embroidered cushions, throws, warm sunbeams, woodgrain floor at y78%, patterned rug. No people or dogs."
+    ],
+    [
+      "cctv_bath",
+      "Security camera slightly elevated view into bathroom 320:220 aspect. Central paneled wood door exactly x34%-66% y13%-82%, blank cream plaque x39%-61% y20%-31%. Blue ceramic patterned tile wall, white toilet left x13%-27% y55%-86%, vanity right x74%-94% y41%-69%, mirror x76%-91% y14%-36%. Towels, bottles, plants, sunlight from small high window, tiled floor bottom y73%-100%."
+    ],
+    [
+      "cctv_kid",
+      "Security camera slightly elevated view into cozy kid bedroom 320:220 aspect. Wood bunk bed left x6%-44% y24%-77%, red upper mattress at y27%, blue lower mattress at y45%, ladder on right of bed. Blank dark TV right x73%-98% y12%-38%, black console shelf below at y43%. Gold patterned wallpaper, window upper left, shelves of toys and books upper center, original rocket poster, scattered toy blocks bottom left, gaming chair lower right, green patterned rug bottom center, grain wood floor bottom y78%, warm sunbeams. No people."
+    ],
+    [
+      "cctv_wife",
+      "Security camera slightly elevated view into cozy craft corner 320:220 aspect. Pegboard upper left x9%-33% y9%-50%, craft dresser left x12%-30% y55%-83%, craft table right x60%-91% y59%-91%, supplies on table, shelves of books yarn fabric and jars across upper wall. Keep center x34%-59% y30%-90% unobstructed for runtime person. Warm cream floral wallpaper, window upper center, woodgrain floor y76%-100%, purple patterned rug bottom center, laundry basket far right, strong warm sunbeams."
+    ]
+  ]
+}

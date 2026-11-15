@@ -22,7 +22,10 @@ HEX = (
     '776080','b6a0c6','b6ce4c','b24943','b9ad98','f4cf24','b27a54','c58f67','dca77e',
     # Room pass: plaster, walnut, upholstery, ceramic and garden shade ramps.
     '65534b','957b61','bdab89','d6c6a5','f5dfa9','47352e',
-    'a57a50','b88859','cbb78e','abc1ba','54705b','814a43')
+    'a57a50','b88859','cbb78e','abc1ba','54705b','814a43',
+    # Generated room pass: additional deep shadows and saturated material accents.
+    '211b22','38251e','603b26','956138','ce9959','f7d98a','fff6d9','a34832',
+    '693d39','c56e53','315664','528d9b','82b7c2','304b38','58804c','a9b776')
 PAL = [tuple(bytes.fromhex(c)) for c in HEX]
 BAYER = ((0,8,2,10),(12,4,14,6),(3,11,1,9),(15,7,13,5))
 MATS = {'fur':(6,7,8,9,10),'cream':(31,0,11),'wood':(3,6,7,2,9),
@@ -100,7 +103,9 @@ def surface_pixelize(source, size):
     """Opaque textures keep their UV bounds: no silhouette outline or trimming."""
     source = source.convert('RGB').resize(size, Image.Resampling.NEAREST)
     palette = Image.new('P', (1, 1))
-    palette.putpalette([v for c in PAL for v in c] + [0] * (768-len(PAL)*3))
+    # Pad with a real palette entry: zero padding admits unintended pure black
+    # when quantizing the deeper shadows in generated artwork.
+    palette.putpalette([v for c in PAL for v in c] + list(PAL[-1]) * (256-len(PAL)))
     return source.quantize(palette=palette, dither=Image.Dither.NONE).convert('RGB')
 
 
