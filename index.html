@@ -1567,7 +1567,9 @@ function clipNow(){return {y0:HY-12};}
 function flushArt(){const k=SC/2;for(const a of ART_Q){const w=a.im.naturalWidth*k,h=a.im.naturalHeight*k,px=a.x*SC,py=a.y*SC;ctx.save();ctx.beginPath();ctx.rect(0,a.clip.y0*SC,cv.width,720);ctx.clip();if(a.flip){ctx.translate(Math.round(px),0);ctx.scale(-1,1);ctx.drawImage(a.im,Math.round(-w/2),Math.round(py-h),w,h);}else ctx.drawImage(a.im,Math.round(px-w/2),Math.round(py-h),w,h);ctx.restore();}ART_Q.length=0;}
 
 // ================= HUD =================
-function txt(s,x,y,c='#fff',sz=8,al='left'){ctx.font=`${sz}px ${FONT}`;ctx.textAlign=al;ctx.fillStyle='#000';ctx.fillText(s,x+2,y+2);ctx.fillStyle=c;ctx.fillText(s,x,y);ctx.textAlign='left';}
+// every canvas text gets a black outline so it reads on any background
+{const P=CanvasRenderingContext2D.prototype,F=P.fillText;P.fillText=function(s,x,y,m){const fs=String(this.fillStyle).toLowerCase();if(fs!=='#000000'&&fs!=='#000'&&!this._noOutline){const px=parseFloat(this.font)||8;this.save();this.strokeStyle='#000';this.lineWidth=Math.max(2,px/3);this.lineJoin='round';this.miterLimit=2;m==null?this.strokeText(s,x,y):this.strokeText(s,x,y,m);this.restore();}return m==null?F.call(this,s,x,y):F.call(this,s,x,y,m);};}
+function txt(s,x,y,c='#fff',sz=8,al='left'){ctx.font=`${sz}px ${FONT}`;ctx.textAlign=al;ctx.fillStyle=c;ctx.fillText(s,x,y);ctx.textAlign='left';}
 function bar(x,y,w,h,f,c){ctx.fillStyle='#000';ctx.fillRect(x-2,y-2,w+4,h+4);ctx.fillStyle='#222';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,w*clamp(f,0,1),h);}
 function btn(label,x,y,w,h,col,fn){ctx.fillStyle='#000';ctx.fillRect(x-3,y-3,w+6,h+6);ctx.fillStyle=col;ctx.fillRect(x,y,w,h);txt(label,x+w/2,y+h/2+5,'#fff',8,'center');hits.push({x,y,w,h,fn});}
 function drawHUD(){
