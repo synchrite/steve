@@ -1,0 +1,36 @@
+# Roadmap
+
+Plain list of where the game is going, in order. Update it when an item finishes or the plan changes.
+
+## Now
+
+- Theme art pass (Codex): finish 16-BIT and RPG, add GRITTY, MODERN, HALLOWEEN. See `ASSETS.md`.
+- Theme picker in the menu, with per-theme asset folders and fallback to the previous theme.
+- Wire the art that loads but is not drawn yet: TV set, burglars, car on the lift, pizza driver, lawn statue, top-down TV sprites, weapon icons.
+- Show-readiness review, then a gameplay wave: minigames for repetitive tasks, more interactions with the family and Simba.
+
+## Next: themes as "DLC"
+
+All themes are free. The menu presents them like paid DLC as a joke, then asks for a donation instead of a payment.
+
+- A **THEMES** screen styled like a game-store DLC page: each theme gets a card with a preview, a description and a price tag that is crossed out and stamped FREE (for example "~~$4.99~~ FREE!" or "~~1,200 Gems~~ FREE").
+- Every theme can be equipped without paying. Nothing is locked.
+- Each card and the screen footer have a "Tip the developer" button with playful copy ("This DLC cost $0. Your support costs whatever you like.").
+- Themes planned: CLASSIC (base game), 16-BIT, RPG, GRITTY, MODERN, HALLOWEEN, then more seasonal or style packs later (each one is a new folder under `assets/<theme>/`).
+- Track which themes exist and what each one replaces in `ASSETS.md`.
+
+## Next: Google Play release
+
+- Package the web game as an Android app. Two options to compare: a Trusted Web Activity (wraps the GitHub Pages site, needs Digital Asset Links on the domain) or Capacitor (bundles the files in the app, works offline). Capacitor is the likely pick since the game is one HTML file plus assets.
+- Landscape lock, full screen, safe-area insets, back button opens the menu, pause on app switch.
+- Save data: move the localStorage saves (locker, UI settings, volume) so they survive app updates; add a reset option.
+- Performance pass on low-end phones: canvas size caps, image decode sizes, battery use.
+- Store listing: icon, feature graphic, screenshots per theme, short and long description, content rating questionnaire, privacy policy page (the game collects no personal data; say so).
+- Donations on Android: Google Play's payments policy generally requires Play Billing for payments made inside an app, including tips to the developer. Plan a "tip" in-app product (consumable, several sizes) through Play Billing in the Android build, and keep any external donation link (Ko-fi or similar) to the web build only. Check the current Play policy before release.
+- Closed testing track first, then open testing, then production.
+
+## Later
+
+- Blender-made 3D models for the TV game close-ups (Blender MCP once installed), replacing the box people.
+- REAL theme (realistic 32-bit concepts kept in `tools/art/rooms_src_real/`).
+- More minigames, more family events, more lobby characters.
