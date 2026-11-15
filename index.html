@@ -66,7 +66,9 @@ canvas{width:100%;display:block;image-rendering:pixelated;border:4px solid #000;
 #phone{position:absolute!important;right:8px!important;left:auto!important;top:240px;bottom:auto!important;height:500px!important;width:250px!important;aspect-ratio:auto;max-width:none;z-index:5;transition:transform .25s ease;display:flex!important}
 #phone.min{transform:translateX(calc(100% + 24px))}
 #cuWrap{position:absolute;right:8px;left:auto;top:8px;width:min(290px,34%);z-index:4;display:flex!important;padding:4px!important;gap:3px!important;border-width:3px!important}
-#fpsWrap{position:absolute;inset:0;z-index:6;display:none;background:#000}#fps{width:100%;height:100%;display:block;image-rendering:pixelated;cursor:crosshair;touch-action:none}
+#fpsWrap{position:absolute;inset:0;z-index:6;display:none;background:#000}
+#x3d{position:absolute;inset:0;width:100%;height:100%;display:none}
+#fps.hud{position:absolute;inset:0;width:100%;height:100%;background:transparent;image-rendering:pixelated}#fps{width:100%;height:100%;display:block;image-rendering:pixelated;cursor:crosshair;touch-action:none}
 #fpsExit{position:absolute;right:8px;top:8px;font:inherit;font-size:9px;background:#2f8f50;color:#fff;border:3px solid #000;padding:8px;cursor:pointer}
 #fpsHint{position:absolute;left:8px;bottom:8px;right:8px;font-size:7px;color:#cfd3dd;text-shadow:1px 1px 0 #000;pointer-events:none;text-align:center}
 #tStick,#tFire,#tJump,#tRun{display:none}
@@ -1926,24 +1928,24 @@ const shadeC=(c,k)=>(((c>>16)&255)*k<<16)|(((c>>8)&255)*k<<8)|((c&255)*k);
 const hexC=h=>parseInt(h.slice(1,7),16);
 function setupFPS(){
  const st=$('stage'),w=document.createElement('div');w.id='fpsWrap';
- w.innerHTML=`<canvas id="fps" width="${FW}" height="${FH}"></canvas><button id="fpsExit">⏎ AUTOPLAY</button><div id="fpsHint">CLICK to aim · WASD move · SHIFT sprint · SPACE jump · hold CLICK to shoot · ESC then AUTOPLAY to hand it back</div><div id="tStick"><i></i></div><button id="tFire">FIRE</button><button id="tJump">JUMP</button><button id="tRun">RUN</button>`;
+ w.innerHTML=`<canvas id="fps" width="${FW}" height="${FH}"></canvas><button id="fpsExit">⏎ AUTOPLAY</button><div id="fpsHint">WASD move · mouse drag or Q/E to turn · hold CLICK to shoot · SPACE jump · SHIFT sprint · ESC hands it back to autoplay</div><div id="tStick"><i></i></div><button id="tFire">FIRE</button><button id="tJump">JUMP</button><button id="tRun">RUN</button>`;
  w.addEventListener('pointerenter',()=>contextTip(w,'fps',$('fpsHint').textContent));w.addEventListener('pointerdown',()=>contextTip(w,'fps',$('fpsHint').textContent),{passive:true});
  st.appendChild(w);fpsC=$('fps');fctx=fpsC.getContext('2d');fimg=fctx.createImageData(FW,FH);fbuf=new Uint32Array(fimg.data.buffer);
  $('fpsExit').onclick=e=>{e.stopPropagation();exitFPS();};
  fpsC.addEventListener('pointerdown',e=>{if(!M||!M.fps)return;e.preventDefault();
   if(e.pointerType==='touch'){const r=fpsC.getBoundingClientRect();if(e.clientX-r.left<r.width*.42)tch.stick={id:e.pointerId,x:e.clientX,y:e.clientY};else tch.look={id:e.pointerId,x:e.clientX,y:e.clientY};return;}
-  if(document.pointerLockElement!==fpsC&&fpsC.requestPointerLock){try{fpsC.requestPointerLock();}catch(_){}}
-  M.firing=true;M.dragLook={x:e.clientX,y:e.clientY};});
+  if(e.button===2){M.dragLook={x:e.clientX,y:e.clientY};return;}M.firing=true;M.dragLook={x:e.clientX,y:e.clientY,soft:true};});
+ fpsC.addEventListener('contextmenu',e=>e.preventDefault());
  window.addEventListener('pointerup',e=>{if(!M)return;if(tch.stick&&tch.stick.id===e.pointerId){tch.stick=null;tch.mx=tch.my=0;}if(tch.look&&tch.look.id===e.pointerId)tch.look=null;if(e.pointerType!=='touch'){M.firing=false;M.dragLook=null;}});
  window.addEventListener('pointermove',e=>{if(!M||!M.fps)return;
   if(e.pointerType==='touch'){if(tch.stick&&tch.stick.id===e.pointerId){tch.mx=clamp((e.clientX-tch.stick.x)/45,-1,1);tch.my=clamp((e.clientY-tch.stick.y)/45,-1,1);}
    if(tch.look&&tch.look.id===e.pointerId){M.ang+=(e.clientX-tch.look.x)*.008;M.pitch=clamp(M.pitch-(e.clientY-tch.look.y)*.4,-45,45);tch.look.x=e.clientX;tch.look.y=e.clientY;}return;}
   if(document.pointerLockElement===fpsC){M.ang+=e.movementX*.0026;M.pitch=clamp(M.pitch-e.movementY*.22,-45,45);}
-  else if(M.dragLook){M.ang+=(e.clientX-M.dragLook.x)*.006;M.pitch=clamp(M.pitch-(e.clientY-M.dragLook.y)*.3,-45,45);M.dragLook={x:e.clientX,y:e.clientY};}});
+  else if(M.dragLook){const k=M.dragLook.soft?.0035:.008;M.ang+=(e.clientX-M.dragLook.x)*k;M.pitch=clamp(M.pitch-(e.clientY-M.dragLook.y)*.3,-45,45);M.dragLook={x:e.clientX,y:e.clientY};}});
  const hold=(id,on,off)=>{const b=$(id);b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();on();});b.addEventListener('pointerup',e=>{e.stopPropagation();off&&off();});b.addEventListener('pointerleave',()=>off&&off());};
  hold('tFire',()=>{M.firing=true;},()=>{M.firing=false;});hold('tJump',fpsJump);hold('tRun',()=>{tch.run=!tch.run;$('tRun').classList.toggle('on',tch.run);});
 }
-window.addEventListener('keydown',e=>{if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;keys[e.code]=true;if(mode==='play'&&run&&!(M&&M.fps))houseKey(e);if(!M||!M.fps)return;if(e.code==='Space'){e.preventDefault();fpsJump();}if(e.code==='Escape'&&document.pointerLockElement!==fpsC)exitFPS();});
+window.addEventListener('keydown',e=>{if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;keys[e.code]=true;if(mode==='play'&&run&&!(M&&M.fps))houseKey(e);if(!M||!M.fps)return;if(e.code==='Space'){e.preventDefault();fpsJump();}if(e.code==='Escape')exitFPS();});
 window.addEventListener('keyup',e=>{keys[e.code]=false;});
 function enterFPS(){if(!fpsC)setupFPS();const me=M.squad[0];
  {const hv=Math.hypot(me.vx||0,me.vy||0);M.ang=hv>.1?Math.atan2(me.vy,me.vx):-Math.PI/2;M.pitch=0;}toast('🎮 First person: W forward, A/D strafe, mouse or Q/E to turn','#7fe0a0');
@@ -1977,7 +1979,7 @@ function islandRender(t){ensureCine();const I=M.isl,sv={...M};
  M.ang=Math.atan2(me.y-cy,me.x-cx);M.pitch=-6;M.view3d={style:'orbit',t:0,act:true};const sx=me.x,sy=me.y;me.x=cx;me.y=cy;M.camOff={x:sx,y:sy};try{fpsRender();}catch(e){}
  for(const k of Object.keys(M))if(!(k in sv))delete M[k];Object.assign(M,sv);}
 function ensureCine(){const hi=HI();if(fpsC&&fpsC.width===(hi?480:240))return;FW=hi?480:240;FH=hi?360:180;zbuf=new Float32Array(FW);fpsC=document.createElement('canvas');fpsC.width=FW;fpsC.height=FH;fctx=fpsC.getContext('2d');fimg=fctx.createImageData(FW,FH);fbuf=new Uint32Array(fimg.data.buffer);}
-function cineRender(){ensureCine();const me=M.squad[0],v=M.view3d,st=v.style||'chase',P=v.p||me;let cx=me.x,cy=me.y,look=M.ang||0;
+function cineRender(){ensureCine();if(useX()){M._xc=X3D.render('cine',600,260,xState());return;}M._xc=null;const me=M.squad[0],v=M.view3d,st=v.style||'chase',P=v.p||me;let cx=me.x,cy=me.y,look=M.ang||0;
  if(st==='chase'){const e=v.e,tg=e||{x:me.x+(me.vx||1)*10,y:me.y+(me.vy||0)*10},a=Math.atan2(tg.y-me.y,tg.x-me.x)+Math.sin(M.t*.6)*.1;cx=me.x-Math.cos(a)*(v.scope?2:16);cy=me.y-Math.sin(a)*(v.scope?2:16);look=a;M.pitch=0;}
  else if(st==='orbit'){const a=(v.a0||0)+v.t*.75;cx=P.x+Math.cos(a)*36;cy=P.y+Math.sin(a)*36;look=Math.atan2(P.y-cy,P.x-cx);M.pitch=-6;}
  else if(st==='low'){const a=(v.a0||0)+v.t*.3;cx=P.x+Math.cos(a)*20;cy=P.y+Math.sin(a)*20;look=Math.atan2(P.y-cy,P.x-cx);M.pitch=28;}
@@ -2040,6 +2042,21 @@ function tri(a,b2,c,ua,ub,uc,A,lit,W,H,buf,fogCol,flash){
   const u=(w0*ua[0]*ia+w1*ub[0]*ib+w2*uc[0]*ic)*z,v=(w0*ua[1]*ia+w1*ub[1]*ib+w2*uc[1]*ic)*z;
   let col=flash?0xffffff:A.d[(Math.floor(v)&63)*64+(Math.floor(u)&63)];col=lit>1?mixC(col,0xffffff,lit-1):shadeC(col,lit);
   DEP[i]=z;buf[i]=ABGR(mixC(col,fogCol,Math.min(.9,z/34)));}}
+let X3DOK=false;import('./x3d.js').then(m=>{X3DOK=!!m.init();}).catch(e=>console.warn('3D engine unavailable',e));
+const tvEngine=()=>{try{return localStorage.getItem('steveTV')||'xbox';}catch(e){return 'xbox';}};
+const useX=()=>X3DOK&&tvEngine()!=='retro';
+const xState=()=>({M,mapC,GUNS});
+function fpsDraw(){if(!fpsC||!M)return;const wrap=$('fpsWrap');
+ if(useX()){const xc=window.x3dCanvas;if(xc.parentNode!==wrap){xc.id='x3d';wrap.insertBefore(xc,wrap.firstChild);}
+  const w=Math.min(1280,Math.round(wrap.clientWidth*(devicePixelRatio>1?1.25:1))),h=Math.round(w*wrap.clientHeight/Math.max(1,wrap.clientWidth));X3D.render('play',w,h,xState());xc.style.display='block';fpsC.classList.add('hud');
+  fctx.clearRect(0,0,FW,FH);xHud();}
+ else{if(window.x3dCanvas)window.x3dCanvas.style.display='none';fpsC.classList.remove('hud');fpsRender();}}
+function xHud(){const g=fctx,me=M.squad[0],W=FW,H=FH;g.save();const K=FW/240;g.scale(K,K);const w=240,h=FH/K;
+ g.fillStyle=M.hitT>0?'#ff5a5a':'#fff';g.fillRect(w/2-6,h/2,4,1);g.fillRect(w/2+3,h/2,4,1);g.fillRect(w/2,h/2-6,1,4);g.fillRect(w/2,h/2+3,1,4);
+ g.fillStyle='rgba(0,0,0,.55)';g.fillRect(4,h-22,82,18);g.fillStyle='#46c46e';g.fillRect(6,h-12,78*me.hp/100,5);g.fillStyle='#5ab0ff';g.fillRect(6,h-19,78*me.sh/50,5);
+ g.font='bold 8px monospace';g.fillStyle=M.wpn?M.wpn.c:GUNS[M.gun].c;g.textAlign='right';g.fillText(M.wpn?M.wpn.n+' x'+M.wpn.ammo:GUNS[M.gun].n,w-6,h-8);g.fillStyle='#fff';g.fillText('👤'+M.players+'  ☠'+M.kills,w-6,12);g.textAlign='left';
+ if(inStorm(me)){g.fillStyle='rgba(150,60,220,.25)';g.fillRect(0,0,w,h);g.fillStyle='#e0b0ff';g.fillText('IN THE STORM',6,12);}
+ if(M.hurtT>0){g.fillStyle='rgba(255,0,0,'+M.hurtT+')';g.fillRect(0,0,w,h);}g.restore();}
 function fpsRender(){
  if(!fpsC||!M)return;
  const me=M.squad[0],W=FW,H=FH,buf=fbuf,ang=M.ang,t=performance.now()/1000;
@@ -2147,7 +2164,7 @@ const ART={};setTimeout(()=>{setGfx(GFX);},0);
 // right after the buffer, so each art pixel is 1.5 screen pixels instead of 3 (twice the detail).
 const ART_Q=[];
 // 3D views render at 4:3; crop the middle band to the TV's shape instead of squashing it
-function cineImg(){const ch=fpsC.width*TH/TW;b.drawImage(fpsC,0,(fpsC.height-ch)/2,fpsC.width,ch,TX,TY,TW,TH);}
+function cineImg(){if(M&&M._xc&&useX()&&M.view3d){b.drawImage(M._xc,TX,TY,TW,TH);return;}const ch=fpsC.width*TH/TW;b.drawImage(fpsC,0,(fpsC.height-ch)/2,fpsC.width,ch,TX,TY,TW,TH);}
 function hiImg(im,x,y,w,h){b.drawImage(im,x,y,w,h);}
 // graphics mode: CLASSIC = the original blocky pixel art, RPG = Codex's sprites where they exist
 const THEMES=[
@@ -2233,8 +2250,10 @@ function renderThemes(){$('themes').innerHTML=`<div style="display:flex;align-it
   <div class="pr">${t.free?'<b>BASE GAME</b>':`<s>${t.price}</s><b>FREE!</b>`}</div>
   ${u?`<button class="eq" onclick="setGfx('${t.id}');renderThemes()">${GFX===t.id?'✔ EQUIPPED':'EQUIP'}</button>`:`<div class="pb"><i style="width:${n/GIVE_N*100}%"></i></div><button class="give" onclick="giveMe('${t.id}')">${GIVE_LINES[Math.min(GIVE_LINES.length-1,Math.floor(n/GIVE_N*GIVE_LINES.length))]} (${n}/${GIVE_N})</button>`}
   ${t.free?'':'<button class="tip" onclick="tipDev()">💖 Tip the developer</button>'}</div>`;}).join('')}</div>
+ <h2 style="margin-top:16px">📺 TV ENGINE</h2><div class="tg">${[['xbox','XBOX ERA','Full 3D: lighting, shadows, fog, real models.',true],['retro','RETRO TV','The old chunky software renderer. Pure nostalgia.',false]].map(([id,n,d,free])=>{const u=free||TUL['tv_'+id]>=GIVE_N,nn=TUL['tv_'+id]||0;return `<div class="tc ${tvEngine()===id?'on':''}"><b style="font-size:14px">${n}</b><span style="font-size:10px;opacity:.85">${d}</span><div class="pr">${free?'<b>BASE GAME</b>':'<s>$2.99</s><b>FREE!</b>'}</div>${u?`<button class="eq" onclick="setTV('${id}')">${tvEngine()===id?'✔ EQUIPPED':'EQUIP'}</button>`:`<div class="pb"><i style="width:${nn/GIVE_N*100}%"></i></div><button class="give" onclick="giveMe('tv_${id}')">${GIVE_LINES[Math.min(GIVE_LINES.length-1,Math.floor(nn/GIVE_N*GIVE_LINES.length))]} (${nn}/${GIVE_N})</button>`}</div>`;}).join('')}</div>
  <div style="margin-top:14px;font-size:11px;color:#cfd3dd">This DLC cost $0. Your support costs whatever you like.</div>`;}
-window.giveMe=id=>{const t=THEMES.find(x=>x.id===id);let n=(TUL[id]||0)+1;if(Math.random()<.06&&n>8&&n<GIVE_N-3){n-=3;toast('Oops, the bar slipped. Still free though!','#ffd25a');}TUL[id]=n;saveTUL();beep(300+n*12,.04,'square',.03);if(n>=GIVE_N)prize(t);renderThemes();};
+window.setTV=id=>{try{localStorage.setItem('steveTV',id);}catch(e){}renderThemes();toast(id==='retro'?'📺 Retro TV engine on':'📺 Xbox-era 3D engine on','#7fe0a0');};
+window.giveMe=id=>{const t=THEMES.find(x=>x.id===id)||{id,n:id==='tv_retro'?'RETRO TV':id,price:'$2.99'};let n=(TUL[id]||0)+1;if(Math.random()<.06&&n>8&&n<GIVE_N-3){n-=3;toast('Oops, the bar slipped. Still free though!','#ffd25a');}TUL[id]=n;saveTUL();beep(300+n*12,.04,'square',.03);if(n>=GIVE_N)prize(t);renderThemes();};
 window.tipDev=()=>{toast('💖 Tips are coming soon. Thank you for even thinking about it!','#ff9ae0');jingle(1);};
 function prize(t){const el=$('prize')||(()=>{const d=document.createElement('div');d.id='prize';document.body.appendChild(d);return d;})();
  el.innerHTML=Array.from({length:24},(_,i)=>`<div class="lt" style="left:${(i%12)*8.5+2}%;top:${i<12?2:92}%;background:${['#ff5a5a','#ffd25a','#5aff7a','#5ab0ff'][i%4]};animation-delay:${(i%4)*.06}s"></div>`).join('')+`<div class="ban">YOU WON!</div><div class="card">🎨 ${t.n} PACK<br><span style="font-size:13px;color:#7fff9a">Retail value: <s style="color:#ff7a7a">${t.price}</s> FREE</span></div><button style="font:inherit;font-size:16px;padding:12px 18px;background:#2f8f50;color:#fff;border:4px solid #000;box-shadow:4px 4px 0 #000;cursor:pointer" onclick="setGfx('${t.id}');$('prize').style.display='none';renderThemes()">EQUIP NOW</button><button style="font:inherit;font-size:11px;padding:6px 10px;background:#333;color:#fff;border:3px solid #000;cursor:pointer" onclick="$('prize').style.display='none'">later</button>`;
@@ -2327,7 +2346,7 @@ function drawHUD(){
  run.toast.forEach((q,i)=>txt(q.t,480,(HY+20)*SC-i*18-q.y,q.c,8,'center'));}
 
 // ================= frame / input =================
-function draw(){const BK=HI()?2:1;if(B.width!==VW*BK){B.width=VW*BK;B.height=240*BK;}b.setTransform(BK,0,0,BK,0,0);b.imageSmoothingEnabled=false;drawHouse();drawTV();if(run)drawPanel();ctx.imageSmoothingEnabled=false;ctx.drawImage(B,0,0,cv.width,720);flushArt();if(run)drawHUD();cuRot+=1/60;drawCU();}
+function draw(){if(M&&M.fps)try{fpsDraw();}catch(e){console.warn(e);}const BK=HI()?2:1;if(B.width!==VW*BK){B.width=VW*BK;B.height=240*BK;}b.setTransform(BK,0,0,BK,0,0);b.imageSmoothingEnabled=false;drawHouse();drawTV();if(run)drawPanel();ctx.imageSmoothingEnabled=false;ctx.drawImage(B,0,0,cv.width,720);flushArt();if(run)drawHUD();cuRot+=1/60;drawCU();}
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;try{if(mode==='play')update(dt);draw();if(phoneDirty){renderPhone();phoneDirty=false;}phoneTick();}catch(e){const el=$('err');el.style.display='block';el.textContent='Something broke: '+e.message+'\n'+(e.stack||'').split('\n').slice(0,3).join('\n')+'\nSend this to Claude.';}requestAnimationFrame(loop);}
 function pos(e){const R=cv.getBoundingClientRect(),rot=document.body.classList.contains('rot'),r=rot?{width:R.height,height:R.width}:R,cx=rot?e.clientY-R.top:e.clientX-R.left,cy=rot?R.right-e.clientX:e.clientY-R.top,k=Math.min(r.width/cv.width,r.height/720),ox=(r.width-cv.width*k)/2,oy=(r.height-720*k)/2;const x=(cx-ox)/k,y=(cy-oy)/k;return {x,y,bx:x/SC,by:y/SC};}
 const inTV=(x,y)=>x>=TX&&x<=TX+TW&&y>=TY&&y<=TY+TH;
