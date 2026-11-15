@@ -2,31 +2,42 @@
 
 This repo is a pixel-art game in one file, `index.html`. `frozen/steves-day-off-v1.html` is a locked earlier version: do not edit it. Your job is the art in `assets/`.
 
-## Pass 2 (current): build in 3D, render, then pixelize
+## Pass 3 (current): painted pixel textures, SNES / PS1 style
 
-The first pass (hand-placed pixel maps) was rejected by the owner: too flat and stiff, wrong scale, clashed with the scene, and the characters didn't read as themselves. Pass 2 replaces it.
+Pass 1 (flat pixel maps) was rejected, and Pass 2 (Blender) is on hold: Blender is not on this PC. Pass 3 does the art as hand-painted pixel textures, in the style of a SNES or early PS1 game (Earthbound, Secret of Mana, Chrono Trigger, PS1 sprite games). Do not copy any specific game's art.
 
-**Method**
+**What "textured" means here**
 
-1. In Blender, model each character as a simple, chunky low-poly figure (toy-like proportions, big readable silhouettes). Use flat colors per material, not textures.
-2. Light with one warm key light from the top left and a soft fill. Use a toon/flat shader with 3 shading steps so it pixelizes cleanly.
-3. Render with an **orthographic side camera**, transparent background, at 8x the final size (for example 320 x 384 for a 40 x 48 sprite), facing right.
-4. Downscale to the final size with nearest-neighbor or area sampling, then snap every pixel to a shared palette (see below), force alpha to 0 or 255, and add a 1 px outline tinted toward the neighboring color. Keep this step in a script (`tools/art/pixelize.py`) so every sprite goes through the same pipeline.
-5. Pose each character naturally (weight on one leg, slight lean, head tilted toward what they're doing). Simba especially needs life: ears up, tail mid-wag, looking up at Steve when begging.
+- Every surface has texture, not flat fill: knit and seams on the hoodie, denim weave and stitching on overalls and jeans, fur clumps and strands on Simba, wood grain on the shack, fabric on the couch.
+- Use 3 to 5 shades per material, a clear highlight from the top left, a cast shadow below, and ordered dithering for soft transitions (fur, fabric folds). No smooth gradients and no anti-aliasing.
+- Volume: draw rounded forms with rim light and shadow, so figures look solid and not cut-out. The poses are natural, with weight on one leg and the head turned toward what they're doing. Simba has ears up and a wagging tail.
+- Colors: snap to a shared 32-color palette built from the colors in `index.html` (wall cream #e4ddd0, floor gray #8a8580, couch tan #c79a5e, wood #4a2a1a, plus skin, fur and clothing tones), so sprites match the room.
 
-**Scale (fixes "wrong size")**
+**How**
 
-Size everything against the house. The floor line is the bottom of each sprite, and these are the in-game heights at 2x: a door is 84 px, the couch seat is 28 px off the floor, the coffee table is 22 px. Steve standing should be about 46 px (just over half a door), the wife about 44, the kid about 32, Simba standing about 30 at the shoulder. Render a single "lineup" image with everyone next to a door and the couch, and check proportions before exporting individual sprites.
+Use whatever works best: image generation followed by a Pillow cleanup script, or procedural Pillow painting. Every sprite goes through one shared script, `tools/art/pixelize.py`. It:
 
-**Matching the scene (fixes "doesn't match")**
+1. downscales to the exact size
+2. snaps to the palette
+3. forces alpha to 0 or 255
+4. adds a 1 px tinted outline
+5. trims to the bottom-center anchor
 
-Use one shared 32-color palette for all characters, built from the colors already in `index.html` (wall cream #e4ddd0, floor gray #8a8580, couch tan #c79a5e, wood brown #4a2a1a, plus skin, fur and clothing tones). Every sprite is snapped to that palette, so characters and room share the same colors.
+**Scale (heights at 2x, bottom of sprite = floor)**
 
-**Likeness (fixes "characters look off")**
+- door 84 px
+- couch seat 28 px
+- Steve 46 px
+- wife 44 px
+- kid 32 px
+- Simba 30 px at the shoulder
 
-Work from the photos in `ref/` for Simba (stocky tan pit/shepherd mix, big upright ears, black muzzle, lilac collar with lime buckle). People are stylized and original; match hair, clothing and build, not faces.
+The sprite sizes in the table are limits; fill them.
 
-**Deliverables:** the same file names and sizes as the table below, plus `tools/art/lineup.png` (everyone side by side with a door and the couch) for the owner to approve before anything is wired in. Keep the `.blend` file in `art-src/` (Git LFS if over a few MB).
+**Deliverable order**
+
+1. First make `tools/art/lineup.png`: everyone side by side with a door and the couch, at 4x nearest-neighbor. Then stop and leave a note for the owner's approval.
+2. Only after approval, export the individual sprites with the file names and sizes in the table below. Overwrite the rejected pass-1 PNGs.
 
 ## Target look
 
