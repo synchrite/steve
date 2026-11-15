@@ -304,3 +304,41 @@ Visually reviewed the updated asset sheet. Rebuild and validate using the
 same textures3.py and check_textures3.py commands documented above.
 No git commands run. No writes to index.html, frozen/, ref/, burglars,
 car_lift, lobby_shack, house_bg or tv_frame. Game integration was not changed.
+
+## Lobby fighters
+
+All 36 PNGs are in `assets/lobby/`, each **64 x 96**, facing right,
+transparent with binary alpha, bottom-center anchored. Exported, not wired.
+Original arcade-fighter designs; no borrowed game characters or logos.
+
+| Fighter | Files | Design |
+|---|---|---|
+| Steve | `fighter_steve_0.png`, `fighter_steve_1.png`, `fighter_steve_2.png`, `fighter_steve_3.png`, `fighter_steve_dance0.png`, `fighter_steve_dance1.png` | White astronaut suit, green control panel, bubble helmet, red rocket pack; four-frame idle bounce and two dance poses |
+| Bront | `fighter_bront_idle0.png`, `fighter_bront_idle1.png`, `fighter_bront_dance0.png`, `fighter_bront_dance1.png`, `fighter_bront_shoot0.png` | Massive dockyard brawler, ochre work vest, wrapped fists, slate cargo trousers |
+| Serein | `fighter_serein_idle0.png`, `fighter_serein_idle1.png`, `fighter_serein_dance0.png`, `fighter_serein_dance1.png`, `fighter_serein_shoot0.png` | Lean kicker, asymmetric cream training tunic, diagonal bindings and split trousers |
+| Vesper | `fighter_vesper_idle0.png`, `fighter_vesper_idle1.png`, `fighter_vesper_dance0.png`, `fighter_vesper_dance1.png`, `fighter_vesper_shoot0.png` | Angular cyber ninja, segmented armor, plum tabard and lime visor |
+| Solaro | `fighter_solaro_idle0.png`, `fighter_solaro_idle1.png`, `fighter_solaro_dance0.png`, `fighter_solaro_dance1.png`, `fighter_solaro_shoot0.png` | Muscular wrestler, original asymmetric sunburst mask, zigzag tights and wrist cuffs |
+| Rivet | `fighter_rivet_idle0.png`, `fighter_rivet_idle1.png`, `fighter_rivet_dance0.png`, `fighter_rivet_dance1.png`, `fighter_rivet_shoot0.png` | Wiry punk, pink mohawk, studded vest, patched trousers and chain belt |
+| Orion | `fighter_orion_idle0.png`, `fighter_orion_idle1.png`, `fighter_orion_dance0.png`, `fighter_orion_dance1.png`, `fighter_orion_shoot0.png` | Space cowboy, angular wide-brim hat, scarf, frontier jacket and armored chaps |
+
+### Dated handoff — 2026-11-14
+
+Read AGENTS.md, this brief, and drawTV()'s prep-lobby code. Created the
+original fighter studies with the built-in imagegen tool, then finalized
+through the existing shared tools/art/pixelize.py pipeline. Preserved the
+shared 36-color palette, hard pixel edges, tinted outlines and top-left
+light. Steve follows the current owner's GREEN panel / RED pack instruction.
+Each rival has two idles, two dances and one upward-aiming toy-blaster pose
+with a contrasting safety muzzle. Steve's idle loop uses a restrained
+0/1/2/1-pixel upper-body compression with fixed floor contact.
+
+Preview: tools/art/sheet_lobby.png, exact 3x nearest-neighbor (1512 x 2703).
+Visually reviewed the full roster sheet. All 36 exports pass exact dimensions,
+shared palette membership, binary alpha and balanced bottom-center bounds.
+Sources and exact generation prompts: tools/art/lobby_sources/ (prompts.json).
+Reproduce final exports: python tools/art/lobby_fighters.py (Pillow required).
+Exact filename manifest: tools/art/lobby_manifest.json.
+
+No git commands run. No changes to index.html, frozen/, assets/tex/, burglar
+sprites, car_lift, lobby_shack, house_bg or tv_frame. Game wiring and in-game
+animation review remain for Claude; these assets are intentionally unwired.
