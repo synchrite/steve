@@ -1360,7 +1360,8 @@ function drawPanel(){
 
 // ================= close-up view =================
 const CU=$('cu'),cx=CU.getContext('2d');let cuKey='',cuRot=0;
-function Q(x,y,w,h,c){cx.fillStyle=c;cx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
+let cuBgOn=false;const CUBG={};['yard','stove','door','couch','bath','kid','wife'].forEach(n=>{const im=new Image();im.onload=()=>{CUBG[n]=im;};im.src='assets/cctv_'+n+'.png';});
+function Q(x,y,w,h,c){if(cuBgOn&&w*h>=1200)return;cx.fillStyle=c;cx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
 function cuFocus(){
  if(!run)return {k:'idle',t:'CLOSE-UP'};
  const g=run.burglars;if(g)return {k:'burglars',t:g.st==='flee'?'🏃 THEY\'RE RUNNING':'🚨 BURGLARS IN THE YARD',urgent:g.st!=='flee'};
@@ -1386,7 +1387,9 @@ function drawCU(){
  const t=performance.now()/1000,f=cuFocus();
  const key=f.k+'|'+f.t+'|'+(run?JSON.stringify(run.deter)+run.up.train:'');if(key!==cuKey){cuKey=key;renderCU(f);}
  
- cx.imageSmoothingEnabled=false;Q(0,0,160,110,'#000');
+ {const K=GFX==='16'?2:1;if(CU.width!==160*K){CU.width=160*K;CU.height=110*K;}cx.setTransform(K,0,0,K,0,0);}
+ cuBgOn=false;cx.imageSmoothingEnabled=false;Q(0,0,160,110,'#000');
+ {const bgk={burglars:'yard',gate:'yard',lot:'yard',stove:'stove',door:'door',simba:'couch',steve:'couch',bath:'bath',kid:'kid',wife:'wife'}[f.k],bg=GFX==='16'&&bgk&&CUBG[bgk];if(bg){cx.drawImage(bg,0,0,160,110);cuBgOn=true;}else cuBgOn=false;}
  if(!run){Q(0,0,160,110,'#14161c');return;}
  cx.save();
  const k=f.k;
