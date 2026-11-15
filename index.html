@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <title>Steve's Day Off</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
@@ -79,9 +79,35 @@ canvas{width:100%;display:block;image-rendering:pixelated;border:4px solid #000;
 #pill.hide{display:none}#pill.alert{border-color:#e23b3b;animation:buzz .5s infinite}
 .sbar button{font:inherit;font-size:8px;background:#222;color:#fff;border:2px solid #444;padding:2px 6px;cursor:pointer}
 @media(max-width:700px){#phone{height:440px!important;width:220px!important}#cuWrap{width:42%}}
+/* ===== three-column layout: CCTV left, game center, phone right. Nothing overlaps. ===== */
+html,body{height:100%;overflow:hidden}
+header,#help,#side,#tabs,#pill{display:none!important}
+#game{display:flex!important;height:100vh;height:100dvh;max-width:none;margin:0;padding:6px;gap:6px;padding-left:max(6px,env(safe-area-inset-left));padding-right:max(6px,env(safe-area-inset-right))}
+#lcol,#rcol{display:flex;flex-direction:column;gap:6px;min-height:0;flex:0 0 clamp(150px,19vw,300px)}
+#rcol{flex-basis:clamp(180px,22vw,320px)}
+#stage{flex:1 1 auto;min-width:0;height:100%;max-width:none!important;margin:0!important;background:transparent;display:flex;align-items:center;justify-content:center}
+#stage>canvas{width:100%;height:100%;object-fit:contain;border:0;background:transparent}
+#cuWrap{position:static!important;width:100%!important;flex:0 0 auto}
+#phone{position:static!important;width:100%!important;height:auto!important;flex:1 1 auto;min-height:0;transform:none!important;border-radius:22px;padding:8px 6px}
+.colbtn{font:inherit;color:#fff;border:4px solid #000;box-shadow:3px 3px 0 #000;cursor:pointer;touch-action:manipulation}
+#menuBtn{font-size:16px;padding:14px 10px;background:#e23b3b}
+#fsBtn{font-size:12px;padding:10px;background:#2a2f3e}
+#menu{position:fixed;inset:0;z-index:20;background:rgba(8,9,14,.92);display:none;flex-direction:column;align-items:center;justify-content:safe center;gap:12px;padding:16px;overflow:auto}
+#menu.on{display:flex}#menu h2{font-size:20px;color:#ffd25a;text-shadow:3px 3px 0 #000;margin:0 0 6px}
+#menu button{font:inherit;font-size:14px;width:min(360px,90vw);padding:14px;background:#3a4258;color:#fff;border:4px solid #000;box-shadow:4px 4px 0 #000;cursor:pointer}
+#menu button.go{background:#2f8f50}#menuHelp{max-width:640px;font-size:10px;line-height:2;color:#cfd3dd;display:none}
+#rot{display:none}
+@media (orientation:portrait) and (pointer:coarse){#rot{display:flex;position:fixed;inset:0;z-index:30;background:#14161c;color:#ffd25a;align-items:center;justify-content:center;text-align:center;font-size:14px;line-height:2;padding:24px}}
+/* bigger, readable text */
+.tx{font-size:10px}.fr{font-size:11px}.bub{font-size:11px}.sec{font-size:9px}.hd{font-size:9px}.sbar{font-size:10px}.sbar button{font-size:9px}
+.sugg button{font-size:12px}.sugg .big1{font-size:13px!important}.sugg .row3 button{font-size:10px!important}
+#cuTitle{font-size:10px!important}#cuBtns button{font-size:9px!important;padding:7px 4px!important}
+.thread .who{font-size:11px}.thread .who button{font-size:9px}.legend{font-size:9px}
+@media (max-height:500px){.legend,.notch{display:none}.sugg button{padding:7px}#menuBtn{font-size:13px;padding:9px}}
 </style></head><body>
 <header><h1>STEVE'S DAY OFF</h1><div><button id="gfx">GRAPHICS: 16-BIT</button> <button id="mute">SOUND: ON</button></div></header>
 <div id="game">
+ <div id="lcol"><button id="menuBtn" class="colbtn">☰ MENU</button></div>
  <div id="stage"><canvas id="c" width="960" height="720"></canvas><div id="ov"></div></div>
  <div id="side">
  <div id="tabs"><button data-t="phone" class="on">📱 PHONE <span class="badge" id="phB"></span></button><button data-t="cuWrap">🔍 CLOSE-UP <span class="badge" id="cuB"></span></button></div>
@@ -97,6 +123,9 @@ canvas{width:100%;display:block;image-rendering:pixelated;border:4px solid #000;
 <div id="help">TV: click enemies to shoot · click rustling bushes to spot sneaky players · click sparkles for rare guns · click cars to drive · click the ground to go there (far = jetpack wings).<br>
 House: ◀ ▶ to look around · stove, front door, lift, work board, machine, gate · GET UP to go AFK (costs a squad heart mid-match, free in breaks) · click the lift, work board, answering machine, front door, gate, burglars, or your wife.<br>
 Simba: drag-fling the lamb toy · click her for tug-of-war, to wiggle her off your lap, or to put her to sleep when she's tired · scrub drool off the TV.</div>
+<div id="rcolTpl"></div>
+<div id="menu"><h2>PAUSED</h2><button class="go" onclick="closeMenu()">▶ RESUME</button><button id="mGfx" onclick="$('gfx').click();menuLabels()"></button><button id="mSnd" onclick="$('mute').click();menuLabels()"></button><button onclick="toggleFS()">⛶ FULL SCREEN</button><button onclick="const h=$('menuHelp');h.style.display=h.style.display==='block'?'none':'block'">? HOW TO PLAY</button><div id="menuHelp"></div><button onclick="if(confirm('Start over? This run will be lost.'))location.reload()">↺ NEW GAME</button></div>
+<div id="rot">↻<br>Turn your phone sideways<br>to play</div>
 <div id="err"></div>
 <script>
 window.addEventListener('error',e=>{const el=document.getElementById('err');el.style.display='block';el.textContent='Something broke: '+e.message+' (line '+e.lineno+')\nSend this to Claude.';});
@@ -104,7 +133,7 @@ window.addEventListener('error',e=>{const el=document.getElementById('err');el.s
 const $=id=>document.getElementById(id);
 const cv=$('c'),ctx=cv.getContext('2d'),B=document.createElement('canvas');
 // desktop gets a wider playfield: the TV stays put, the house view grows, and the top-right becomes room for the CCTV and phone
-const VW=innerWidth>=1100?480:320;B.width=VW;B.height=240;cv.width=VW*3;const b=B.getContext('2d');
+const VW=(innerWidth*.58)/innerHeight>=1.8?480:320;B.width=VW;B.height=240;cv.width=VW*3;const b=B.getContext('2d');
 const SC=3,FONT='"Press Start 2P",monospace';
 const rnd=(a,c)=>a+Math.random()*(c-a),ri=(a,c)=>Math.floor(rnd(a,c+1)),pick=a=>a[Math.floor(Math.random()*a.length)],clamp=(v,a,c)=>Math.max(a,Math.min(c,v));
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
@@ -321,7 +350,7 @@ function renderPhone(){
  el.innerHTML=nb+snz+(snoozedN?`<div class="sec">😴 ${snoozedN} WAITING ON "GIMME A SEC"</div>`:'')+(urgent.length?'<div class="sec">HAPPENING NOW</div>'+urgent.map(row).join(''):'')+(texts.length?'<div class="sec">MESSAGES</div>'+texts.map(row).join(''):'')+(vms.length?'<div class="sec">ANSWERING MACHINE · '+vms.length+' NEW</div>'+vms.map(row).join(''):'');
 }
 window.snoozeAll=()=>{if(!run)return;run.snoozed=run.match+':'+run.phase;let fam=0;run.inbox.forEach(x=>{if(x.due!=null){x.due=Math.max(x.due,dueNow())+1;if(x.fam)fam++;}});if(fam)addMood(-2*fam,'Snoozed family');toast('😴 Everything snoozed until the next break','#b0a0ff');phoneDirty=true;};
-function dockPhone(){const w=$('cuWrap'),ph=$('phone'),pl=$('pill'),st=$('stage');const y=w.offsetTop+w.offsetHeight+8;{const need=y+ph.offsetHeight+10;const mh=need+'px';if(st.style.minHeight!==mh)st.style.minHeight=mh;}const r=Math.max(8,st.clientWidth-(w.offsetLeft+w.offsetWidth));ph.style.top=y+'px';ph.style.right=r+'px';ph.style.left='auto';pl.style.top=y+'px';pl.style.right=(r+2)+'px';pl.style.left='auto';}
+function dockPhone(){return;const w=$('cuWrap'),ph=$('phone'),pl=$('pill'),st=$('stage');const y=w.offsetTop+w.offsetHeight+8;{const need=y+ph.offsetHeight+10;const mh=need+'px';if(st.style.minHeight!==mh)st.style.minHeight=mh;}const r=Math.max(8,st.clientWidth-(w.offsetLeft+w.offsetWidth));ph.style.top=y+'px';ph.style.right=r+'px';ph.style.left='auto';pl.style.top=y+'px';pl.style.right=(r+2)+'px';pl.style.left='auto';}
 function phoneTick(){dockPhone();if(!run){setPhone(false);return;}
  {const ringing=run.call&&!run.call.live;if(view||(run.call&&run.call.live)||(ringing&&(run.ringer||'ring')==='ring')){if(!phoneOpen)setPhone(true);}else if(phoneOpen&&!run.inbox.some(x=>!(x.snoozeT>0))&&!ringing)setPhone(false);
   const pl=$('pill'),n=run.inbox.length;pl.textContent=ringing?'📞 '+run.call.from:'📱'+(n?' '+n:'');pl.classList.toggle('alert',!!ringing||run.inbox.some(x=>x.urgent));}
@@ -1580,7 +1609,9 @@ function flushArt(){const k=SC/2;for(const a of ART_Q){if(a.raw){ctx.imageSmooth
 // ================= HUD =================
 // every canvas text gets a black outline so it reads on any background
 {const P=CanvasRenderingContext2D.prototype,F=P.fillText;P.fillText=function(s,x,y,m){const fs=String(this.fillStyle).toLowerCase();if(fs!=='#000000'&&fs!=='#000'&&!this._noOutline){const px=parseFloat(this.font)||8;this.save();this.strokeStyle='#000';this.lineWidth=Math.max(2,px/3);this.lineJoin='round';this.miterLimit=2;m==null?this.strokeText(s,x,y):this.strokeText(s,x,y,m);this.restore();}return m==null?F.call(this,s,x,y):F.call(this,s,x,y,m);};}
-function txt(s,x,y,c='#fff',sz=8,al='left'){ctx.font=`${sz}px ${FONT}`;ctx.textAlign=al;ctx.fillStyle=c;ctx.fillText(s,x,y);ctx.textAlign='left';}
+// canvas text grows when the game is shown small (phones), so it stays readable
+let TXK=1.2;function fitTXK(){const h=cv.getBoundingClientRect().height||720,k=Math.min(h/720,cv.getBoundingClientRect().width/cv.width||1);TXK=Math.min(1.8,Math.max(1.2,1.25/(k*1.9)));}addEventListener('resize',fitTXK);setTimeout(fitTXK,50);
+function txt(s,x,y,c='#fff',sz=8,al='left'){ctx.font=`${Math.round(sz*TXK)}px ${FONT}`;ctx.textAlign=al;ctx.fillStyle=c;ctx.fillText(s,x,y);ctx.textAlign='left';}
 function bar(x,y,w,h,f,c){ctx.fillStyle='#000';ctx.fillRect(x-2,y-2,w+4,h+4);ctx.fillStyle='#222';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,w*clamp(f,0,1),h);}
 function btn(label,x,y,w,h,col,fn){ctx.fillStyle='#000';ctx.fillRect(x-3,y-3,w+6,h+6);ctx.fillStyle=col;ctx.fillRect(x,y,w,h);txt(label,x+w/2,y+h/2+5,'#fff',8,'center');hits.push({x,y,w,h,fn});}
 function drawHUD(){
@@ -1666,7 +1697,7 @@ function drawHUD(){
 // ================= frame / input =================
 function draw(){const BK=GFX==='16'?2:1;if(B.width!==VW*BK){B.width=VW*BK;B.height=240*BK;}b.setTransform(BK,0,0,BK,0,0);b.imageSmoothingEnabled=false;drawHouse();drawTV();if(run)drawPanel();ctx.imageSmoothingEnabled=false;ctx.drawImage(B,0,0,cv.width,720);flushArt();if(run)drawHUD();cuRot+=1/60;drawCU();}
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;try{if(mode==='play')update(dt);draw();if(phoneDirty){renderPhone();phoneDirty=false;}phoneTick();}catch(e){const el=$('err');el.style.display='block';el.textContent='Something broke: '+e.message+'\n'+(e.stack||'').split('\n').slice(0,3).join('\n')+'\nSend this to Claude.';}requestAnimationFrame(loop);}
-function pos(e){const r=cv.getBoundingClientRect();const x=(e.clientX-r.left)*cv.width/r.width,y=(e.clientY-r.top)*720/r.height;return {x,y,bx:x/SC,by:y/SC};}
+function pos(e){const r=cv.getBoundingClientRect(),k=Math.min(r.width/cv.width,r.height/720),ox=(r.width-cv.width*k)/2,oy=(r.height-720*k)/2;const x=(e.clientX-r.left-ox)/k,y=(e.clientY-r.top-oy)/k;return {x,y,bx:x/SC,by:y/SC};}
 const inTV=(x,y)=>x>=TX&&x<=TX+TW&&y>=TY&&y<=TY+TH;
 cv.addEventListener('contextmenu',e=>e.preventDefault());
 cv.addEventListener('pointerdown',e=>{
@@ -1702,11 +1733,17 @@ window.addEventListener('pointerup',()=>{mouse.down=false;if(mode!=='play'||!run
  if(run.drag){run.drag=false;const h=mouse.hist||[];let vx=0,vy=0;if(h.length>1){const a=h[0],z=h[h.length-1],dt=Math.max(.016,(z[2]-a[2])/1000);vx=(z[0]-a[0])/dt;vy=(z[1]-a[1])/dt;}
   if(Math.hypot(vx,vy)<60){run.lamb.st='floor';run.lamb.y=FLOOR;}else throwLamb(vx,vy);}});
 
-{const st=$('stage');st.appendChild($('cuWrap'));st.appendChild($('phone'));const pl=document.createElement('button');pl.id='pill';pl.textContent='📱';pl.onclick=()=>{if(!run)return;setPhone(true);if(!run.inbox.length&&!view)openContacts();};st.appendChild(pl);}
+{const g=$('game'),lc=$('lcol'),rc=document.createElement('div');rc.id='rcol';lc.appendChild($('cuWrap'));const fs=document.createElement('button');fs.id='fsBtn';fs.className='colbtn';fs.textContent='⛶ FULL SCREEN';fs.onclick=()=>toggleFS();rc.appendChild(fs);rc.appendChild($('phone'));g.appendChild(rc);const pl=document.createElement('button');pl.id='pill';document.body.appendChild(pl);$('menuHelp').innerHTML=$('help').innerHTML;}
+window.toggleFS=()=>{const d=document,el=d.documentElement;if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d);return;}const rq=el.requestFullscreen||el.webkitRequestFullscreen;if(rq){Promise.resolve(rq.call(el)).then(()=>{try{screen.orientation.lock('landscape').catch(()=>{});}catch(e){}}).catch(()=>{});}else toast('On iPhone: Share → Add to Home Screen for full screen','#9aa0b0');};
+document.addEventListener('fullscreenchange',()=>{$('fsBtn').textContent=document.fullscreenElement?'✕ EXIT FULL':'⛶ FULL SCREEN';});
+let preMenu=null;window.menuLabels=()=>{$('mGfx').textContent=$('gfx').textContent;$('mSnd').textContent=$('mute').textContent;};
+window.openMenu=()=>{menuLabels();if(mode==='play'){preMenu='play';mode='pause';}$('menu').classList.add('on');};
+window.closeMenu=()=>{$('menu').classList.remove('on');if(preMenu){mode=preMenu;preMenu=null;}};
+$('menuBtn').onclick=openMenu;window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!(M&&M.fps)){$('menu').classList.contains('on')?closeMenu():openMenu();}});
 {const t=$('cuTitle'),w=$('cuWrap');let d=null;t.addEventListener('pointerdown',e=>{const r=w.getBoundingClientRect(),sr=$('stage').getBoundingClientRect();d={dx:e.clientX-r.left,dy:e.clientY-r.top,sr};t.setPointerCapture(e.pointerId);e.preventDefault();});
  t.addEventListener('pointermove',e=>{if(!d)return;const sr=$('stage').getBoundingClientRect();const x=clamp(e.clientX-sr.left-d.dx,0,sr.width-w.offsetWidth),y=clamp(e.clientY-sr.top-d.dy,0,sr.height-w.offsetHeight);w.style.left=x+'px';w.style.top=y+'px';w.style.right='auto';w.style.bottom='auto';});
  t.addEventListener('pointerup',()=>d=null);}
-if(VW>320){$('stage').style.maxWidth=`calc((100vh - 64px)*${VW/240})`;$('cuWrap').style.width='31%';}
+
 let phoneOpen=true;function setPhone(o){phoneOpen=o;$('phone').classList.toggle('min',!o);$('pill').classList.toggle('hide',o);}
 window.minPhone=()=>{view=null;phoneDirty=true;setPhone(false);};
 window.cycleRinger=()=>{if(!run)return;run.ringer={ring:'vibrate',vibrate:'silent',silent:'ring'}[run.ringer||'ring'];$('ringer').textContent={ring:'🔔 RING',vibrate:'📳 VIBRATE',silent:'🔕 SILENT'}[run.ringer];toast('Phone set to '+run.ringer.toUpperCase(),'#9aa0b0');};
