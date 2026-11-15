@@ -2,7 +2,7 @@
 
 No noise, diffusion, or per-pixel lighting on characters. The approval sheet
 passes these paintings through pixelize.py's shared palette/anchor finalizer.
-Numbers below are indices into the unchanged shared 32-color palette.
+Numbers below are indices into the shared palette.
 """
 from PIL import Image, ImageDraw
 
@@ -102,9 +102,9 @@ def human(palette, finish, role='steve', seated=False):
     kid=role=='kid';wife=role=='wife'
     p=Clusters((30,46) if seated else ((12,30) if kid else (18,42)),palette)
     if kid:
-        # Cap over blond side tufts, saturated yellow sleeved tee and shorts.
-        p.poly([(3,21),(6,21),(5,27),(3,28),(2,27)],13)
-        p.rect((8,22,10,27),14)
+        # Warm tan skin, black hair under the cap, yellow sleeved tee and shorts.
+        p.poly([(3,21),(6,21),(5,27),(3,28),(2,27)],33)
+        p.rect((8,22,10,27),34)
         p.rect((1,28,5,29),15);p.rect((8,28,11,29),15)
         p.line([(2,28),(4,28)],18);p.line([(9,28),(11,28)],18)
         p.poly([(2,19),(10,19),(10,23),(7,23),(6,21),(5,23),(2,23)],16)
@@ -113,21 +113,26 @@ def human(palette, finish, role='steve', seated=False):
         p.line([(3,11),(6,11)],11)
         p.line([(9,14),(8,17),(9,18)],9)
         p.line([(2,18),(8,18)],8)
-        p.poly([(1,14),(3,14),(3,18),(4,20),(2,21),(0,18)],14)
-        p.poly([(9,14),(11,14),(11,18),(10,20),(8,19),(9,17)],13)
+        p.poly([(1,14),(3,14),(3,18),(4,20),(2,21),(0,18)],35)
+        p.poly([(9,14),(11,14),(11,18),(10,20),(8,19),(9,17)],34)
         p.poly([(2,11),(3,12),(3,15),(0,15),(0,13)],32)
         p.poly([(8,11),(10,12),(11,13),(11,15),(9,15)],32)
         p.line([(0,15),(2,15)],9);p.line([(9,15),(11,15)],9)
-        p.poly([(2,2),(7,1),(10,3),(10,5),(11,6),(10,7),(9,7),(9,9),(6,11),(3,9),(1,6)],14)
-        p.line([(7,4),(9,4)],7);p.dot(8,5,4);p.dot(10,6,13)
+        p.poly([(2,2),(7,1),(10,3),(10,5),(11,6),(10,7),(9,7),(9,9),(6,11),(3,9),(1,6)],34)
+        p.line([(4,4),(6,4)],35)
+        p.line([(4,9),(6,10)],33)
+        p.line([(7,4),(9,4)],7);p.dot(8,5,4);p.dot(10,6,35)
         p.line([(7,8),(8,8)],5)
-        p.rect((1,3,3,6),9)
-        p.line([(1,4),(2,4)],10)
-        p.dot(9,4,9)
+        # Black hair: nape tuft, side tuft above the ear, forehead fringe.
+        p.poly([(1,4),(3,4),(3,6),(4,7),(3,9),(2,8),(1,8)],4)
+        p.line([(1,4),(2,5)],15)
+        p.rect((2,4,4,5),4)
+        p.line([(7,4),(9,4)],4)
+        p.dot(7,5,4)
         p.poly([(1,3),(1,2),(3,0),(8,0),(10,2),(10,3)],16)
         p.line([(2,2),(4,1),(7,1)],17)
         p.line([(1,3),(11,3)],15)
-        p.dot(3,6,13)
+        p.dot(3,6,34)
         return finish(p.im,(14,36))
     # Adults: 12px head / 42px height, relaxed asymmetric stance.
     if seated:

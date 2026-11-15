@@ -7,7 +7,7 @@ alpha, bottom-center anchors, four separate standing legs, exact nearest-neighbo
 
 `cluster_art.py` contains the revised native-resolution character paintings:
 explicit silhouettes, hard shading clusters, and placed material details.
-`pixelize.py` owns the shared palette (33 colors: the original 32 plus saturated tee yellow) and finalizer, retained
+`pixelize.py` owns the shared palette (36 colors: the original 32 plus saturated tee yellow and three kid skin tones) and finalizer, retained
 textured door/couch/lamb, and approval-sheet composition. These scripts save only
 the lineup. Character sprites remain in memory pending owner approval.
 

@@ -59,7 +59,7 @@ Reference photos are in `ref/` (local only, not committed). Use them for colors 
 - **Simba**: tan pit/shepherd mix. Fur base #c98f4e with lighter belly and darker back. Big upright ears with darker insides, black muzzle, warm brown eyes. Lilac woven collar with a lime-green buckle.
 - **Steve**: olive camo hoodie, short brown hair, light beard, jeans. Holds a game controller on the couch.
 - **Wife**: pink hair in a bun, patterned glasses, denim overalls over a black shirt.
-- **Kid**: saturated yellow T-shirt with sleeves and shorts, black hair under a cap with a little visible at the sides; gender-ambiguous, about half Steve's height.
+- **Kid**: saturated yellow T-shirt with sleeves and shorts, warm light-medium tan skin a few steps darker than the adults, with matching shade and highlight; black hair visible below the cap in tufts over the ear, at the back of the neck, and a little forehead fringe; gender-ambiguous, about half Steve's height.
 - **Burglars**: an original bumbling pair. One short and round in a red beanie and striped shirt; one tall and lanky in a dark jacket and flat cap.
 - **Lamb toy**: off-white plush lamb with stubby legs and a red stitched mouth.
 
@@ -156,8 +156,8 @@ assets remain pending owner approval. No git commands run; index.html,
 assets/ and frozen/ were not edited. Reference photos remain local only.
 
 2026-11-14 (targeted approval-lineup corrections): Updated the kid in
-cluster_art.py with a blue baseball cap covering most of the black hair,
-small visible black side locks, a saturated yellow T-shirt with distinct
+cluster_art.py with a blue baseball cap covering most of the blond hair,
+small visible blond side tufts, a saturated yellow T-shirt with distinct
 sleeves, and shorts. Kept the existing size and pixel-cluster style.
 Shortened and squared off both Simba muzzles; lowered seated Steve into
 the couch cushion by 4 native pixels while retaining his floor contact.
@@ -169,3 +169,15 @@ Visually reviewed the lineup; check_lineup.py passes dimensions, palette,
 binary alpha, bottom-center anchors, four standing leg separations, exact
 4x nearest-neighbor enlargement and byte-identical regeneration.
 No git commands run; index.html, assets/ and frozen/ were not edited.
+
+2026-11-14 (kid skin and hair refinement): Updated only the kid painting
+in tools/art/cluster_art.py: warm light-medium tan skin, with coordinated
+shadow #b27a54, base #c58f67 and highlight #dca77e added to the shared
+palette (36 colors total). Black hair now shows below the cap over the ear,
+at the nape and as a small forehead fringe. Kept the cap, yellow tee, shorts,
+size and pixel-cluster style. Re-rendered tools/art/lineup.png; no individual
+assets exported. Updated palette-count checks. No git commands run;
+index.html and frozen/ were not touched.
+Visually reviewed the result; check_lineup.py passes palette membership,
+dimensions, binary alpha, anchors, exact 4x enlargement and deterministic
+regeneration. Confirmed all eight non-kid paintings remain pixel-identical.

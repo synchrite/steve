@@ -32,7 +32,7 @@ def check():
     assert sha256((ROOT/'lineup.png').read_bytes()).hexdigest() == before
     im = Image.open(ROOT/'lineup.png').convert('RGBA')
     assert im.size == (1616,600)
-    assert len(im.getcolors()) <= 33
+    assert len(im.getcolors()) <= 36
     assert set(im.getchannel('A').tobytes()) == {255}
     native = im.resize((404,150), Image.Resampling.NEAREST)
     assert native.resize(im.size, Image.Resampling.NEAREST).tobytes() == im.tobytes()
