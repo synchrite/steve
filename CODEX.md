@@ -581,3 +581,40 @@ Game wiring and live in-game review remain with the concurrent game-code
 task. Initial pull was blocked by pre-existing unstaged changes. No commit
 or push, as requested. Existing CODEX.md bytes/encoding were preserved;
 this section was appended as ASCII because the file contains legacy bytes.
+
+### Notes from Codex - 2026-11-15 (16-BIT v2)
+
+Reworked the 60 required assets/16bit exports under brief_16bit_v2.txt.
+Captured the current CLASSIC drawHouse geometry with a read-only JS recorder;
+repainted house and CCTV surfaces in CLASSIC material families with inset
+bevels, seams and broken texture clusters. Reworked character material hues
+and enlarged visible bounds while preserving bottom-center floor contact.
+Painted new white-suit Steve poses with green panel/poncho and red side pack.
+Terrain and UV fixtures use CLASSIC raycaster material colours. All five
+island_bg images now have green land with a sand rim; their 16-BIT composition
+follows the drawTV ellipse proportions. Only these four explicitly requested
+island files were changed outside the 16bit theme.
+
+Regenerated sheet_theme_16bit.png and refreshed themes_manifest.json while
+preserving valid status strings and legacy entries. Sources/reproduction:
+tools/art/16BIT_V2.md, classic_v2_capture.cjs, remaster_16bit_v2.py and the
+one-time v2_original snapshots. Per-image palettes and SHA-256 export evidence
+are in v2_palettes.json and v2_validation.json. Independent checks in
+check_16bit_v2.py pass all 60 dimensions, <=64 colours, binary alpha, 39 sprite
+anchors, terrain/sky seams, bezel alpha, identical neutral tint masks, five
+green islands, byte-identical rebuild and unchanged other-theme exports
+against the previous export inventory (except the four island exceptions).
+Visually inspected the exported contact sheet. Chrome launch failed EPERM;
+live house/CCTV/lobby screenshots remain UNVERIFIED. Game source changed
+externally during this pass; the final capture was refreshed and rebuilt.
+This art script never writes index.html, frozen/, ref/ or other theme files
+besides the four named islands. No commit or push. Initial pull failed because
+.git/FETCH_HEAD is not writable in this session.
+
+Unresolved exact-colour requirement: CLASSIC's house exceeds the requested
+64-colour cap even before extra shading (the current capture contains 91
+relevant base colours). The export currently retains 56 exact dominant base
+colours plus same-hue shading; some minor accents are approximated. It does
+not meet an exact match for EVERY CLASSIC colour. Owner question: should the
+house-only palette cap increase, or should a reduced CLASSIC palette be
+approved? The current 64-colour approximation is retained for review.

@@ -1,0 +1,16 @@
+3D models for the TV game's Xbox-era engine (x3d.js, Three.js). Use the Blender MCP. Another Codex job is editing assets/16bit/ right now: do not touch assets/16bit, index.html or x3d.js. Write only to assets/models/ and tools/models/. Do not commit or push.
+
+Target look: original Xbox / early 2000s console game. Low-poly but well shaped, smooth-shaded where it matters, hand-painted or baked textures (512x512 or 1024x1024 PNG embedded in the GLB), a little ambient occlusion baked in. Original designs only, nothing copied from Fortnite or any other game.
+
+Scale and axes: 1 unit = 1 game unit. A standing person is 8 units tall, feet at y=0, facing -Z. Export glTF binary (.glb), Y up, one file per model, under 1.5 MB each where possible. Name meshes and animations clearly.
+
+Characters (rigged, shared humanoid skeleton, animations baked into each GLB: idle, walk, run, shoot, jump, dance, knocked):
+ 1. steve.glb: Steve's space-ranger suit (white suit, blue visor helmet with a clear dome, orange backpack) plus an optional glow-in-the-dark poncho as a separate mesh named "poncho". About 3000 triangles.
+ 2. player.glb: a generic player body for enemies and squadmates. Keep the materials split into three named materials "body", "skin", "accent" so the engine can tint them per skin. About 2500 triangles.
+ 3. Optional extras if time allows: juice_jug.glb (round juice-jug mascot, original), cop_mascot.glb (generic cartoon cop), hoops.glb (basketball player).
+Props (static):
+ 4. house_suburb.glb (footprint 16 x 14, two-tone siding, porch, pitched roof), warehouse.glb (24 x 30, corrugated metal), barn.glb (24 x 20, red barn), resort_cabana.glb.
+ 5. tree_oak.glb, tree_pine.glb (snow-dusted variant as tree_pine_snow.glb), palm.glb, bush.glb, rock.glb.
+ 6. car.glb (compact car, 12 x 6, body material named "paint" so it can be recoloured), chest.glb (treasure chest with lid as a separate node "lid"), vending.glb, supply_drop.glb (crate with balloon), golden_lamb.glb (small plush lamb, gold metallic), battle_bus.glb (original flying bus with balloon).
+ 7. Weapons (held, about 3 units long): pistol, rifle, shotgun, rocket launcher, laser blaster, bubble bow, minigun, snowball cannon, pickaxe. One GLB each in assets/models/weapons/.
+Also write assets/models/manifest.json listing every file, triangle count, animations, material names, and footprint size. Render a turntable contact sheet of everything to tools/models/sheet_models.png. Keep the .blend sources in tools/models/ (git LFS will handle them). Add a short Models section to CODEX.md. Print a summary at the end.
