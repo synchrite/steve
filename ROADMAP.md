@@ -14,7 +14,10 @@ Plain list of where the game is going, in order. Update it when an item finishes
 All themes are free. The menu presents them like paid DLC as a joke, then asks for a donation instead of a payment.
 
 - A **THEMES** screen styled like a game-store DLC page: each theme gets a card with a preview, a description and a price tag that is crossed out and stamped FREE (for example "~~$4.99~~ FREE!" or "~~1,200 Gems~~ FREE").
-- Every theme can be equipped without paying. Nothing is locked.
+- Nothing costs money, but each theme is unlocked by play, two ways:
+  - **Minigames:** beat a theme's minigame challenge (for example a cookie-plate high score, a fast oil change, a perfect signature) to unlock it.
+  - **The GIVE ME button:** press it enough times (around 50 to 100 presses). The label changes as you go and eggs you on with jokes ("Are you sure?", "Still free, by the way", "My lawyer says keep pressing", "Almost... just kidding, keep going", "Your thumb is a legend"). Progress is saved, with a bar that sometimes jumps backwards a little for comedy, but never by much.
+  - **The unlock:** a hyper game-show reward. Flashing lights, confetti, spinning theme card, a "YOU WON!" banner, a fanfare and prize jingle (made with the existing Web Audio synth), and a one-tap "Equip now".
 - Each card and the screen footer have a "Tip the developer" button with playful copy ("This DLC cost $0. Your support costs whatever you like.").
 - Themes planned: CLASSIC (base game), 16-BIT, RPG, GRITTY, MODERN, HALLOWEEN, then more seasonal or style packs later (each one is a new folder under `assets/<theme>/`).
 - Track which themes exist and what each one replaces in `ASSETS.md`.
