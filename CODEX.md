@@ -78,12 +78,12 @@ Sizes are width x height in pixels, already doubled for the 16-bit pass.
 | `steve_walk.png` | 20 x 44 | wired; Pass 3 exported | standing |
 | `wife.png` | 20 x 44 | wired; Pass 3 exported | standing |
 | `kid.png` | 14 x 36 | wired; Pass 3 exported | standing |
-| `burglar_short.png` | 20 x 36 | not wired | |
-| `burglar_tall.png` | 16 x 48 | not wired | |
-| `car_lift.png` | 96 x 44 | not wired | white compact car, side view |
-| `lobby_shack.png` | 120 x 88 | not wired | wooden beach shack on sand |
-| `house_bg.png` | 1320 x 192 | not wired | full house cross-section: living room, kitchen, bathroom, two bedrooms, garage, yard and lot |
-| `tv_frame.png` | 624 x 284 | not wired | TV bezel, screen area transparent |
+| `burglar_short.png` | 20 x 36 | not wired; Pass 3 exported | |
+| `burglar_tall.png` | 16 x 48 | not wired; Pass 3 exported | |
+| `car_lift.png` | 96 x 44 | not wired; Pass 3 exported | white compact car, side view |
+| `lobby_shack.png` | 120 x 88 | not wired; Pass 3 exported | wooden beach shack on sand |
+| `house_bg.png` | 1320 x 192 | not wired; Pass 3 exported | full house cross-section: living room, kitchen, bathroom, two bedrooms, garage, yard and lot |
+| `tv_frame.png` | 624 x 284 | not wired; Pass 3 exported | TV bezel, screen area transparent |
 
 "Wired" files show up in the game as soon as they exist in `assets/`. "Not wired" files load, but Claude still has to hook them up.
 
@@ -342,3 +342,62 @@ Exact filename manifest: tools/art/lobby_manifest.json.
 No git commands run. No changes to index.html, frozen/, assets/tex/, burglar
 sprites, car_lift, lobby_shack, house_bg or tv_frame. Game wiring and in-game
 animation review remain for Claude; these assets are intentionally unwired.
+
+2026-11-14 (remaining six, approved Pass 3): Exported all six remaining
+assets at their exact table sizes. Original clean-cluster paintings with
+the unchanged shared 36-color palette and pixelize.py pipeline. Burglars
+face right: short/round with red beanie and stripes, tall/lanky with dark
+jacket and flat cap. White compact car faces right; wooden shack on sand.
+
+Read drawHouse and drawTV. House uses source daylight room/furniture/lot
+coordinates including GX=200, at 2x with world origin (0,144); native floor
+y=180. Off-palette CSS colors use approved palette equivalents; exact CSS
+RGB values cannot coexist with the unchanged palette. Material families
+are preserved. House uses surface_pixelize to retain the full layout.
+TV asset origin corresponds to game (4,0). Screen cutout is exactly
+(12,12,600,260), fully transparent, matching TX=10/TY=6/TW=300/TH=130.
+Its alpha mask survives surface_pixelize without trimming or expansion.
+Other four sprites use the standard palette/outline/bottom-anchor finalizer.
+
+Preview: tools/art/sheet2.png, five assets at exact 4x nearest-neighbor,
+house at 1x. Visually reviewed; dimensions, palette membership, binary
+alpha, sprite anchors and TV cutout pass. Rebuild: node
+tools/art/house_capture.cjs then tools/art/remaining_assets.py with Python
+from C:/Users/synchrite/ComfyUI/venv/Scripts/python.exe (Pillow installed).
+Six remain unwired for Claude. No git commands run; index.html, frozen/,
+lineup and previous assets were not edited.
+
+## Room backgrounds - 2026-11-14
+
+| File in assets/ | Size | Content |
+|---|---|---|
+| house_bg.png | 1320 x 192 | Full house cross-section, kitchen, bathroom, adult bedroom, kid bunk bed and Xbox, garage with empty lift, craft corner, work board/bench, yard and parked lot inventory |
+| cctv_yard.png | 320 x 220 | Garage exterior, lawn, fixed base fence |
+| cctv_stove.png | 320 x 220 | Kitchen counters and unlit stove |
+| cctv_door.png | 320 x 220 | Front door from inside; code door framing, interior cream wall |
+| cctv_couch.png | 320 x 220 | Empty living room couch and dark TV, shared Simba/Steve view |
+| cctv_bath.png | 320 x 220 | Tiled bathroom, central door, toilet and vanity |
+| cctv_kid.png | 320 x 220 | Bunk bed, dark wall TV and Xbox |
+| cctv_wife.png | 320 x 220 | Empty craft corner, table, materials, storage |
+
+### Notes from Codex - 2026-11-14
+
+Created eight original opaque Pillow pixel paintings using the unchanged shared
+36-color palette and pixelize.py surface_pixelize() finalizer. Read AGENTS.md,
+CODEX.md, drawHouse(), drawCU(), the approved lineup and existing art. Main house
+fixtures are extracted from static drawHouse rectangles, with GX=200 applied
+for global garage/yard coordinates. Place house_bg at buffer (0,138), scale 0.5;
+it ends immediately before FLOOR=234. Source colors use shared material shades:
+sky is slate blue, red is brick red within the approved palette. Added material
+strokes, wood grain, tiles, rugs, pictures, plants, shelves, cables and tools.
+Close-ups preserve principal code framing with additional room dressing.
+
+Preview: tools/art/sheet_rooms.png (all eight assets at native export size).
+Rebuild: python tools/art/rooms.py (Pillow required). Exact dimensions, opaque
+RGB, palette membership and four dark TV screen rectangles pass validation.
+Visually reviewed the contact sheet. No characters, visitors, animated cooking
+pot/effects, fireplace flames, moving car, arriving vehicle, job marks, upgrades,
+scanlines, timestamps or blinking indicators are baked in. Empty lift includes
+fixed posts and resting platform; runtime owns moving elements. Exported, not
+wired: game integration remains for Claude. No git commands run. No edits to
+index.html, frozen/, ref/, approved lineup or existing character sprites.
