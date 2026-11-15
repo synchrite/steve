@@ -416,7 +416,7 @@ const clockStr=()=>{const m=gameMin(),h=Math.floor(m/60),hh=(h+11)%12+1;return `
 function afk(){return hands()<.3;}
 function inMatch(){return !!run&&run.phase==='match'&&!!M&&!M.ended;}
 function free(){return !inMatch()||run.afk;}
-function goAFK(){if(run.afk)return;run.afk=true;
+function goAFK(){if(M&&inMatch())M.gotUp=true;if(run.afk)return;run.afk=true;
  if(inMatch()&&run.easy){feed('Steve went AFK (easy mode: squad doesn\'t mind)','#9aa0b0');return;}
  if(inMatch()){run.hearts--;M.roll=0;feed('Steve went AFK','#ff8b8b');if(M.mode!=='solo')feed(pick(['Taco: again??','Dano: bro...','Mom: is he ok?','Taco: we need you man']),'#ffb27a');toast(`-1 ❤ squad patience (${run.hearts} left)`,'#ff7070');beep(200,.15,'sawtooth');}}
 function sendHome(){run.steve.target=SPOT.couch;run.steve.onArrive=()=>{run.afk=false;};}
@@ -838,11 +838,27 @@ function dogTick(dt){const d=run.dog||(run.dog={i:0,t:rnd(50,80),need:null,wait:
  if(d.need==='in'&&d.wait>4&&Math.random()<dt*.5)beep(420,.08,'square',.02);
  if(d.wait>25&&Math.random()<dt*.2){run.flow=Math.max(0,run.flow-4);if(Math.random()<.4)toast({out:'Simba whines at the door...',in:'WOOF WOOF WOOF (from outside)',food:'Simba nudges the bowl across the floor. Clang.',snack:'Simba stares into your soul',toy:'Simba squeaks the lamb. Repeatedly.'}[d.need],'#c98f4e');}
  if(d.need==='out'&&d.wait>70){d.need=null;d.i++;d.t=rnd(50,80);addMood(-10,'Simba had an accident');addLot(-3);rel('Simba',-4);toast('💦 Too late. Simba had an accident on the rug.','#ff7070');}}
-function dogMet(msg){const d=run.dog;d.need=null;d.i++;d.t=rnd(45,90);d.happy=Math.min(100,d.happy+12);rel('Simba',3);addFun(2);toast('🐕 '+msg,'#c98f4e');phoneDirty=true;}
+function dogMet(msg){const d=run.dog;if(inMatch())qp('feedDog');d.need=null;d.i++;d.t=rnd(45,90);d.happy=Math.min(100,d.happy+12);rel('Simba',3);addFun(2);toast('🐕 '+msg,'#c98f4e');phoneDirty=true;}
 function dogDoor(){const d=run.dog,s=run.simba;if(!d)return false;
  if(d.need==='out'){walkTo('door',()=>{s.st='outside';dogMet('Simba bolts out into the yard');});return true;}
  if(d.need==='in'){walkTo('door',()=>{s.st='roam';s.x=20;s.t=5;dogMet('Simba runs in, tracking a little mud');});return true;}return false;}
 function dogKitchen(){const d=run.dog;if(!d||d.need!=='food')return false;walkTo('stove',()=>startTask({kind:'bowl',label:"Filling Simba's bowl",level:0,pour:false,time:10,win:()=>dogMet('Simba inhales the whole bowl'),fail:()=>toast('Simba is still hungry','#ff7070')}));return true;}
+const QPOOL=[
+ {k:'smash',n:3,t:'Smash 3 buildings with the pickaxe',r:120},{k:'wpnElim',n:2,t:'Get 2 elims with a special weapon',r:150},{k:'fish',n:2,t:'Go fishing 2 times',r:90},
+ {k:'lamb',n:3,t:'Find 3 golden lambs on the map',r:160},{k:'spot',n:2,t:'Spot 2 bush campers',r:90},{k:'elim',n:5,t:'Get 5 elims',r:120},{k:'combo',n:20,t:'Reach a x20 tap combo',r:110},
+ {k:'visit',n:1,t:'Visit POI',r:80},{k:'noGetUp',n:1,t:'Win a match without getting up',r:250},{k:'feedDog',n:1,t:'Take care of Simba during a match',r:100},{k:'cookies',n:3,t:'Eat 3 cookies',r:80},{k:'sell',n:1,t:'Sell a car between matches',r:120}];
+const NPCQ={jug:{who:'Juice Jug',line:'"OH YEAH! Bring me 3 golden lambs and I\'ll make it worth your while."',q:{k:'lamb',n:3,t:'Juice Jug wants 3 golden lambs',r:300,sp:1}},
+ narc:{who:'Officer Chin',line:'"Citizen! Bush campers are a menace. Spot 3 of them for me."',q:{k:'spot',n:3,t:'Officer Chin: spot 3 bush campers',r:260,sp:1}},
+ hoops:{who:'Hoops',line:'"Bet you can\'t get a 30 combo. Prove me wrong."',q:{k:'combo',n:30,t:'Hoops: reach a x30 combo',r:220,sp:1}},
+ dad:{who:'Some Dad',line:'"Back in my day we smashed buildings for fun. Smash 5."',q:{k:'smash',n:5,t:'Some Dad: smash 5 buildings',r:220,sp:1}}};
+function quests(){if(!run.q){run.q=[];for(let i=0;i<3;i++)newQuest();}return run.q;}
+function newQuest(){const have=run.q.map(q=>q.k);const c=QPOOL.filter(q=>!have.includes(q.k));const b=pick(c.length?c:QPOOL);const q={...b,p:0,daily:true};if(q.k==='visit'){q.poi=pick(POI_NAMES.slice(0,6));q.t='Visit '+q.poi;}run.q.push(q);}
+function qp(k,n=1,poi){if(!run)return;for(const q of quests()){if(q.k!==k||q.done)continue;if(k==='visit'&&q.poi!==poi)continue;q.p=k==='combo'?Math.max(q.p,n):q.p+n;
+  if(q.p>=q.n){q.done=true;addBux(q.r,'quest');if(q.sp)prog().sp+=q.sp;toast(`✅ QUEST DONE: ${q.t} (+${q.r} 💎${q.sp?' +1 SP':''})`,'#7fe8ff');jingle(3);if(M)big('QUEST COMPLETE!','#7fe8ff',1.6);
+   later(4,()=>{run.q.splice(run.q.indexOf(q),1);if(run.q.filter(x=>x.daily).length<3)newQuest();phoneDirty=true;});}
+  else if(k!=='combo')toast(`📜 ${q.t}: ${q.p}/${q.n}`,'#cfe9ff');}phoneDirty=true;}
+function npcQuest(fn){const g=NPCQ[fn];if(!g)return false;if(quests().some(q=>q.npc===fn&&!q.done)){toast(`${g.who}: "Still waiting on you!"`,'#ffb27a');return true;}
+ run.q.push({...g.q,p:0,npc:fn});toast(`💬 ${g.who}: ${g.line}`,'#ffb27a');toast('📜 New quest: '+g.q.t,'#cfe9ff');beep(660,.06);setTimeout(()=>beep(880,.08),90);return true;}
 function delivery(){
  if(run.door)return;const pk=run.pending[0];const nm=pk?(UPS.find(x=>x.id===pk)||{name:pk}).name:null;
  if(run.sched.packages||run.up.dropbox){toast('📦 Package left at the door'+(nm?': '+nm:''),'#9aa0b0');addLot(1);if(pk){run.pending.shift();applyUp(pk);}return;}
@@ -915,7 +931,7 @@ function finishJob(job,by){prog().sp++;toast('+1 SKILL POINT','#7fe0a0');king(by
 function showTask(car,who){if(isWeekend()){addMood(-4,"It's the weekend!");addFun(-3);toast('Working on a Saturday... your wife noticed.','#ffb27a');}
  const zones=[['the engine',PX+20,PY+42,40,16],['the tires',PX+46,PY+66,22,16],['the trunk',PX+150,PY+40,34,18],['the interior',PX+82,PY+32,50,18],['the headlights',PX+8,PY+50,14,10]];
  startTask({kind:'show',label:`Showing the ${car} to ${who}`,car,who,zones,asks:shuffle(zones).slice(0,3),k:0,interest:0,flash:0,time:18,col:run.gate?run.gate.col:'#c8202a',
-  win:()=>{const p=ri(5,9)*100;addCash(p,'Sold the '+car);addLot(6);run.sales++;king(3);jingle(3);deed(pick(['just sold a car','sold a jeep today','closed a sale']));big('SOLD! +$'+p,'#7fe0a0');},fail:()=>addLot(1,`${who} will "think about it"`)});
+  win:()=>{const p=ri(5,9)*100;addCash(p,'Sold the '+car);qp('sell');addLot(6);run.sales++;king(3);jingle(3);deed(pick(['just sold a car','sold a jeep today','closed a sale']));big('SOLD! +$'+p,'#7fe0a0');},fail:()=>addLot(1,`${who} will "think about it"`)});
  if(run.gate){clearUrgent(run.gate.it);run.gate=null;}}
 function signTask(){const pk=run.door&&run.door.pk;startTask({kind:'sign',label:pk?'Signing for your order':'Signing for parts',prog:0,pts:[],ink:0,glitch:Array.from({length:ri(2,5)},()=>({y:rnd(22,70),a:rnd(-.3,.3),c:pick(['rgba(120,255,160,.25)','rgba(255,255,255,.18)','rgba(0,0,0,.35)'])})),scr:Array.from({length:ri(0,4)},()=>[rnd(0,180),rnd(0,60),rnd(10,50),rnd(-1,1)]),time:14,win:()=>{if(pk){const i=run.pending.indexOf(pk);if(i>=0)run.pending.splice(i,1);applyUp(pk);}else addLot(2,'Parts in');},fail:()=>addLot(-2)});if(run.door){clearUrgent(run.door.it);run.door=null;}}
 // cookies: eat them before they crumble; drag one to Simba; crumbs hit the floor and Simba cleans up
@@ -924,7 +940,7 @@ function cookieTask(){toast('🍪 Fresh cookies! Eat them before they crumble. D
   cookies:Array.from({length:6},(_,i)=>({x:PX+34+(i%3)*30,y:PY+36+Math.floor(i/3)*26,hp:1,rate:rnd(.05,.11)})),
   win:()=>{const t=run.task0;},fail:()=>{}});run.task.win=run.task.fail=()=>cookieEnd();}
 function cookieEnd(){const t=run.cookieT0||{};}
-function cookieDone(t){if(t.eaten)addFun(t.eaten*3,`Ate ${t.eaten} cookie${t.eaten>1?'s':''}`);if(t.eaten)run.buffs.push({k:'snack',name:'Cookies',t:20+t.eaten*4});
+function cookieDone(t){if(t.eaten)qp('cookies',t.eaten);if(t.eaten)addFun(t.eaten*3,`Ate ${t.eaten} cookie${t.eaten>1?'s':''}`);if(t.eaten)run.buffs.push({k:'snack',name:'Cookies',t:20+t.eaten*4});
  if(t.fed){rel('Simba',4*t.fed);run.simba.tired+=t.fed*.6;run.dog&&(run.dog.happy=Math.min(100,(run.dog.happy||50)+15*t.fed));toast(t.fed>=2?'🐕 Simba is SO happy. Tail going crazy.':'🐕 Simba loved that cookie','#c98f4e');}
  if(t.lost){run.crumbs=(run.crumbs||0)+t.lost;toast(`${t.lost} cookie${t.lost>1?'s':''} crumbled onto the floor`,'#c8904a');}}
 function trashTask(){startTask({kind:'trash',label:'Taking out the trash',bx:PX+24,by:PY+56,grab:false,time:10,win:()=>addMood(12,'Trash is out'),fail:()=>{}});}
@@ -1114,6 +1130,7 @@ function newMatch(){
  for(let i=0;i<n;i++){const hid=Math.random()<.35;const bu=hid?pick(M.bushes):null;const p=pick(M.pois);
   const sk=pick(SKINS);M.enemies.push({skin:sk,name:Math.random()<.6?sk.n+ri(1,99):pick(ENEMY),x:bu?bu.x:p.x+rnd(-70,70),y:bu?bu.y:p.y+rnd(-60,60),hp:100,sh:ri(0,50),hidden:hid,bush:bu,home:null,t:rnd(0,3),fire:rnd(.5,1.2),skill:rnd(.4,.7)+run.match*.03,flash:0,state:'idle'});}
  M.enemies.forEach(e=>e.home={x:e.x,y:e.y});
+ M.glambs=Array.from({length:4},()=>{const a=rnd(0,6.28),d=rnd(40,330);return {x:M.cx0+Math.cos(a)*d,y:M.cy0+Math.sin(a)*d*.9,taken:false};});
  if(run.party.includes('Dan')&&!M.squad.some(x=>x.name==='Dan')){rel('Dan',3);const d=mkS('Dan','#2ab070',.7);if(run.danNext){d.mic=20;run.danNext=false;}M.squad.push(d);if(M.mode==='solo')M.mode='duo';}M.others=Math.max(0,100-n-squad.length);
  run.flow=Math.max(run.flow,55);
  feed(`Match ${run.match} · ${modeName.toUpperCase()}${modeName==='duo'?' with Mom':''}`,'#9aa0b0');
@@ -1174,8 +1191,11 @@ function updateBR(dt){
   if(M.fly>0&&Math.random()<dt*.6){const tr=M.trees.find(q=>dist(q,me)<7);if(tr){M.fly=0;M.flyCD=3;M.fx.push({t:'boom',x1:me.x,y1:me.y,life:.5});feed(pick(['Steve flew straight into a tree 🌲','BONK. Tree.','Steve: who put that tree there']),'#ffb060');M.best=M.best||{};M.best.tree=1;beep(140,.15,'sawtooth',.05);M.view3d={style:'low',p:me,t:0,replay:true,a0:rnd(0,6)};}}
   if(target){me.fire-=dt;if(me.fire<=0){me.fire=.55;M.flashT=.05;M.kick=5;M.fx.push({t:'shot',x1:me.x,y1:me.y,x2:target.x,y2:target.y,life:.06,c:'#fff36a'});if(Math.random()<(.45+.4*run.flow/100+run.king/500-(run.tired?.1:0)+(run.buffs.some(b=>b.k==='conf')?.12:0)+(run.up.tv?.08:0))*h)hitEnemy(target,GUNS[M.gun].d*.85,me);}}
   if(Math.random()<dt*.15*h){const hid=M.enemies.find(e=>e.hidden&&dist(e,me)<60);if(hid){hid.hidden=false;feed(`Steve spotted ${hid.name} in a bush`,'#fff36a');}}
+  if(!M.way&&!foes.length&&quests().some(q=>q.k==='lamb'&&!q.done)){const g=(M.glambs||[]).find(q=>!q.taken&&dist(q,me)<120);if(g&&Math.random()<dt*.4)M.way={x:g.x,y:g.y};}
   if(!M.way&&!foes.length){const r=M.rares.find(q=>!q.taken&&dist(q,me)<110);if(r&&Math.random()<dt*.5)M.way={x:r.x,y:r.y,rare:r};}
  }
+ (M.glambs||[]).forEach(g=>{if(!g.taken&&dist(g,me)<8&&!me.down){g.taken=true;addBux(15,'golden lamb');big('GOLDEN LAMB!','#ffd25a',1.2);jingle(2);qp('lamb');}});
+ {const pz=M.pois.find(p=>dist(p,me)<40);if(pz&&M.lastPoi!==pz.name){M.lastPoi=pz.name;qp('visit',1,pz.name);}}
  M.chests.forEach(c=>{if(!c.open&&dist(c,me)<6&&!me.down){c.open=true;if(Math.random()<.45&&M.gun<3){M.gun++;feed('Steve looted a '+GUNS[M.gun].n,GUNS[M.gun].c);}}});
  if(inStorm(me)&&!me.down)dmg(me,(4+M.stage)*dt);
  me.x=clamp(me.x,10,MW-10);me.y=clamp(me.y,10,MH-10);
@@ -1205,7 +1225,7 @@ function updateBR(dt){
    if(M.t>M.T*.45||Math.hypot(e.home.x-s.cx,e.home.y-s.cy)>s.to*.8){e.home={x:s.cx+rnd(-s.to*.5,s.to*.5),y:s.cy+rnd(-s.to*.5,s.to*.5)};}}}
  for(const e of [...M.enemies])if(e.hp<=0){M.enemies.splice(M.enemies.indexOf(e),1);const k=e.by||{name:'The storm'};M.fx.push({t:'boom',x1:e.x,y1:e.y,life:.5});
   feed(`${k.name} eliminated ${e.name}`,k.me?'#fff36a':k.simba?'#ffb060':'#fff');
-  if(k.me){M.best=M.best||{};M.best.kill=(M.best.kill||0)+1;if(dist(e,me)>95)M.best.snipe=e.name;M.view3d={style:pick(['orbit','low','high','orbit']),p:{x:e.x,y:e.y},t:0,replay:true,a0:rnd(0,6)};M.last3d=M.t;M.kills++;run.kills++;addBux(25,'elim');M.roll++;king(.6);addFun(3);run.flow=Math.min(100,run.flow+6);beep(990,.05);setTimeout(()=>beep(1320,.06),60);if(M.roll===3)big('ON A ROLL!','#ffd25a');}
+  if(k.me){M.best=M.best||{};M.best.kill=(M.best.kill||0)+1;if(dist(e,me)>95)M.best.snipe=e.name;M.view3d={style:pick(['orbit','low','high','orbit']),p:{x:e.x,y:e.y},t:0,replay:true,a0:rnd(0,6)};M.last3d=M.t;M.kills++;run.kills++;addBux(25,'elim');qp('elim');if(M.wpn)qp('wpnElim');M.roll++;king(.6);addFun(3);run.flow=Math.min(100,run.flow+6);beep(990,.05);setTimeout(()=>beep(1320,.06),60);if(M.roll===3)big('ON A ROLL!','#ffd25a');}
   else if(k.simba){run.simbaKills++;addFun(10,'SIMBA GOT A KILL?!');big('SIMBA GOT A KILL','#ffb060',2.5);}
   else if(k.name==='Mom'){feed('Mom: did I do that?? :D','#c99ae8');addFun(4,'Mom got a kill');}}
  // the rest of the lobby fights each other off screen
@@ -1239,7 +1259,7 @@ function actStart(a){const me=M.squad[0];
  if(a.k==='fish'){feed(pick(['Steve: fishing break','Steve: gonna catch something good','Steve: shhh, fishing']),'#9fe07f');if(!M.view3d)M.view3d={style:'orbit',p:me,t:0,act:true,a0:rnd(0,6)};}
  if(a.k==='vend'){feed('Steve: ooh, a vending machine','#9fe07f');beep(500,.05);if(!M.view3d)M.view3d={style:'low',p:me,t:0,act:true,a0:rnd(0,6)};}}
 function actReward(a){
- if(a.k==='fish'){M.fished=(M.fished||0)+1;const r=Math.random();
+ if(a.k==='fish'){M.fished=(M.fished||0)+1;qp('fish');const r=Math.random();
   if(r<.3){M.gun=Math.min(4,Math.max(M.gun+1,2));feed(`Steve fished up a ${GUNS[M.gun].n}!`,GUNS[M.gun].c);big('FISHED UP A GUN!',GUNS[M.gun].c,1.4);jingle(2);}
   else if(r<.7){M.squad[0].sh=50;M.squad[0].hp=Math.min(100,M.squad[0].hp+25);feed('Steve caught a floppy fish (+shields)','#5ab0ff');jingle(1);}
   else feed(pick(['Steve caught... an old boot','Steve caught a tire','Steve caught nothing. The fish laughed.']),'#9aa0b0');}
@@ -1252,6 +1272,7 @@ function lobbyClick(bx,by,btn){if(!M||M.phase!=='lobby')return false;
  if(M.l3view)return true;
  const sx=(M.sx||TX+132)+8,sy=TY+92-12;M.lshots=M.lshots||[];M.lshots.push({x1:sx,y1:sy,x2:bx,y2:by,life:.12});beep(520,.03,'square',.02);
  const o=(M.lob||[]).find(o=>Math.abs(o.x+3-bx)<9&&by>TY+70&&by<TY+110);
+ if(o&&NPCQ[o.fn]&&!o.asked){o.asked=true;npcQuest(o.fn);return true;}
  if(o){o.follow=true;o.ft=0;o.hit=.3;toast(pick([`${o.fn} wants to fight! (it's the lobby, nobody can get hurt)`,`${o.fn}: "oh it's ON"`,`${o.fn} is following you now`]),'#ffb27a');beep(880,.05);}
  return true;}
 function tvClick(bx,by){if(lobbyClick(bx,by,0))return;
@@ -1266,7 +1287,7 @@ function tvClick(bx,by){if(lobbyClick(bx,by,0))return;
  const e=M.enemies.find(e=>!e.hidden&&Math.hypot(e.x-w.x,e.y-w.y)<7);
  if(e){if(dist(e,me)>120){toast('Too far to hit','#cfd3dd');return;}shootAt(e,h);return;}
  const hid=M.enemies.find(e=>e.hidden&&Math.hypot(e.x-w.x,e.y-w.y)<8);
- if(hid){hid.hidden=false;run.spots++;big('SPOTTED!','#ffd25a',1.2);addFun(3);feed(`Steve spotted ${hid.name} in a bush`,'#fff36a');beep(1000,.06);return;}
+ if(hid){hid.hidden=false;run.spots++;qp('spot');big('SPOTTED!','#ffd25a',1.2);addFun(3);feed(`Steve spotted ${hid.name} in a bush`,'#fff36a');beep(1000,.06);return;}
  if(M.bushes.some(q=>Math.hypot(q.x-w.x,q.y-w.y)<7)){toast('Just a bush','#9aa0b0');return;}
  const r=M.rares.find(q=>!q.taken&&Math.hypot(q.x-w.x,q.y-w.y)<9);if(r){M.way={x:r.x,y:r.y,rare:r};if(dist(r,me)>140&&M.flyCD<=0){M.fly=5;M.flyCD=14;}toast('Going for the rare gun','#ffd25a');return;}
  const car=M.cars.find(c=>Math.hypot(c.x-w.x,c.y-w.y)<10);if(car){M.way={x:car.x,y:car.y,carHop:car};toast('Hopping in the car','#9aa0b0');return;}
@@ -1274,7 +1295,7 @@ function tvClick(bx,by){if(lobbyClick(bx,by,0))return;
  M.fx.push({t:'ping',x1:M.way.x,y1:M.way.y,life:.6});
 }
 function tapCombo(h){const me=M.squad[0];
- M.combo=(M.comboT>0?(M.combo||0):0)+1;M.comboT=1.5;const cb=M.combo;
+ M.combo=(M.comboT>0?(M.combo||0):0)+1;M.comboT=1.5;const cb=M.combo;if(cb%5===0)qp('combo',cb);
  addBux(1+Math.floor(cb/6),'taps');M.fx.push({t:'tap',x1:me.x,y1:me.y,life:.35});
  if(cb%10===0){big(`COMBO x${cb}! +${cb} BUX`,'#7fe8ff',1.2);addBux(cb,'combo');jingle(cb>=30?3:2);run.flow=Math.min(100,run.flow+5);}
  const foe=M.enemies.filter(e=>!e.hidden&&dist(e,me)<(M.wpn?M.wpn.rng:130)&&losOK(me,e)).sort((a,c)=>dist(a,me)-dist(c,me))[0];
@@ -1309,7 +1330,7 @@ function nearBld(me,r){let bi=-1,bd=r;(M.solids||[]).forEach((q,i)=>{const d=dis
 function pickaxe(bi){const q=M.solids[bi];M.bhp=M.bhp||{};const key=q.join(',');M.bhp[key]=(M.bhp[key]??100)-(LOCK.pick?30:24);M.swingT=.3;
  M.mats=(M.mats||0)+4;addBux(1,'pickaxe');const c=bCenter(q);M.fx.push({t:'chip',x1:c.x+rnd(-q[2]/3,q[2]/3),y1:c.y+rnd(-q[3]/3,q[3]/3),life:.4});beep(220+Math.random()*80,.04,'square',.04);
  if(M.bhp[key]<=0){M.solids.splice(bi,1);const g=mapC.getContext('2d');g.fillStyle='#6a6a64';g.fillRect(q[0],q[1],q[2],q[3]);for(let i=0;i<14;i++){g.fillStyle=pick(['#8a8a80','#5a4a3a','#a09a90','#4a4a48']);g.fillRect(q[0]+Math.random()*q[2],q[1]+Math.random()*q[3],2+Math.random()*3,2+Math.random()*2);}
-  M.grid=buildGrid(M);M.fx.push({t:'boom',x1:c.x,y1:c.y,life:.5});M.fx.push({t:'ring',x1:c.x,y1:c.y,life:.6});M.mats+=30;M.smashed=(M.smashed||0)+1;addBux(15,'smashed a building');big('BUILDING SMASHED! +15 BUX','#ffb060',1.3);beep(90,.35,'sawtooth',.06);
+  M.grid=buildGrid(M);M.fx.push({t:'boom',x1:c.x,y1:c.y,life:.5});M.fx.push({t:'ring',x1:c.x,y1:c.y,life:.6});M.mats+=30;M.smashed=(M.smashed||0)+1;qp('smash');addBux(15,'smashed a building');big('BUILDING SMASHED! +15 BUX','#ffb060',1.3);beep(90,.35,'sawtooth',.06);
   M.best=M.best||{};M.best.smash=M.smashed;
   if(Math.random()<.35){const w=pick(SPEC);M.drops=M.drops||[];M.drops.push({x:c.x,y:c.y+8,w,life:30});feed('Something was inside! '+w.n,w.c);}}}
 function shootAt(e,h,in3d){const me=M.squad[0];M.fx.push({t:'shot',x1:me.x,y1:me.y,x2:e.x,y2:e.y,life:.06,c:IT(LOCK.wrap).c});beep(520,.03,'square',.02);
@@ -1317,7 +1338,7 @@ function shootAt(e,h,in3d){const me=M.squad[0];M.fx.push({t:'shot',x1:me.x,y1:me
  const d=GUNS[M.gun].d*(M.roll>=3?1.4:1);hitEnemy(e,d,me);run.flow=Math.min(100,run.flow+2);M.fx.push({t:'txt',x1:e.x,y1:e.y,s:String(Math.round(d)),life:.5,in3d});}
 function endMatch(win,why){
  M.ended=true;M.win=win;M.place=win?1:Math.max(2,M.players);M.endT=3;M.view3d=null;
- if(win){run.wins++;prog().sp++;king(7);addBux(250,'VICTORY ROYALE');addFun(22,'VICTORY');addMood(-4);M.confetti=Array.from({length:70},()=>({x:rnd(0,TW),y:rnd(-TH,0),v:rnd(20,50),c:pick(['#ffd25a','#ff5a7a','#5ab0ff','#7fe0a0'])}));[660,880,1320].forEach((f,i)=>setTimeout(()=>beep(f,.12),i*120));}
+ if(win){run.wins++;prog().sp++;if(!M.gotUp)qp('noGetUp');king(7);addBux(250,'VICTORY ROYALE');addFun(22,'VICTORY');addMood(-4);M.confetti=Array.from({length:70},()=>({x:rnd(0,TW),y:rnd(-TH,0),v:rnd(20,50),c:pick(['#ffd25a','#ff5a7a','#5ab0ff','#7fe0a0'])}));[660,880,1320].forEach((f,i)=>setTimeout(()=>beep(f,.12),i*120));}
  else if(M.place<=5){addFun(4,'Top 5');addBux(60,'top 5');}else{addFun(-5,'Early exit');if(M.place>20)crownDip(2,'Out early');}}
 function startLobby(){
  run.phase='lobby';run.lobbyT=60;run.afk=false;run.partyWait=0;run.partyWarned=false;const won=M.win,place=M.place,k=M.kills,pw=M.power,bst=M.best||{};
@@ -1419,6 +1440,7 @@ function drawTopDown(t){
  M.rares.forEach(r=>{if(r.taken)return;const p=P(r),k=Math.floor(t*6+r.x)%6;R(p.x-2,p.y-1,5,2,GUNS[r.tier].c);if(k<3){R(p.x-1-k,p.y,1,1,'#fff');R(p.x+3+k,p.y,1,1,'#fff');R(p.x+1,p.y-2-k,1,1,'#fff');}});
  M.cars.forEach(cr=>{if(cr===M.car)return;const p=P(cr);R(p.x-6,p.y-3,12,6,cr.col);R(p.x-2,p.y-2,5,4,'#33404a');});
  if(M.bhp)(M.solids||[]).forEach(q=>{const hp=M.bhp[q.join(',')];if(hp==null||hp>=100)return;const p=W2S(q[0],q[1]);b.strokeStyle='rgba(20,15,10,.8)';b.beginPath();const n=Math.ceil((100-hp)/25);for(let i=0;i<n;i++){const sx=p.x+hash(i+q[0])*q[2],sy=p.y+hash(i*3+q[1])*q[3];b.moveTo(sx,sy);b.lineTo(sx+4,sy+3);b.lineTo(sx+2,sy+6);}b.stroke();R(p.x,p.y-4,q[2],2,'#000');R(p.x,p.y-4,q[2]*hp/100,2,'#ffb060');});
+ (M.glambs||[]).forEach(g=>{if(g.taken)return;const p=W2S(g.x,g.y),k=Math.floor(t*5+g.x)%6;R(p.x-3,p.y-2,7,4,'#ffd25a');R(p.x+2,p.y-4,3,3,'#ffd25a');R(p.x+3,p.y-3,1,1,'#7a5a10');if(k<2){R(p.x-5,p.y-5,1,1,'#fff');R(p.x+6,p.y-6,1,1,'#fff');}});
  (M.drops||[]).forEach(d=>{const p=W2S(d.x,d.y),bob=Math.round(Math.sin(t*4)*1.5);b.fillStyle=d.w.c+'55';b.fillRect(p.x-2,TY,4,p.y-TY);R(p.x-5,p.y-2,11,6,'rgba(0,0,0,.3)');wIcon(d.w.id,p.x-4,p.y-6+bob);if(Math.floor(t*6)%2)R(p.x+5,p.y-8+bob,1,1,'#fff');});
  // enemies (hidden ones are inside bushes)
  M.enemies.forEach(e=>{if(e.hidden)return;const p=P(e),sk=e.skin||SKINS[0],dance=M.spect?Math.round(Math.sin(t*10+e.x)*2):0;R(p.x-2,p.y+2,6,2,'rgba(0,0,0,.25)');
@@ -1837,7 +1859,7 @@ function setupFPS(){
  const hold=(id,on,off)=>{const b=$(id);b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();on();});b.addEventListener('pointerup',e=>{e.stopPropagation();off&&off();});b.addEventListener('pointerleave',()=>off&&off());};
  hold('tFire',()=>{M.firing=true;},()=>{M.firing=false;});hold('tJump',fpsJump);hold('tRun',()=>{tch.run=!tch.run;$('tRun').classList.toggle('on',tch.run);});
 }
-window.addEventListener('keydown',e=>{if(!M||!M.fps)return;keys[e.code]=true;if(e.code==='Space'){e.preventDefault();fpsJump();}if(e.code==='Escape'&&document.pointerLockElement!==fpsC)exitFPS();});
+window.addEventListener('keydown',e=>{if(M&&!M.fps&&inMatch()&&M.phase==='play'&&!M.ended&&!M.spect&&['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown'].includes(e.code)&&hands()>=.3&&mode==='play'){enterFPS();toast('🎮 You have control. ESC + AUTOPLAY hands it back.','#7fe0a0');}if(!M||!M.fps)return;keys[e.code]=true;if(e.code==='Space'){e.preventDefault();fpsJump();}if(e.code==='Escape'&&document.pointerLockElement!==fpsC)exitFPS();});
 window.addEventListener('keyup',e=>{keys[e.code]=false;});
 function enterFPS(){if(!fpsC)setupFPS();const me=M.squad[0];
  if(M.ang==null){M.ang=Math.atan2(M.storm.cy-me.y,M.storm.cx-me.x);M.pitch=0;}
@@ -2113,7 +2135,8 @@ function droidHTML(){const P=prog(),done=run.board.filter(j=>j.done).length,ups=
  <div style="color:#9acd32;margin-top:6px">⭐ SKILLS · ${P.sp} SP</div>${TREE.map(b=>`<div>${b.n} ${'★'.repeat(P.sk[b.k])}${'☆'.repeat(3-P.sk[b.k])}</div>`).join('')}
  <div style="color:#9acd32;margin-top:6px">📦 OWNED</div><div>${ups.length?ups.join(', '):'nothing yet'}</div>`;}
 function gbcHTML(){const pg=deckPg.g,m=inMatch()?M:null;
- if(pg===0)return `<b>FORTNITE TODAY</b><br>Wins ${run.wins}<br>Elims ${run.kills}<br>Spotted ${run.spots}<br>Simba elims ${run.simbaKills}<br>Match # ${run.match}<br>King ${Math.floor(run.king)}%<br>Aim ${Math.round(run.flow)}%`;
+ if(pg===2&&false)return '';
+ if(pg===0)return `<b>QUESTS</b><br>${quests().map(q=>`${q.done?'✔':'·'} ${q.t} ${Math.min(q.p,q.n)}/${q.n}`).join('<br>')}<br><br><b>FORTNITE TODAY</b><br>Wins ${run.wins}<br>Elims ${run.kills}<br>Spotted ${run.spots}<br>Simba elims ${run.simbaKills}<br>Match # ${run.match}<br>King ${Math.floor(run.king)}%<br>Aim ${Math.round(run.flow)}%`;
  if(pg===1)return m?`<b>THIS MATCH</b><br>Players ${m.players}<br>Elims ${m.kills}<br>Mode ${m.mode}<br>Gun ${GUNS[m.gun].n}<br>Special ${m.wpn?m.wpn.n+' x'+m.wpn.ammo:'-'}<br>Mats ${m.mats||0}<br>Combo x${m.combo||0}<br>Smashed ${m.smashed||0}`:`<b>THIS MATCH</b><br>Not in a match.<br><br>Ready up on the TV.`;
  const own=LOCK.own.length;return `<b>LOCKER</b><br>Bux ${LOCK.bux}<br>Skin ${IT(LOCK.skin).n}<br>Wings ${IT(LOCK.glider).n}<br>Pickaxe ${LOCK.pick?IT(LOCK.pick).n:'Default'}<br>Tracers ${IT(LOCK.wrap).n}<br>Emote ${IT(LOCK.emote).n}<br>Items ${own}/${ITEMS.length}`;}
 // ---- theme store: everything is free, unlocked by pressing GIVE ME (or minigames later) ----
@@ -2139,7 +2162,8 @@ function drawHUD(){
  else if(M.phase==='lobby'){txt('PREP PHASE',L+W2/2,T+28,'#fff',11,'center');
   const pz=run.party;txt(pz.length?'Party: Steve, '+pz.map(n=>n==='Randoms'?'Taco & Dano':n).join(', '):'Party: just Steve (solo)',L+W2/2,T+50,'#ffd25a',8,'center');
   if(pz.length){const f=1-clamp(run.partyWait/75,0,1);txt('PARTY PATIENCE',L+W2/2-150,T+74,'#cfd3dd',7);bar(L+W2/2-20,T+66,170,8,f,f>.5?'#46c46e':f>.2?'#f0b43c':'#e23b3b');}
-  else txt('Invite someone from your phone contacts, or FIND A SQUAD.',L+W2/2,T+74,'#cfd3dd',7,'center');}
+  else txt('Invite someone from your phone contacts, or FIND A SQUAD.',L+W2/2,T+74,'#cfd3dd',7,'center');
+  quests().forEach((q,i)=>txt(`${q.done?'✅':q.npc?'💬':'📜'} ${q.t}  ${Math.min(q.p,q.n)}/${q.n}`,L+12,T+H2-(quests().length-i)*12*TXK-4,q.done?'#7fe0a0':q.npc?'#ffb27a':'#cfe9ff',7));}
  else{
   txt(`👤${M.players}`,L+10,T+22,'#fff',11);txt(`☠${M.kills}`,L+10+52*TXK,T+22,'#fff36a',11);txt(M.mode.toUpperCase(),L+10+90*TXK,T+22,'#cfd3dd',8);
   if(M.phase==='play'){txt(`${GUNS[M.gun].n}${M.flyCD>0?'':' · wings ready'}`,L+10,T+22+12*TXK,GUNS[M.gun].c,7);}
@@ -2152,6 +2176,7 @@ function drawHUD(){
   if(M.phase==='bus')txt('BATTLE BUS · dropping at '+M.target.name,L+W2/2,T+H2-16,'#fff',8,'center');
   if(M.spect)txt('SPECTATING · '+(M.spect.k?M.spect.k.name:''),L+W2/2,T+H2-20,'#ff9a7a',9,'center');
   if(M.phase==='play'&&!M.ended&&!M.spect){if(run.simba.st==='gamer')txt('SIMBA IS PLAYING · CLICK HER',L+W2/2,T+H2/2+40,'#ffb060',10,'center');else if(hands()<.3)txt('STEVE IS AFK',L+W2/2,T+H2/2+40,'#ff8b8b',11,'center');}
+  if(M.phase==='play'&&!M.ended&&!M.spect&&!M.fps&&hands()>=.3)btn('🎮 TAKE CONTROL',L+W2-150,T+H2-26,140,20,'#7a3ab0',()=>{enterFPS();});
   if(M.roll>=3)txt(`ON A ROLL x${M.roll}`,L+W2-60,T+40,'#ffd25a',8,'right');
   txt(`💎 ${LOCK.bux}`,L+W2-10,T+22,'#7fe8ff',9,'right');
   if(M.phase==='play'){if(M.wpn)txt(M.wpn.n+' ×'+M.wpn.ammo,L+W2/2,T+62,M.wpn.c,7,'center');if(M.mats)txt('🪵'+M.mats,L+W2-10-60*TXK,T+22,'#d8b080',8,'right');

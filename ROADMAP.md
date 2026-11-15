@@ -9,6 +9,14 @@ Plain list of where the game is going, in order. Update it when an item finishes
 - Wire the art that loads but is not drawn yet: TV set, burglars, car on the lift, pizza driver, lawn statue, top-down TV sprites, weapon icons.
 - Show-readiness review, then a gameplay wave: minigames for repetitive tasks, more interactions with the family and Simba.
 
+## Decisions (from Dan)
+
+- TV game control: the match autoplays; the player can take over any time (WASD + mouse, arrows, or the on-screen joystick on touch) and hand it back with AUTOPLAY. Quests count in both.
+- Quests: daily challenges, NPC quest givers in the lobby, collectibles (golden lambs), and real-life tie-ins (win without getting up, care for Simba mid-match, eat cookies, sell a car). First version is in.
+- Halloween theme: always available, unlocked like the others.
+- Lobby mouse: left-click shoots, right-click toggles the 3D view, middle-click emotes.
+- Default graphics theme: 16-BIT. Island is always green with a sand beach in every theme.
+
 ## Next: themes as "DLC"
 
 All themes are free. The menu presents them like paid DLC as a joke, then asks for a donation instead of a payment.
