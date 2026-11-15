@@ -113,3 +113,24 @@ asset commits, and this status commit could not be completed. Files remain
 unstaged for the owner's agent to commit individually. The local HTTP server
 started, but the browser preview failed because the Computer Use native pipe
 is unavailable, so the house-view visual check remains outstanding.
+
+2026-11-14 (Pass 3, step 1 only): Added tools/art/pixelize.py and
+tools/art/lineup.png, an original procedural pixel-painted approval study.
+The lineup shows Simba standing and sitting, walking Steve, seated Steve
+holding a controller on the couch, wife, kid, and an off-white lamb toy,
+alongside an 84px door and couch with its seat 28px above the floor.
+Native sprites remain in memory; only the 1616 x 600 lineup is exported,
+at exact 4x nearest-neighbor enlargement. Shared 32-color palette,
+top-left material shading, ordered dithering, fur clumps, fabric weave,
+denim seams, wood grain, tinted outlines, and floor shadows are included.
+The shared pixelize() pipeline fits to the table limits, snaps the palette,
+thresholds alpha, adds a tinted 1px outline, and bottom-centers each sprite.
+Used the table's 44px Steve limit where the scale guidance says 46px.
+Checked palette membership, binary alpha, bottom anchors, enlargement,
+and visually inspected the final lineup. Simba reference photos informed
+coat colors and build only; people and toy are original stylizations.
+No individual sprites exported, no assets overwritten, no git commands run,
+and no changes to index.html or frozen/.
+
+Owner approval requested: please review tools/art/lineup.png for the Pass 3
+art direction before any individual sprite exports (step 2).
