@@ -97,6 +97,17 @@ header,#help,#side,#tabs,#pill{display:none!important}
 #menu button{font:inherit;font-size:14px;width:min(360px,90vw);padding:14px;background:#3a4258;color:#fff;border:4px solid #000;box-shadow:4px 4px 0 #000;cursor:pointer}
 #menu button.go{background:#2f8f50}#menuHelp{max-width:640px;font-size:10px;line-height:2;color:#cfd3dd;display:none}
 #rot{display:none}
+/* UI scales with the window: columns are zoomed by --ui (set from the window height) */
+:root{--ui:1}
+#lcol{flex:0 0 240px!important;zoom:var(--ui);height:calc((100dvh - 12px)/var(--ui))}
+#rcol{flex:0 0 270px!important;zoom:var(--ui);height:calc((100dvh - 12px)/var(--ui))}
+body.mob #rcol{flex-basis:300px!important}
+.free{position:fixed!important;zoom:var(--ui);z-index:14;margin:0!important}
+body.unlock .free{outline:3px dashed #ffd25a;overflow:hidden;resize:both}
+.grab{display:none}body.unlock .grab{display:block;position:absolute;left:0;right:0;top:0;height:22px;z-index:20;background:rgba(255,210,90,.85);color:#000;font-size:9px;line-height:22px;text-align:center;cursor:move;touch-action:none}
+#phone.zoomed{position:fixed!important;right:0;top:0;width:270px!important;height:calc(100dvh/var(--pz))!important;zoom:var(--pz);z-index:16;box-shadow:-6px 0 0 rgba(0,0,0,.5)}
+body.rot #game{position:fixed;left:0;top:0;width:100vh;width:100dvh;height:100vw;transform:rotate(90deg) translateY(-100%);transform-origin:top left}
+body.rot #rot{display:none!important}
 #rtop{display:flex;gap:6px}#rtop button{flex:1 1 0}
 /* phones in landscape: the phone owns the right side, the CCTV docks under it or floats */
 body.mob #lcol{display:none}
@@ -132,7 +143,7 @@ body.mob #cuWrap{flex:0 0 auto}body.mob #cuBtns{display:none!important}body.mob 
 House: ◀ ▶ to look around · stove, front door, lift, work board, machine, gate · GET UP to go AFK (costs a squad heart mid-match, free in breaks) · click the lift, work board, answering machine, front door, gate, burglars, or your wife.<br>
 Simba: drag-fling the lamb toy · click her for tug-of-war, to wiggle her off your lap, or to put her to sleep when she's tired · scrub drool off the TV.</div>
 <div id="rcolTpl"></div>
-<div id="menu"><h2>PAUSED</h2><button class="go" onclick="closeMenu()">▶ RESUME</button><button id="mGfx" onclick="$('gfx').click();menuLabels()"></button><button id="mSnd" onclick="$('mute').click();menuLabels()"></button><button onclick="toggleFS()">⛶ FULL SCREEN</button><button onclick="const h=$('menuHelp');h.style.display=h.style.display==='block'?'none':'block'">? HOW TO PLAY</button><div id="menuHelp"></div><button onclick="if(confirm('Start over? This run will be lost.'))location.reload()">↺ NEW GAME</button></div>
+<div id="menu"><h2>PAUSED</h2><button class="go" onclick="closeMenu()">▶ RESUME</button><button id="mGfx" onclick="$('gfx').click();menuLabels()"></button><button id="mSnd" onclick="$('mute').click();menuLabels()"></button><button onclick="toggleFS()">⛶ FULL SCREEN</button><button id="mPz" onclick="UI.pz=!UI.pz;saveUI();menuLabels()"></button><button id="mLock" onclick="toggleUnlock()"></button><button onclick="resetUI()">↺ RESET LAYOUT</button><button onclick="const h=$('menuHelp');h.style.display=h.style.display==='block'?'none':'block'">? HOW TO PLAY</button><div id="menuHelp"></div><button onclick="if(confirm('Start over? This run will be lost.'))location.reload()">↺ NEW GAME</button></div>
 <div id="rot">↻<br>Turn your phone sideways<br>to play</div>
 <div id="err"></div>
 <script>
@@ -1525,6 +1536,7 @@ function charAtlas(key,P){if(ATL[key])return ATL[key];const T=TEX['chr_'+key.spl
  cell(9,P.boot||0x2a2a30,r=>r(0x111111,0,12,16,4));
  cell(10,P.pack||0xc03030,r=>{r(0xc0c4ca,2,2,12,3);r(0xffd25a,4,12,8,4);});
  cell(11,0x2a2a30,r=>{r(P.gun||0x888888,0,4,16,6);r(0x555555,0,4,16,1);});
+ cell(12,0x9dff3a,r=>{r(0xd8ff7a,0,0,16,2);for(let i=0;i<16;i+=4){r(0x5ad81a,i,6,2,2);r(0x5ad81a,i+2,8,2,2);}r(0xf4ffb0,0,13,16,1);r(0x3aa010,0,15,16,1);});
  const d=g.getImageData(0,0,64,64).data,a=new Int32Array(4096);for(let i=0;i<4096;i++)a[i]=(d[i*4]<<16)|(d[i*4+1]<<8)|d[i*4+2];return ATL[key]={w:64,h:64,d:a};}
 // corners: 0..3 bottom, 4..7 top; order (-f,-s) (+f,-s) (+f,+s) (-f,+s)
 const BOXF=[[[4,5,6,7],'t'],[[1,2,6,5],'f'],[[3,0,4,7],'b'],[[0,1,5,4],'s'],[[2,3,7,6],'s'],[[3,2,1,0],'d']];
@@ -1538,6 +1550,7 @@ function drawPerson(o,s,px,py,dirX,dirY,plX,plY,invDet,hz,W,H,buf,fogCol,t,P,key
   [0,-.23,.46,.055,.055,.35,1,-sw*.8+dance,{f:7,s:7,b:7,t:7,d:7}],[0,.23,.46,.055,.055,.35,1,(aim?-1.4:sw*.8)-dance,{f:7,s:7,b:7,t:7,d:7}],
   [0,0,.82,P.helm?.15:.11,P.helm?.15:.11,P.helm?.28:.22,0,0,{f:0,s:1,b:2,t:3,d:3}]];
  if(P.pack)parts.push([-.17,0,.5,.06,.13,.3,0,0,{f:10,s:10,b:10,t:10,d:10}]);
+ if(P.poncho)parts.push([0,0,.5,.14,.25,.32,0,0,{f:12,s:12,b:12,t:12,d:12,glow:1}]);
  if(aim||s.k==='ally')parts.push([.3,.23,.7,.17,.03,.06,0,0,{f:11,s:11,b:11,t:11,d:11}]);
  for(const pt of parts){const [cx,cy,z0,hf,hs,h,piv,ang,C]=pt,zt=z0+h,cs=Math.cos(ang),sn=Math.sin(ang),Q=[];
   for(let k=0;k<8;k++){const kk=k&3;let fx=(kk===1||kk===2)?hf:-hf,fy=(kk>=2)?hs:-hs,z=k<4?z0:zt;
@@ -1547,7 +1560,7 @@ function drawPerson(o,s,px,py,dirX,dirY,plX,plY,invDet,hz,W,H,buf,fogCol,t,P,key
   if(Q.some(c=>c[2]<.12))continue;
   for(const [ix,nm] of BOXF){const q=ix.map(i=>Q[i]);
    const cl=nm==='f'?C.f:nm==='b'?C.b:nm==='t'?C.t:nm==='d'?C.d:C.s,u0=(cl%4)*16,v0=Math.floor(cl/4)*16;
-   const lit=nm==='t'?1.08:nm==='f'?1:nm==='s'?.8:nm==='b'?.75:.55;
+   const lit=C.glow?1.12:nm==='t'?1.08:nm==='f'?1:nm==='s'?.8:nm==='b'?.75:.55;
    const uv=[[u0,v0+15.99],[u0+15.99,v0+15.99],[u0+15.99,v0],[u0,v0]];
    tri(q[0],q[1],q[2],uv[0],uv[1],uv[2],A,lit,W,H,buf,fogCol,o.flash>0);tri(q[0],q[2],q[3],uv[0],uv[2],uv[3],A,lit,W,H,buf,fogCol,o.flash>0);}}}
 function tri(a,b2,c,ua,ub,uc,A,lit,W,H,buf,fogCol,flash){
@@ -1610,7 +1623,7 @@ function fpsRender(){
   const BB=tx16(s.k==='tree'?(M.trees===M.isl?.palms||o.palm?'bb_palm':'bb_tree'):'bb_'+s.k);let tint=null;if(BB&&(s.k==='enemy'||s.k==='ally')){const sk=o.skin||SKINS[0];tint=s.k==='enemy'?(o.flash>0?0xffffff:hexC(sk.b)):hexC(o.col||'#88aaff');}
   let pal=null;if(s.k==='steve')pal={b:0xf4f4f4,h:0xe8b890,a:0x2d5fa8};if(s.k==='enemy'){const sk=o.skin||SKINS[0];pal={b:o.flash>0?0xffffff:hexC(sk.b),h:hexC(sk.h),a:hexC(sk.a)};}if(s.k==='ally')pal={b:hexC(o.col),h:0xe8b890,a:0x222222};
   const wig=s.k==='bush'&&s.hid&&Math.floor(t*3+o.x)%5===0?2:0,walk=(s.k==='enemy'||s.k==='ally')?Math.floor(t*8+o.x)%2:0;
-  if(s.k==='enemy'||s.k==='ally'||s.k==='steve'){let P,key;if(s.k==='steve'){P={b:0xf4f4f4,h:0xe8b890,a:0x2fa84a,l:0xd8d8d8,boot:0x8a8e94,helm:1,pack:0xd83030,hair:0x5a3e28};key='steve';}
+  if(s.k==='enemy'||s.k==='ally'||s.k==='steve'){let P,key;if(s.k==='steve'){P={b:0xf4f4f4,h:0xe8b890,a:0x2fa84a,l:0xd8d8d8,boot:0x8a8e94,helm:1,pack:0xd83030,hair:0x5a3e28,poncho:1};key='steve';}
    else if(s.k==='enemy'){const sk=o.skin||SKINS[0];P={b:hexC(sk.b),h:hexC(sk.h),a:hexC(sk.a),l:shadeC(hexC(sk.b),.6)};key='e_'+sk.b+sk.h+sk.a;}
    else{P={b:hexC(o.col||'#88aaff'),h:0xe8b890,a:0x222222,l:0x2a2a30};key='a_'+(o.col||'x');}
    P.gun=hexC(GUNS[M.gun||0].c);drawPerson(o,s,px,py,dirX,dirY,plX,plY,invDet,hz,W,H,buf,fogCol,t,P,key);}
@@ -1764,7 +1777,7 @@ function drawHUD(){
 // ================= frame / input =================
 function draw(){const BK=GFX==='16'?2:1;if(B.width!==VW*BK){B.width=VW*BK;B.height=240*BK;}b.setTransform(BK,0,0,BK,0,0);b.imageSmoothingEnabled=false;drawHouse();drawTV();if(run)drawPanel();ctx.imageSmoothingEnabled=false;ctx.drawImage(B,0,0,cv.width,720);flushArt();if(run)drawHUD();cuRot+=1/60;drawCU();}
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;try{if(mode==='play')update(dt);draw();if(phoneDirty){renderPhone();phoneDirty=false;}phoneTick();}catch(e){const el=$('err');el.style.display='block';el.textContent='Something broke: '+e.message+'\n'+(e.stack||'').split('\n').slice(0,3).join('\n')+'\nSend this to Claude.';}requestAnimationFrame(loop);}
-function pos(e){const r=cv.getBoundingClientRect(),k=Math.min(r.width/cv.width,r.height/720),ox=(r.width-cv.width*k)/2,oy=(r.height-720*k)/2;const x=(e.clientX-r.left-ox)/k,y=(e.clientY-r.top-oy)/k;return {x,y,bx:x/SC,by:y/SC};}
+function pos(e){const R=cv.getBoundingClientRect(),rot=document.body.classList.contains('rot'),r=rot?{width:R.height,height:R.width}:R,cx=rot?e.clientY-R.top:e.clientX-R.left,cy=rot?R.right-e.clientX:e.clientY-R.top,k=Math.min(r.width/cv.width,r.height/720),ox=(r.width-cv.width*k)/2,oy=(r.height-720*k)/2;const x=(cx-ox)/k,y=(cy-oy)/k;return {x,y,bx:x/SC,by:y/SC};}
 const inTV=(x,y)=>x>=TX&&x<=TX+TW&&y>=TY&&y<=TY+TH;
 cv.addEventListener('contextmenu',e=>e.preventDefault());
 cv.addEventListener('pointerdown',e=>{
@@ -1803,10 +1816,42 @@ window.addEventListener('pointerup',()=>{mouse.down=false;if(mode!=='play'||!run
 {const g=$('game'),lc=$('lcol'),rc=document.createElement('div');rc.id='rcol';lc.appendChild($('cuWrap'));const fs=document.createElement('button');fs.id='fsBtn';fs.className='colbtn';fs.textContent='⛶ FULL SCREEN';fs.onclick=()=>toggleFS();const rt=document.createElement('div');rt.id='rtop';rt.appendChild(fs);rc.appendChild(rt);rc.appendChild($('phone'));g.appendChild(rc);const pl=document.createElement('button');pl.id='pill';document.body.appendChild(pl);$('menuHelp').innerHTML=$('help').innerHTML;}
 window.toggleFS=()=>{const d=document,el=d.documentElement;if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d);return;}const rq=el.requestFullscreen||el.webkitRequestFullscreen;if(rq){Promise.resolve(rq.call(el)).then(()=>{try{screen.orientation.lock('landscape').catch(()=>{});}catch(e){}}).catch(()=>{});}else toast('On iPhone: Share → Add to Home Screen for full screen','#9aa0b0');};
 document.addEventListener('fullscreenchange',()=>{$('fsBtn').textContent=document.fullscreenElement?'✕ EXIT FULL':'⛶ FULL SCREEN';});
-let preMenu=null;window.menuLabels=()=>{$('mGfx').textContent=$('gfx').textContent;$('mSnd').textContent=$('mute').textContent;};
+let preMenu=null;window.menuLabels=()=>{$('mPz').textContent='📱 PHONE ZOOM ON HOVER/TAP: '+(UI.pz?'ON':'OFF');$('mLock').textContent=document.body.classList.contains('unlock')?'🔒 LOCK UI':'🔓 UNLOCK UI (move & resize panels)';$('mGfx').textContent=$('gfx').textContent;$('mSnd').textContent=$('mute').textContent;};
 window.openMenu=()=>{menuLabels();if(mode==='play'){preMenu='play';mode='pause';}$('menu').classList.add('on');};
 window.closeMenu=()=>{$('menu').classList.remove('on');if(preMenu){mode=preMenu;preMenu=null;}};
-$('menuBtn').onclick=openMenu;layoutCols();window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!(M&&M.fps)){$('menu').classList.contains('on')?closeMenu():openMenu();}});
+$('menuBtn').onclick=openMenu;layoutCols();
+// ===== UI: window scaling, forced landscape, phone zoom, movable panels =====
+let UI={pz:false,free:{}};try{UI=Object.assign(UI,JSON.parse(localStorage.getItem('steveUI')||'{}'));}catch(e){}
+function saveUI(){try{localStorage.setItem('steveUI',JSON.stringify(UI));}catch(e){}}
+const isRot=()=>document.body.classList.contains('rot');
+const winH=()=>isRot()?innerWidth:innerHeight,winW=()=>isRot()?innerHeight:innerWidth;
+function scaleUI(){document.body.classList.toggle('rot',matchMedia('(orientation:portrait) and (pointer:coarse)').matches);
+ const k=Math.max(.55,Math.min(1.7,winH()/720));document.documentElement.style.setProperty('--ui',k.toFixed(3));
+ document.documentElement.style.setProperty('--pz',(winH()/560).toFixed(3));}
+addEventListener('resize',scaleUI);scaleUI();
+// phone zoom: hover (mouse) or first tap blows the phone up to the full window height
+{const ph=$('phone');let swallow=false;
+ const zoomOn=()=>{if(!UI.pz||ph.classList.contains('zoomed')||document.body.classList.contains('unlock'))return false;ph.classList.add('zoomed');return true;};
+ const zoomOff=()=>ph.classList.remove('zoomed');
+ ph.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')zoomOn();});
+ ph.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')zoomOff();});
+ ph.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'&&zoomOn()){swallow=true;e.preventDefault();e.stopPropagation();}},true);
+ ph.addEventListener('click',e=>{if(swallow){swallow=false;e.preventDefault();e.stopPropagation();}},true);
+ document.addEventListener('pointerdown',e=>{if(!ph.contains(e.target))zoomOff();},true);}
+// movable panels: unlock UI in the menu, drag the yellow bar, resize from the corner; layout is saved
+const FREE_IDS=['cuWrap','phone','rtop','menuBtn'];
+function freeEl(id,r){const el=$(id);if(!el)return;el.classList.add('free');$('game').appendChild(el);
+ Object.assign(el.style,{left:r.x+'px',top:r.y+'px',width:r.w+'px',height:r.h+'px'});
+ if(!el.querySelector(':scope>.grab')){const g=document.createElement('div');g.className='grab';g.textContent='⠿ DRAG · resize from corner';el.prepend(g);let d=null;
+  g.addEventListener('pointerdown',e=>{d={x:e.clientX,y:e.clientY,l:parseFloat(el.style.left),t:parseFloat(el.style.top)};g.setPointerCapture(e.pointerId);e.preventDefault();e.stopPropagation();});
+  g.addEventListener('pointermove',e=>{if(!d)return;const k=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui'))||1;el.style.left=(d.l+(e.clientX-d.x)/k)+'px';el.style.top=(d.t+(e.clientY-d.y)/k)+'px';});
+  g.addEventListener('pointerup',()=>{d=null;});}}
+window.toggleUnlock=()=>{const on=!document.body.classList.contains('unlock');const k=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui'))||1;
+ if(on){FREE_IDS.forEach(id=>{const el=$(id);if(!el||el.classList.contains('free'))return;const r=el.getBoundingClientRect();freeEl(id,{x:r.left/k,y:r.top/k,w:r.width/k,h:r.height/k});});document.body.classList.add('unlock');closeMenu();toast('UI unlocked: drag the yellow bars. Lock it again from the menu.','#ffd25a');}
+ else{document.body.classList.remove('unlock');UI.free={};FREE_IDS.forEach(id=>{const el=$(id);if(el&&el.classList.contains('free'))UI.free[id]={x:parseFloat(el.style.left),y:parseFloat(el.style.top),w:el.offsetWidth,h:el.offsetHeight};});saveUI();menuLabels();}};
+window.resetUI=()=>{UI.free={};saveUI();location.reload();};
+setTimeout(()=>{for(const id in (UI.free||{}))freeEl(id,UI.free[id]);},0);
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!(M&&M.fps)){$('menu').classList.contains('on')?closeMenu():openMenu();}});
 {const t=$('cuTitle'),w=$('cuWrap');let d=null;
  // drag the CCTV title to float it anywhere; double-tap the title to dock it back
  t.addEventListener('pointerdown',e=>{const r=w.getBoundingClientRect();d={dx:e.clientX-r.left,dy:e.clientY-r.top,moved:false};t.setPointerCapture(e.pointerId);e.preventDefault();});
@@ -1815,8 +1860,8 @@ $('menuBtn').onclick=openMenu;layoutCols();window.addEventListener('keydown',e=>
  t.addEventListener('pointerup',()=>d=null);
  t.addEventListener('dblclick',()=>{w.classList.remove('float');w.style.left=w.style.top='';layoutCols();});}
 function layoutCols(){const mob=matchMedia('(pointer:coarse), (max-height:600px)').matches,w=$('cuWrap');document.body.classList.toggle('mob',mob);
- const rt=$('rtop');if(mob){rt.prepend($('menuBtn'));if(!w.classList.contains('float'))$('rcol').appendChild(w);}
- else{$('lcol').prepend($('menuBtn'));if(!w.classList.contains('float'))$('lcol').appendChild(w);}setTimeout(()=>typeof fitTXK==='function'&&fitTXK(),50);}
+ const rt=$('rtop');const fr=x=>x.classList.contains('free');if(mob){if(!fr($('menuBtn')))rt.prepend($('menuBtn'));if(!w.classList.contains('float')&&!fr(w))$('rcol').appendChild(w);}
+ else{if(!fr($('menuBtn')))$('lcol').prepend($('menuBtn'));if(!w.classList.contains('float')&&!fr(w))$('lcol').appendChild(w);}setTimeout(()=>typeof fitTXK==='function'&&fitTXK(),50);}
 addEventListener('resize',layoutCols);
 
 let phoneOpen=true;function setPhone(o){phoneOpen=o;$('phone').classList.toggle('min',!o);$('pill').classList.toggle('hide',o);}
