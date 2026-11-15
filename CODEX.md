@@ -214,27 +214,27 @@ front and use bottom-center anchors, with alpha restricted to 0 or 255.
 
 | File | Size | Content / use |
 |---|---|---|
-| `tex_grass.png` | 32 x 32 | Seamless XY; olive grass clumps |
-| `tex_sand.png` | 32 x 32 | Seamless XY; pale sand ripples |
-| `tex_snow.png` | 32 x 32 | Seamless XY; cream-white snow and cool depressions |
-| `tex_desert.png` | 32 x 32 | Seamless XY; warm ochre sand ridges |
-| `tex_water0.png` | 32 x 32 | Seamless XY; blue-slate water, frame 0 |
-| `tex_water1.png` | 32 x 32 | Seamless XY; shifted ripples, frame 1 |
-| `tex_building.png` | 64 x 96 | Hit 2; red roof top quarter, siding, middle window, lower-right door |
-| `tex_rock.png` | 64 x 64 | Hit 3; staggered stone blocks and cracks |
-| `tex_cliff.png` | 64 x 128 | Hits 1/4; snow cap, cool fractured cliff face |
-| `sky_day.png` | 512 x 120 | Horizontal wrap; blue-slate sky, low soft-edged pixel clouds |
-| `sky_dusk.png` | 512 x 120 | Horizontal wrap; purple-orange storm sky |
-| `bb_tree.png` | 48 x 96 | Leafy clustered tree, exposed trunk |
-| `bb_palm.png` | 48 x 96 | Splayed fronds, coconuts and curved trunk |
-| `bb_bush.png` | 48 x 32 | Rounded leaf clumps |
-| `bb_chest.png` | 32 x 24 | Gold loot chest, bands and latch |
-| `bb_vend.png` | 32 x 56 | Red vending machine, glass display and collection slot |
-| `bb_steve.png` | 32 x 48 | Original white astronaut, GREEN panel, clear bubble helmet, visible RED side pack pods |
-| `bb_enemy.png` | 32 x 48 | Neutral gray/white player mask for runtime tinting |
-| `bb_ally.png` | 32 x 48 | Identical neutral player mask for runtime tinting |
-| `island_bg.png` | 600 x 260 | Prep TV backdrop: ocean, sky, sand island and palms; no characters or shack |
-| `map_island.png` | 1000 x 1000 | Generic map using genMap coast formula and biome layout |
+| `tex_grass.png` | 64 x 64 | Seamless XY; olive grass clumps |
+| `tex_sand.png` | 64 x 64 | Seamless XY; pale sand ripples |
+| `tex_snow.png` | 64 x 64 | Seamless XY; cream-white snow and cool depressions |
+| `tex_desert.png` | 64 x 64 | Seamless XY; warm ochre sand ridges |
+| `tex_water0.png` | 64 x 64 | Seamless XY; blue-slate water, frame 0 |
+| `tex_water1.png` | 64 x 64 | Seamless XY; shifted ripples, frame 1 |
+| `tex_building.png` | 128 x 192 | Hit 2; red roof top quarter, siding, middle window, lower-right door |
+| `tex_rock.png` | 128 x 128 | Hit 3; staggered stone blocks and cracks |
+| `tex_cliff.png` | 128 x 256 | Hits 1/4; snow cap, cool fractured cliff face |
+| `sky_day.png` | 1024 x 240 | Horizontal wrap; brighter blue-slate sky, layered cumulus pixel clouds |
+| `sky_dusk.png` | 1024 x 240 | Horizontal wrap; purple-orange storm sky |
+| `bb_tree.png` | 96 x 192 | Leafy clustered tree, exposed trunk |
+| `bb_palm.png` | 96 x 192 | Splayed fronds, coconuts and curved trunk |
+| `bb_bush.png` | 96 x 64 | Rounded leaf clumps |
+| `bb_chest.png` | 64 x 48 | Gold loot chest, bands and latch |
+| `bb_vend.png` | 64 x 112 | Red vending machine, glass display and collection slot |
+| `bb_steve.png` | 64 x 96 | Original white astronaut, GREEN panel, clear bubble helmet, visible RED side pack pods |
+| `bb_enemy.png` | 64 x 96 | Neutral gray/white player mask for runtime tinting |
+| `bb_ally.png` | 64 x 96 | Identical neutral player mask for runtime tinting |
+| `island_bg.png` | 1200 x 520 | Prep TV backdrop: ocean, sky, sand island and palms; no characters or shack |
+| `map_island.png` | 2000 x 2000 | Generic map using genMap coast formula and biome layout |
 
 2026-11-14 (3D and map textures): Read fpsRender(), drawTopDown(), genMap(),
 islandWorld(), islandRender() and buildGrid() in the current index.html.
@@ -277,3 +277,30 @@ installation in C:/Users/synchrite/ComfyUI/venv/Scripts/python.exe.
 No git commands run. No writes to index.html, frozen/, ref/, burglars,
 car_lift, lobby_shack, house_bg or tv_frame. Integration preview in the game
 is left for the game-code handoff because these filenames are not wired.
+
+
+2026-11-14 (double-detail 3D texture pass): Rebuilt all 21 assets/tex PNGs
+at the owner's requested doubled dimensions; updated the table above and
+replaced tools/art/sheet3.png (1440 x 2300). Retained the shared 36-color
+palette, original compositions and meanings. Added native-resolution grass
+blades and tiny flowers, sand ripples and pebbles, snow facets, water crests,
+siding grain/nails, roof detail, rock fractures, leaf veins, bark, chest grain
+and rivets, vending products/buttons/vents, suit seams and helmet reflections.
+Skies have richer multi-lobed cloud shapes and ordered band transitions;
+day uses the brighter existing blue-slate with cream cloud highlights.
+Backdrop has the revised day sky and fine beach/ocean detail. Map retains
+its generic biome/coast layout with finer terrain marks at 2000 x 2000.
+These are new material marks on larger rasterized shapes, not plain upscales.
+
+Billboards occupy the full height, touch the bottom row and have exactly
+one transparent column on each side. Steve keeps his white suit, green
+chest panel, clear helmet and red rocket pack. Enemy and ally remain
+identical neutral grayscale masks for runtime tinting. Every export passes
+the shared pixelize.py finalizer; texture_detail.py adds the native marks.
+Updated check_textures3.py passes all requested sizes, palette/grayscale,
+opaque UV rectangles, binary alpha, full-canvas anchors, floor XY / sky X
+edge equality, distinct water frames and byte-identical regeneration.
+Visually reviewed the updated asset sheet. Rebuild and validate using the
+same textures3.py and check_textures3.py commands documented above.
+No git commands run. No writes to index.html, frozen/, ref/, burglars,
+car_lift, lobby_shack, house_bg or tv_frame. Game integration was not changed.

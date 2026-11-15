@@ -16,9 +16,23 @@ OUT=ROOT/'assets/tex'
 ART=ROOT/'tools/art'
 IMAGES={}
 
+class ScaledDraw:
+    """Rasterize the composition at twice the coordinate density."""
+    def __init__(self,im): self.d=ImageDraw.Draw(im)
+    def shape(self,kind,xy,**kw):
+        if isinstance(xy[0],(tuple,list)): xy=[(round(x*2),round(y*2)) for x,y in xy]
+        else: xy=tuple(round(v*2) for v in xy)
+        if 'width' in kw: kw['width']*=2
+        getattr(self.d,kind)(xy,**kw)
+    def rectangle(self,xy,**kw): self.shape('rectangle',xy,**kw)
+    def polygon(self,xy,**kw): self.shape('polygon',xy,**kw)
+    def ellipse(self,xy,**kw): self.shape('ellipse',xy,**kw)
+    def line(self,xy,**kw): self.shape('line',xy,**kw)
+
+
 def canvas(size, color=None):
-    im=Image.new('RGBA',size, PAL[color]+(255,) if color is not None else (0,0,0,0))
-    return im, ImageDraw.Draw(im)
+    im=Image.new('RGBA',(size[0]*2,size[1]*2), PAL[color]+(255,) if color is not None else (0,0,0,0))
+    return im, ScaledDraw(im)
 
 def rect(d,box,c): d.rectangle(box,fill=PAL[c])
 def poly(d,pts,c): d.polygon(pts,fill=PAL[c])
@@ -26,7 +40,21 @@ def line(d,pts,c,w=1): d.line(pts,fill=PAL[c],width=w)
 def oval(d,box,c): d.ellipse(box,fill=PAL[c])
 
 def save(name,im,sprite=False,neutral=False):
-    im=pixelize(im,im.size) if sprite else surface_pixelize(im,im.size)
+    from texture_detail import detail
+    im=detail(name,im)
+    if sprite:
+        im=pixelize(im,im.size)
+        # Owner requests full canvases, including naturally narrow objects.
+        body=im.crop(im.getbbox())
+        out=Image.new('RGBA',im.size)
+        out.paste(body.resize((im.width-2,im.height),Image.Resampling.NEAREST),(1,0))
+        im=out
+    else: im=surface_pixelize(im,im.size)
+    if name.startswith('tex_') and im.size==(64,64):
+        for y in range(im.height): im.putpixel((im.width-1,y),im.getpixel((0,y)))
+        for x in range(im.width): im.putpixel((x,im.height-1),im.getpixel((x,0)))
+    if name.startswith('sky_'):
+        for y in range(im.height): im.putpixel((im.width-1,y),im.getpixel((0,y)))
     if neutral:
         # Tint masks require R=G=B. Four luminance bands, same geometry/alpha.
         alpha=im.getchannel('A')
@@ -61,8 +89,8 @@ def tile(kind,frame=0):
                     if kind=='snow':line(d,[(X-2,Y-4),(X+1,Y-4)],glint)
                     elif kind=='desert':line(d,[(X-6,Y+5),(X+2,Y+5),(X+5,Y+3)],light)
     # Duplicate boundary samples guarantee exact opposing-edge equality.
-    for y in range(32):im.putpixel((31,y),im.getpixel((0,y)))
-    for x in range(32):im.putpixel((x,31),im.getpixel((x,0)))
+    for y in range(64):im.putpixel((63,y),im.getpixel((0,y)))
+    for x in range(64):im.putpixel((x,63),im.getpixel((x,0)))
     return im
 
 def walls():
@@ -116,7 +144,7 @@ def sky(dusk=False):
             pts=[(X,y+10),(X+7,y+10),(X+7,y+4),(X+18,y+4),(X+18,y),(X+35,y),(X+35,y+3),(X+w-14,y+3),(X+w-14,y+8),(X+w,y+8),(X+w,y+16),(X,y+16)]
             poly(d,pts,23 if dusk else 18)
             poly(d,[(X+3,y+8),(X+12,y+8),(X+12,y+2),(X+30,y+2),(X+30,y+5),(X+w-17,y+5),(X+w-17,y+10),(X+w-3,y+10),(X+w-3,y+12),(X+3,y+12)],27 if dusk else 11)
-    for y in range(120):im.putpixel((511,y),im.getpixel((0,y)))
+
     return im
 
 def foliage(kind):
@@ -197,7 +225,7 @@ def person(steve=False):
     return im
 
 def backdrop():
-    im=sky().resize((600,260),Image.Resampling.NEAREST).convert('RGBA');d=ImageDraw.Draw(im)
+    im=sky().resize((1200,520),Image.Resampling.NEAREST).convert('RGBA');d=ScaledDraw(im)
     for x,y in [(35,76),(245,60),(470,83)]:
         rect(d,(x,y+5,x+63,y+11),18);rect(d,(x+11,y,x+44,y+8),0)
         line(d,[(x+14,y),(x+39,y)],11,2)
@@ -209,7 +237,7 @@ def backdrop():
     poly(d,[(145,191),(194,171),(340,168),(424,184),(443,200),(346,208),(205,205)],10)
     line(d,[(114,209),(159,218),(249,223),(393,221),(469,209)],11,2)
     for x,y in [(182,104),(365,113),(423,128)]:
-        palm=foliage('palm');im.alpha_composite(palm,(x,y))
+        palm=foliage('palm');im.alpha_composite(palm,(x*2,y*2))
     return im
 
 def matchmap():
@@ -218,8 +246,8 @@ def matchmap():
     coast=[440+math.sin(a*.7)*18+math.sin(a*1.9)*10+rng.uniform(-6,6) for a in range(64)]
     def shore(scale):return [(round((500+math.cos(a/64*math.tau)*r*scale)/2),round((500+math.sin(a/64*math.tau)*r*scale)/2)) for a,r in enumerate(coast)]
     poly(d,shore(1.04),17);poly(d,shore(1),10);poly(d,shore(.96),20)
-    mask=Image.new('1',im.size);ImageDraw.Draw(mask).polygon(shore(.96),fill=1)
-    land,ld=canvas(im.size,20)
+    mask=Image.new('1',im.size);ScaledDraw(mask).polygon(shore(.96),fill=1)
+    land,ld=canvas((500,500),20)
     rect(ld,(0,0,499,124),0)
     poly(ld,[(310,500),(310,330),(500,280),(500,500)],2)
     oval(ld,(45,310,195,420),19)
@@ -233,7 +261,7 @@ def matchmap():
             line(ld,[(x,y+1),(x+2,y),(x+5,y)],c)
     for i in range(24):
         x=rng.randrange(65,177);y=rng.randrange(330,400);oval(ld,(x,y,x+8,y+4),16)
-    im.paste(land,(0,0),mask);d=ImageDraw.Draw(im)
+    im.paste(land,(0,0),mask);d=ScaledDraw(im)
     # Mountain at (500,380), within actual +/-60 X variation.
     for r,c in [(45,21),(34,1),(24,18),(15,0),(7,11)]:
         oval(d,(250-r*1.3,190-r,250+r*1.3,190+r),c)
@@ -274,44 +302,17 @@ def matchmap():
             for a in range(4):rect(d,(x-17+a*10,y+10,x-15+a*10,y+12),25 if a%2 else 10)
     for i in range(320):
         x=rng.randrange(48,452);y=rng.randrange(48,452)
-        if not mask.getpixel((x,y)) or y<130 or x>310 and y>300:continue
+        if not mask.getpixel((x*2,y*2)) or y<130 or x>310 and y>300:continue
         if any(abs(x-X)<30 and abs(y-Y)<24 for X,Y,k in towns):continue
         if math.hypot(x-250,y-190)<62 or math.hypot(x-250,y-257)<34:continue
         if any(math.hypot(x-X,y-Y)<7 for X,Y in pts):continue
         oval(d,(x-3,y-2,x+4,y+4),19);oval(d,(x-3,y-4,x+3,y+2),20);line(d,[(x-2,y-3),(x,y-4),(x+1,y-3)],21)
-    return im.resize((1000,1000),Image.Resampling.NEAREST)
+    return im.resize((2000,2000),Image.Resampling.NEAREST)
 
 def sheet():
-    im,d=canvas((1320,1720),0);font=ImageFont.load_default()
-    def text(x,y,s):d.text((x,y),s,font=font,fill=PAL[3])
-    text(20,12,'STEVE\'S DAY OFF / 3D AND MAP / PASS 3 CLEAN CLUSTERS')
-    text(20,30,'Native pixel art / shared palette / top-left lighting / original designs')
-    for i,name in enumerate(['tex_grass','tex_sand','tex_snow','tex_desert','tex_water0','tex_water1']):
-        x=20+i*210;text(x,58,name+' 32x32')
-        tileim=IMAGES[name].resize((80,80),Image.Resampling.NEAREST)
-        for a in range(2):
-            for b in range(2):im.paste(tileim,(x+a*80,78+b*80))
-    for i,name in enumerate(['tex_building','tex_rock','tex_cliff']):
-        x=20+i*170;text(x,254,name);art=IMAGES[name];im.paste(art.resize((art.width*2,art.height*2),Image.Resampling.NEAREST),(x,274))
-    names=['bb_tree','bb_palm','bb_bush','bb_chest','bb_vend','bb_steve','bb_enemy','bb_ally']
-    for i,name in enumerate(names):
-        x=550+(i%4)*190;y=254+(i//4)*230;text(x,y,name)
-        art=IMAGES[name];w,h=art.size
-        for yy in range(y+20,y+215,12):
-            for xx in range(x,x+150,12):rect(d,(xx,yy,xx+11,yy+11),31 if (xx//12+yy//12)%2 else 18)
-        im.alpha_composite(art.resize((w*2,h*2),Image.Resampling.NEAREST),(x+24,y+214-h*2))
-    for i,name in enumerate(['sky_day','sky_dusk']):
-        text(20,555+i*150,name+' 512x120 / horizontal wrap');im.paste(IMAGES[name],(20,575+i*150))
-    text(570,730,'island_bg 600x260 / no characters or shack');im.paste(IMAGES['island_bg'],(570,750))
-    text(20,1030,'map_island 1000x1000 / generic randomized island / preview 60%')
-    im.paste(IMAGES['map_island'].resize((600,600),Image.Resampling.NEAREST),(20,1050))
-    text(660,1070,'MAP: north at top; snow north; desert southeast; swamp southwest.')
-    text(660,1090,'Ragged sand coast, central lake, mountain, south-running river, towns.')
-    text(660,1110,'World coast and POIs randomize each match: this is a generic backdrop.')
-    text(660,1150,'Enemy and ally: identical neutral RGBA masks for runtime tinting.')
-    text(660,1170,'Steve: white suit, green chest panel, clear helmet, red rocket pack.')
-    for i,c in enumerate(PAL):rect(d,(660+i%18*24,1230+i//18*24,681+i%18*24,1251+i//18*24),i)
-    im.convert('RGB').save(ART/'sheet3.png')
+    from texture_detail import sheet_detail
+    sheet_detail(IMAGES,ART/'sheet3.png')
+
 
 def main():
     OUT.mkdir(parents=True,exist_ok=True)
