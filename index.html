@@ -155,6 +155,19 @@ header,#help,#side,#tabs,#pill{display:none!important}
 #prize .card{background:#20243a;border:6px solid #ffd25a;padding:16px;font-size:20px;animation:spin 1s ease-out}
 @keyframes pz{from{transform:scale(1) rotate(-2deg)}to{transform:scale(1.12) rotate(2deg)}}@keyframes spin{from{transform:rotateY(720deg) scale(.2)}to{transform:none}}
 #prize .lt{position:absolute;width:24px;height:24px;border-radius:50%;animation:bl .25s infinite alternate}@keyframes bl{from{opacity:.2}to{opacity:1}}
+#coach{position:fixed;left:50%;top:14%;transform:translateX(-50%);z-index:30;display:none;max-width:min(420px,90vw);background:#fffbe8;color:#222;border:4px solid #000;box-shadow:6px 6px 0 #000;padding:12px 14px;font-size:12px;line-height:1.5;text-shadow:none}
+#coach b{display:block;font-size:15px;margin-bottom:4px}#coach button{margin-top:8px;font:inherit;font-size:12px;background:#2f8f50;color:#fff;border:3px solid #000;padding:6px 12px;cursor:pointer}
+body:not(.gfx-rpg) .thread{background:repeating-linear-gradient(90deg,#d8dee8 0 2px,#dfe5ee 2px 4px)}
+body:not(.gfx-rpg) .thread .who{background:linear-gradient(#b4c1d3,#8a9bb5 50%,#6d84a2 51%,#7d92ae);color:#fff;text-shadow:0 -1px 0 #3a4a66;border-bottom:1px solid #2d3642;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:bold}
+body:not(.gfx-rpg) .thread .who button{background:linear-gradient(#8ea2bd,#5a7194);border:1px solid #3a4a66;border-radius:5px;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:bold;padding:4px 9px;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+body:not(.gfx-rpg) .bub{font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.35;border:none;border-radius:16px;padding:7px 12px;color:#111;text-shadow:none;box-shadow:0 1px 1px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.7)}
+body:not(.gfx-rpg) .bub.them{background:linear-gradient(#f2f2f2,#d9d9d9);border-bottom-left-radius:4px}
+body:not(.gfx-rpg) .bub.me{background:linear-gradient(#c6f39a,#84d65a);border-bottom-right-radius:4px}
+body:not(.gfx-rpg) .bub.draft{opacity:.7}body:not(.gfx-rpg) .rcpt{font-family:Helvetica,Arial,sans-serif;color:#6a7a90;text-shadow:none}
+body:not(.gfx-rpg) .sugg{background:linear-gradient(#e9edf2,#c9d1db);border-top:1px solid #9aa6b5}
+body:not(.gfx-rpg) .sugg button{font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:bold;color:#222;text-shadow:0 1px 0 #fff;background:linear-gradient(#fdfdfd,#d6dbe2);border:1px solid #8a96a8;border-radius:8px;box-shadow:0 1px 1px rgba(0,0,0,.2)}
+body:not(.gfx-rpg) .sugg button.send{background:linear-gradient(#8fd6ff,#2a8ae0);color:#fff;text-shadow:0 -1px 0 #1a5a9a}
+body:not(.gfx-rpg) .sugg button.hint{background:linear-gradient(#d4f5b0,#8fd462);box-shadow:0 0 0 2px #5aa83a}
 #ishop .close{background:#a02a2a;padding:10px 16px;font-size:13px}#menuHelp{max-width:640px;font-size:10px;line-height:2;color:#cfd3dd;display:none}
 #rot{display:none}
 /* maximal layout: the game takes the full height, one panel column takes exactly the rest */
@@ -276,7 +289,7 @@ setInterval(()=>{if(muted||!run||mode==='menu'||!AC)return;const song=run.phase=
 let best=0;try{best=+localStorage.getItem('steveBest5')||0}catch(e){}
 
 // ================= data =================
-const CARS=['2019 Civic','2021 Civic Si','2022 Civic Hatch','2018 Civic Sport','2018 Wrangler','2020 Wrangler Unlimited','2019 Grand Cherokee','2017 Cherokee','2016 Compass','2020 Gladiator'];
+const CARS=['2019 Civic','2021 Civic Si','2018 Wrangler','2020 Wrangler Unlimited','2019 Grand Cherokee','2020 Gladiator','1972 camper van','1987 hearse','retired ice cream truck','lifted golf cart','amphibious jeep','stretch limo (one door missing)','old mail truck','gullwing coupe','three-wheeler','short school bus','monster truck','1994 minivan with flames','taco truck (smells great)','hovercraft (barely)'];
 const BUYERS=['Brandon','Tiff','Ray','Kayla','Dwayne','Marisol','Cody','Jen','Big Mike','Trevor'];
 const ENEMY=['xX_Sweaty_Xx','NoScopeNana','BuildGod99','crankin90s','Tilted_Tim','LlamaDrama','bush_camper','sk8rboi','TTV_Ghost','ZeroBuildZach','DefaultDave','Cr4nk'];
 const MOMCHAT=['which button is jump again honey','I got a purple gun!','sorry sweetie','oh no oh no oh no','is that one of us?','good job steve!!','im hiding in a bush','where did everybody go','I love this game','I picked up a fish?'];
@@ -361,7 +374,7 @@ const UPS=[
 const TX=10,TY=6,TW=300,TH=130;
 const HY=150,FLOOR=234;
 const GX=200,HWW=660;
-const SPOT={couch:36,door:12,machine:132,kitchen:186,stove:186,craft:166+GX,lift:206+GX,board:222+GX,bench:254+GX,gate:300+GX};
+const SPOT0=1;const SPOT={couch:36,door:12,machine:132,kitchen:186,stove:186,craft:166+GX,lift:206+GX,board:222+GX,bench:254+GX,gate:300+GX};
 let camX=0,panHold=0;
 const PX=54,PY=14,PW=212,PH=118;
 const MW=1000,MH=1000;
@@ -382,6 +395,7 @@ function newRun(){
   lamb:{x:60,y:FLOOR,st:'simba',vx:0,vy:0},drag:false,threads:{},bladder:20,bath:null,story:{},convoOn:{},party:[],partyWait:0,rel:{Wife:50,Kid:50,Mom:50,Dan:40,Dad:40,Brother:40,Sister:40,Simba:60},stove:{st:'off',t:0},deter:{lights:0,music:0,train:0}};camX=0;
  for(let i=0;i<6;i++)run.board.push(makeJob(i));
  M=lobbyScene();
+ setTimeout(()=>coach('start'),1500);
 }
 const SHOP_JOBS={fluids:['Top off fluids',60],brakes:['Brake pads',110],door:['Rehang a door',90],bumper:['Swap a bumper',100],detail:['Detail for sale',80]};
 const HIRE_JOBS=['Oil change','Timing belt','Transmission service','Water pump','Starter motor'];
@@ -400,7 +414,7 @@ function jingle(l){const seq=l>=3?[523,659,784,1047,1319]:l>=2?[660,880,1100,132
 function pop(t,x,c){if(!run)return;(run.pops||(run.pops=[])).push({t,x,c,life:1.3});}
 function king(d){if(!run)return;if(d>0)d*=1.35;const was=run.king;run.king=clamp(run.king+d,0,100);if(d>=.5)pop('+'+d.toFixed(1)+'👑',480,'#ffc23a');if(Math.floor(was/10)<Math.floor(run.king/10)&&run.king<100){jingle(3);toast(`👑 KING OF FORTNITE ${Math.floor(run.king/10)*10}%`,'#ffc23a');}if(was<100&&run.king>=100&&mode==='play')later(.5,kingWin);}
 function deed(brag){if(run)run.lastDeed={t:performance.now(),brag};}
-function toast(t,c){run.toast.push({t,c,life:2.8,y:0});if(run.toast.length>4)run.toast.shift();}
+function toast(t,c){if(run.toast.some(q=>q.t===t))return;run.toast.push({t,c,life:3.4,y:0});if(run.toast.length>2)run.toast.shift();}
 function later(d,fn){run.timers.push({d,fn});}
 function addLot(n,w){run.lot=clamp(run.lot+n,0,100);pop((n>0?'+':'')+n,288,n>0?'#5ab0ff':'#ff7070');if(w)toast((n>0?'+':'')+n+' LOT · '+w,n>0?'#5ab0ff':'#ff7070');}
 function addCash(n,w){run.cash+=n;if(w)toast((n>0?'+$':'-$')+Math.abs(n)+' · '+w,n>0?'#7fe0a0':'#ff7070');}
@@ -424,6 +438,18 @@ function walkTo(spot,fn){
  if(!free()){toast('GET UP first (costs 1 ❤ mid-match)','#ff8b8b');return false;}
  if(run.task){toast("Finish what you're doing first",'#ff8b8b');return false;}
  if(inMatch())run.afk=true;run.steve.target=SPOT[spot]??spot;run.steve.onArrive=fn;return true;}
+function playingMap(){return inMatch()&&M.phase==='play'&&!M.ended&&run.steve.x===SPOT.couch&&!run.afk;}
+function houseKey(e){if(playingMap()&&!['KeyE','Space'].includes(e.code))return;if(run.task||run.bath)return;
+ if(['KeyA','KeyD','ArrowLeft','ArrowRight'].includes(e.code)){coach('walk');if(run.steve.x===SPOT.couch&&!run.afk&&inMatch()){return;}const dir=(e.code==='KeyA'||e.code==='ArrowLeft')?-1:1;run.steve.onArrive=null;run.steve.target=clamp(run.steve.x+dir*40,SPOT.door,SPOT.gate);if(inMatch())run.afk=true;e.preventDefault();}
+ if((e.code==='KeyE'||e.code==='Space')&&!playingMap()){e.preventDefault();interact();}}
+function interact(){const x=run.steve.x,near=(k,r=18)=>Math.abs(x-SPOT[k])<r;
+ if(near('door')){if(dogDoor())return;if(run.pizza&&(run.pizza.st==='door'||run.pizza.st==='porch'))return walkTo('door',()=>takePizza());if(run.door)return walkTo('door',()=>signTask());return toast('Nobody at the door','#9aa0b0');}
+ if(near('stove')){if(dogKitchen())return;return snackRun();}
+ if(near('couch')){run.steve.target=SPOT.couch;run.steve.onArrive=()=>{run.afk=false;};return;}
+ if(near('machine'))return walkTo('machine',playMachine);
+ if(near('board',30)||near('lift',20)){boardOpen=true;return;}
+ if(near('gate',30)&&run.gate)return toast('Click the buyer at the gate to show the car','#9aa0b0');
+ toast('Nothing to use here','#9aa0b0');}
 function hands(){if(run.bath)return 0;
  let h=run.simba.lapSleep?.75:1;if(run.afk||run.steve.x!==SPOT.couch||!run.power)h=0;
  if(run.task)h=0;
@@ -507,6 +533,15 @@ function paintPhone(){
   <div class="sec">FAVORS</div>${hasSk('guilt',1)?fb('mom','😢 Guilt Mom into a game'):''}${hasSk('guilt',2)?fb('money','💸 Ask family for $80'):''}${hasSk('guilt',3)?fb('sob','😭 Sob story for $250'):''}${hasSk('wife',1)?fb('sandwich','🥪 "Make me a sandwich"'):''}${!hasSk('guilt',1)&&!hasSk('wife',1)?'<div class="tx">Unlock Guilt Trips or Wife Demands.</div>':''}
   ${TREE.map(b=>`<div class="sec">${b.n} ${'★'.repeat(P.sk[b.k])}${'☆'.repeat(3-P.sk[b.k])}</div>${b.t.map((d,i)=>`<div class="tx" style="padding:2px;opacity:${P.sk[b.k]>i?1:.55}">${P.sk[b.k]>i?'✔':i+1+'.'} ${d}</div>`).join('')}${P.sk[b.k]<3?`<button style="width:100%;font:inherit;font-size:8px;padding:6px;margin:2px 0" onclick="buySkill2('${b.k}')">UNLOCK TIER ${P.sk[b.k]+1} (${P.sk[b.k]+1} SP)</button>`:''}`).join('')}
   </div></div>`;return;}
+ if(view&&view.type==='hustle'){const H=hustle(),rate=H.rate.toFixed(2);el.innerHTML=`<div class="thread"><div class="who"><span>💸 Hustles</span><button onclick="closeView()">BACK</button></div><div class="log" style="padding:6px;font-size:9px">
+  <div class="sec">BUX EXCHANGE (sketchy website)</div><div class="tx">Today: $${rate} per 100 💎 · you have 💎${LOCK.bux}</div><div class="tx" style="color:#9aa0b0">Rate moves every minute. Some buyers charge back.</div>
+  <button style="width:100%;font:inherit;font-size:9px;padding:7px;margin:4px 0" onclick="sellBux(500)">SELL 💎500 → $${Math.round(H.rate*5)}</button><button style="width:100%;font:inherit;font-size:9px;padding:7px;margin:4px 0" onclick="sellBux(2000)">SELL 💎2000 → $${Math.round(H.rate*20)}</button>
+  <div class="sec">STREAMING</div><div class="tx">${H.live?`🔴 LIVE · ${H.viewers} viewers · earned $${H.earned} today`:'Stream your matches. Elims, wins and funny moments bring tips.'}</div>
+  <button style="width:100%;font:inherit;font-size:9px;padding:7px;margin:4px 0" onclick="toggleStream()">${H.live?'⏹ END STREAM':'🔴 GO LIVE'}</button>
+  <div class="sec">ODD JOBS</div><button style="width:100%;font:inherit;font-size:9px;padding:7px;margin:4px 0" onclick="oddJob()">🧽 Wash the neighbor's car ($45)</button><button style="width:100%;font:inherit;font-size:9px;padding:7px;margin:4px 0" onclick="carryKid()">🎮 Carry a stranger's kid next match ($60 on a win)</button></div></div>`;return;}
+ if(view&&view.type==='clients'){const C=run.clients||[];el.innerHTML=`<div class="thread"><div class="who"><span>💼 Clients</span><button onclick="closeView()">BACK</button></div><div class="log" style="padding:6px;font-size:9px">
+  <div class="tx" style="color:#9aa0b0">They will wait until the match ends. After that they get impatient. Right answers pay a bonus; wrong info or typos cost you.</div>
+  ${C.length?C.map((c,i)=>`<div class="item" style="cursor:default"><div class="hd"><span>${c.icon} ${c.who}</span><span>${c.ok?'😊':c.happy>60?'🙂':c.happy>30?'😐':'😠'} ${Math.round(c.happy)}%</span></div><div class="tx">"${c.q}"</div>${c.shuffled.map(o=>`<button style="width:100%;font:inherit;font-size:9px;padding:6px;margin:3px 0;text-align:left" onclick="answerClient(${i},${o.i})">${o.t}</button>`).join('')}</div>`).join(''):'<div class="empty">No customers right now.</div>'}</div></div>`;return;}
  if(view&&view.type==='pizza'){el.innerHTML=`<div class="thread"><div class="who"><span>🍕 Tony's Pizza</span><button onclick="closeView()">BACK</button></div><div class="log" style="padding:4px">
   <div class="tx" style="padding:4px">Delivered hot to your front door. Somebody has to answer it.</div>${PIZZAS.map((z,i)=>`<div class="item" onclick="orderPizza(${i})"><div class="hd"><span>${z.i} ${z.n}</span><span>$${z.p}</span></div><div class="tx">${z.d}</div></div>`).join('')}
   ${run.pizza?'<div class="sec">One order at a time. Yours is on the way.</div>':''}<div class="tx" style="padding:4px;color:#9aa0b0">Cash: $${run.cash}</div></div></div>`;return;}
@@ -527,7 +562,7 @@ function paintPhone(){
   el.innerHTML=`<div class="thread"><div class="who">${head}</div><div class="log" id="log">${bubbles}${typingThem}${composing}</div>${foot}</div>`;
   const lg=$('log');if(lg)lg.scrollTop=lg.scrollHeight;return;}
  const pzLine=run.pizza?`<div class="sec" style="color:#ffb060">🍕 PIZZA: ${run.pizza.st==='oven'?'in the oven':run.pizza.st==='car'?'out for delivery':run.pizza.st==='door'?'AT THE DOOR!':'on the porch (getting cold)'} ${run.pizza.st==='door'||run.pizza.st==='porch'?'':'· '+Math.ceil(run.pizza.t)+'s'}</div>`:'';
- const nb=pzLine+`<div style="display:flex;gap:6px;margin-bottom:6px"><button onclick="openPizza()" style="flex:1;font:inherit;font-size:8px;background:#b0481a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">🍕 ORDER</button><button onclick="openContacts()" style="flex:2;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📇 NEW CALL / MSG</button><button onclick="openStats()" style="flex:1;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📊 STATS</button></div><div style="display:flex;gap:6px;margin-bottom:6px"><button onclick="view={type:'skills'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#2f8f50;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">⭐ SKILLS ${prog().sp?'('+prog().sp+' SP)':''}</button></div>${prog().netOff?`<button onclick="payBills()" style="font:inherit;font-size:8px;width:100%;background:#a02a2a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer;margin-bottom:6px">📵 INTERNET OFF · PAY $${prog().debt}</button>`:`<div class="sec">🧾 Bills $${billAmt()} in ${Math.ceil(prog().billT)}s</div>`}`;
+ const nb=pzLine+`<div style="display:flex;gap:6px;margin-bottom:6px"><button onclick="openPizza()" style="flex:1;font:inherit;font-size:8px;background:#b0481a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">🍕 ORDER</button><button onclick="openContacts()" style="flex:2;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📇 NEW CALL / MSG</button><button onclick="openStats()" style="flex:1;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📊 STATS</button></div><div style="display:flex;gap:6px;margin-bottom:6px"><button onclick="view={type:'hustle'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#b08a1a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">💸 HUSTLES</button><button onclick="view={type:'clients'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#2a7a8a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">💼 CLIENTS ${clientsWaiting()?'('+clientsWaiting()+')':''}</button><button onclick="view={type:'skills'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#2f8f50;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">⭐ SKILLS ${prog().sp?'('+prog().sp+' SP)':''}</button></div>${prog().netOff?`<button onclick="payBills()" style="font:inherit;font-size:8px;width:100%;background:#a02a2a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer;margin-bottom:6px">📵 INTERNET OFF · PAY $${prog().debt}</button>`:`<div class="sec">🧾 Bills $${billAmt()} in ${Math.ceil(prog().billT)}s</div>`}`;
  if(!run.inbox.length){el.innerHTML=nb+'<div class="empty">All caught up.<br><br>Go play.</div>';return;}
  const snz=run.inbox.some(x=>x.due!=null)&&run.snoozed!==run.match+':'+run.phase?`<button onclick="snoozeAll()" style="font:inherit;font-size:8px;width:100%;background:#5a4ab0;color:#fff;border:3px solid #000;padding:8px;cursor:pointer;margin-bottom:6px">😴 SNOOZE ALL (push to next break)</button>`:'';
  const snoozedN=run.inbox.filter(x=>x.snoozeT>0).length;
@@ -738,7 +773,7 @@ function sendNode(n,c,id){const nd=c.n[id],ct=CONTACTS.find(x=>x.n===n)||{i:n===
 
 // ================= events =================
 function momSilly(){bankText({icon:'👵',from:'Mom',fam:true},pick(MOM_Q));}
-function textEvent(){
+function textEvent(){coach('text');
  if(isWeekend()){const ppl=['Dad','Brother','Sister','Dan','Wife','Kid','Mom'];if(!startConvo(pick(ppl)))momSilly();return;}
  if(Math.random()<.4&&!Object.values(run.convoOn||{}).some(Boolean)){const ppl=['Dad','Brother','Sister','Dan','Wife','Kid','Mom'].filter(n=>!(n==='Kid'&&run.kidAway));const n=pick(ppl);if(startConvo(n))return;}
  if(Math.random()<.05){momSilly();return;}
@@ -800,13 +835,13 @@ const TREE=[
  {k:'kid',n:'🧒 Child Labor',t:['Kid can take any job on the board.','Kid signs for packages at the door.','Kid washes cars for cash. Every shift strains them.']},
  {k:'guilt',n:'😢 Guilt Trips',t:['Guilt Mom into playing (favor below).','Ask family for money (favor below).','The Sob Story: big money, big damage.']},
  {k:'wife',n:'💍 Wife Demands',t:['"Make me a sandwich" (favor below).','She helps with jobs even when annoyed.','She deals with customers for you.']}];
-function prog(){if(!run.prog)run.prog={sp:2,sk:{ai:0,bot:0,kid:0,guilt:0,wife:0},strain:{Wife:0,Kid:0,Family:0},strike:{},billT:150,debt:0,netOff:false,aiT:40,cashT:60};return run.prog;}
+function prog(){if(!run.prog)run.prog={sp:2,sk:{ai:0,bot:0,kid:0,guilt:0,wife:0},strain:{Wife:0,Kid:0,Family:0},strike:{},billT:320,debt:0,netOff:false,aiT:40,cashT:60};return run.prog;}
 const hasSk=(k,n)=>prog().sk[k]>=n;
 const onStrike=w=>!!prog().strike[w];
 function strain(w,n){const P=prog();P.strain[w]=clamp(P.strain[w]+n,0,100);if(P.strain[w]>=75&&!P.strike[w]){P.strike[w]=true;toast({Wife:'💍 Your wife is DONE. No food, no games, no favors.',Kid:'🧒 The kid quits. No chores, no gaming together.',Family:'📵 Family stops answering. No money, no games.'}[w],'#ff5a5a');if(w==='Wife')addMood(-15);}
  else if(n>0&&P.strain[w]>=50)toast({Wife:'Wife: "You are pushing it."',Kid:'Kid: "This is so unfair."',Family:'Mom: "We\'re not a bank, honey."'}[w],'#ffb060');phoneDirty=true;}
 function billAmt(){const P=prog();return 45+P.sk.ai*15+P.sk.bot*12+(run.up.assistant?20:0);}
-function bills(){const P=prog(),amt=billAmt()+P.debt;if(run.cash>=amt){run.cash-=amt;P.debt=0;if(P.netOff){P.netOff=false;toast('📶 Internet is back on','#7fe0a0');}toast(`🧾 Paid bills: -$${amt} (internet, power, subscriptions)`,'#cfd3dd');}
+function bills(){coach('bills');const P=prog(),amt=billAmt()+P.debt;if(run.cash>=amt){run.cash-=amt;P.debt=0;if(P.netOff){P.netOff=false;toast('📶 Internet is back on','#7fe0a0');}toast(`🧾 Paid bills: -$${amt} (internet, power, subscriptions)`,'#cfd3dd');}
  else{P.debt=amt;P.netOff=true;toast(`🧾 Can't pay $${amt}. INTERNET SHUT OFF. Sell cars, do jobs.`,'#ff5a5a');beep(150,.4,'sawtooth',.05);}phoneDirty=true;}
 window.payBills=()=>{const P=prog();if(run.cash<P.debt)return toast('Not enough cash yet','#ff7070');P.debt=0;bills();renderPhone();};
 function progTick(dt){const P=prog();
@@ -831,13 +866,14 @@ window.favor=f=>{const P=prog();
  if(f==='sandwich'){if(onStrike('Wife'))return toast('Wife: "Make it yourself."','#ff7070');addFun(15,'Sandwich');addMood(-6);strain('Wife',15);rel('Wife',-3);toast('🥪 Wife: "Here. Your sandwich. Your Majesty."','#ff9ac0');}
  renderPhone();};
 const DOGNEEDS=[['out','🚪 Simba is scratching at the door. She needs to go out.'],['in','🐕 Simba is barking outside. Let her back in.'],['food','🥣 Simba is staring at her empty bowl. Dinner time.'],['snack','🦴 Simba is doing her best sit. She wants a treat (cookies count).'],['toy','🧸 Simba drops the lamb at your feet. Throw it!']];
-function dogTick(dt){const d=run.dog||(run.dog={i:0,t:rnd(50,80),need:null,wait:0,happy:60});
- if(!d.need){d.t-=dt;if(d.t<=0){const n=DOGNEEDS[d.i%DOGNEEDS.length];d.need=n[0];d.wait=0;toast(n[1],'#c98f4e');if(d.need==='out'||d.need==='in')beep(500,.1,'sine');phoneDirty=true;}return;}
+function dogTick(dt){if(run.clock<200)return;const d=run.dog||(run.dog={i:0,t:rnd(20,40),need:null,wait:0,happy:60});
+ if(!d.need){d.t-=dt;if(d.t<=0){const n=DOGNEEDS[d.i%DOGNEEDS.length];d.need=n[0];d.wait=0;toast(n[1],'#c98f4e');coach('dog');if(d.need==='out'||d.need==='in')beep(500,.1,'sine');phoneDirty=true;}return;}
  d.wait+=dt;d.happy=Math.max(0,d.happy-dt*.15);
  if(d.need==='toy'&&run.lamb.st==='fly'){dogMet('Good throw! Simba sprints after it');return;}
  if(d.need==='in'&&d.wait>4&&Math.random()<dt*.5)beep(420,.08,'square',.02);
  if(d.wait>25&&Math.random()<dt*.2){run.flow=Math.max(0,run.flow-4);if(Math.random()<.4)toast({out:'Simba whines at the door...',in:'WOOF WOOF WOOF (from outside)',food:'Simba nudges the bowl across the floor. Clang.',snack:'Simba stares into your soul',toy:'Simba squeaks the lamb. Repeatedly.'}[d.need],'#c98f4e');}
  if(d.need==='out'&&d.wait>70){d.need=null;d.i++;d.t=rnd(50,80);addMood(-10,'Simba had an accident');addLot(-3);rel('Simba',-4);toast('💦 Too late. Simba had an accident on the rug.','#ff7070');}}
+function dogMet0(){}
 function dogMet(msg){const d=run.dog;if(inMatch())qp('feedDog');d.need=null;d.i++;d.t=rnd(45,90);d.happy=Math.min(100,d.happy+12);rel('Simba',3);addFun(2);toast('🐕 '+msg,'#c98f4e');phoneDirty=true;}
 function dogDoor(){const d=run.dog,s=run.simba;if(!d)return false;
  if(d.need==='out'){walkTo('door',()=>{s.st='outside';dogMet('Simba bolts out into the yard');});return true;}
@@ -859,7 +895,46 @@ function qp(k,n=1,poi){if(!run)return;for(const q of quests()){if(q.k!==k||q.don
   else if(k!=='combo')toast(`📜 ${q.t}: ${q.p}/${q.n}`,'#cfe9ff');}phoneDirty=true;}
 function npcQuest(fn){const g=NPCQ[fn];if(!g)return false;if(quests().some(q=>q.npc===fn&&!q.done)){toast(`${g.who}: "Still waiting on you!"`,'#ffb27a');return true;}
  run.q.push({...g.q,p:0,npc:fn});toast(`💬 ${g.who}: ${g.line}`,'#ffb27a');toast('📜 New quest: '+g.q.t,'#cfe9ff');beep(660,.06);setTimeout(()=>beep(880,.08),90);return true;}
-function delivery(){
+const COACH={start:['👋 Welcome!','Steve wants to play. The TV plays itself. Tap it to help: shoot, combo, smash. That is all for now.'],
+ text:['📱 A text!','People text Steve. Most can wait until the match is over. Open the phone and tap words to reply.'],
+ client:['💼 A customer','Customers wait politely until the match ends, then get impatient. Fast, correct replies pay the best bonus.'],
+ door:['🚪 Someone at the door','Deliveries and visitors need Steve to get up. Getting up mid-match costs a heart.'],
+ dog:['🐕 Simba needs something','Simba has a routine: out, in, dinner, a treat, the toy. Ignoring her costs aim.'],
+ bills:['🧾 Bills','Bills come every few minutes. No money, no internet, no Fortnite. Jobs, sales and hustles pay.'],
+ walk:['🚶 Walking','A/D or the arrows walk Steve around the house. E or Space uses whatever he is standing at.']};
+function coach(k){run.coached=run.coached||{};if(run.coached[k])return;run.coached[k]=1;const c=COACH[k];if(!c)return;let el=$('coach');if(!el){el=document.createElement('div');el.id='coach';document.body.appendChild(el);}
+ el.innerHTML=`<b>${c[0]}</b><div>${c[1]}</div><button onclick="this.parentNode.style.display='none'">GOT IT</button>`;el.style.display='block';clearTimeout(coach.t);coach.t=setTimeout(()=>{el.style.display='none';},12000);}
+function hustle(){if(!run.hustle)run.hustle={rate:rnd(3,9),rt:60,live:false,viewers:0,earned:0,carry:false};return run.hustle;}
+window.sellBux=n=>{const H=hustle();if(LOCK.bux<n)return toast('Not enough bux','#ff7070');LOCK.bux-=n;saveLock();const cash=Math.round(H.rate*n/100);
+ if(Math.random()<.12){toast(`💸 The buyer charged back. You lost 💎${n}. Classic.`,'#ff7070');beep(150,.3,'sawtooth',.05);}else{addCash(cash,`Sold 💎${n} online`);jingle(1);}H.rate=Math.max(2,H.rate*rnd(.85,.97));renderPhone();};
+window.toggleStream=()=>{const H=hustle();H.live=!H.live;if(H.live){H.viewers=ri(3,12);toast('🔴 You are LIVE. Do something cool.','#ff5a5a');}else toast(`Stream ended. Earned $${H.earned} today.`,'#cfd3dd');renderPhone();};
+function streamTip(why,base){const H=hustle();if(!H.live)return;H.viewers=Math.min(5000,Math.round(H.viewers*rnd(1.05,1.3)+ri(1,6)));const tip=Math.round(base*(1+H.viewers/200));H.earned+=tip;addCash(tip,`Stream tips: ${why}`);}
+window.oddJob=()=>{view=null;walkTo('gate',()=>startTask({kind:'scrub',label:"Washing the neighbor's car",spots:Array.from({length:8},()=>({x:PX+30+rnd(0,150),y:PY+28+rnd(0,40),hp:1})),time:16,win:()=>addCash(45,'Neighbor paid for the wash'),fail:()=>toast('Neighbor: "...you missed a spot. Several."','#ff7070')}));renderPhone();};
+window.carryKid=()=>{const H=hustle();H.carry=true;toast('A dad paid you to carry his kid next match. Win it.','#ffd25a');view=null;renderPhone();};
+// clients: inquiries arrive during matches, wait patiently until the match is over, then lose patience
+const SERVICES=[{k:'knife',n:'custom knife',pay:260,q:'Can you forge me a custom knife? Damascus pattern?',right:'yes, damascus takes about a week',wrong:'sure, its plastic but looks real',typo:'yes i can forge you a custom wife'},
+ {k:'leather',n:'leatherwork',pay:180,q:'Do you do custom leather? I want a tooled wallet.',right:'yep, hand tooled, pick your pattern',wrong:'we only do vinyl, close enough',typo:'yes i do custom feathers'},
+ {k:'pinstripe',n:'pinstriping',pay:150,q:'Can you pinstripe my hot rod?',right:'yes, hand painted, one day',wrong:'we use stickers now',typo:'yes i can pinch your hot dog'},
+ {k:'neon',n:'neon underglow',pay:140,q:'I need neon underglow. Purple. Is that legal?',right:'purple is fine when parked, i can wire a switch',wrong:'totally legal while driving lol',typo:'neon undies are legal yes'},
+ {k:'arcade',n:'arcade cabinet repair',pay:200,q:'You fix old arcade cabinets? Mine has a dead monitor.',right:'yes, i can recap the monitor board',wrong:'just hit it, works every time',typo:'yes i fix old arcade cabinet ducks'}];
+function clientsWaiting(){return (run.clients||[]).filter(c=>!c.ok).length;}
+function newClient(){run.clients=run.clients||[];if(run.clients.length>=5)return;coach('client');
+ const car=pick(CARS);const svc=Math.random()<.55?pick(SERVICES):null;
+ const c=svc?{icon:'🛠️',who:pick(['Rhonda','Big Mike','Trish','Dev','Coach Ray','Mrs. Patel','Gus']),svc,q:svc.q,pay:svc.pay,opts:[svc.right,svc.wrong,svc.typo]}
+  :{icon:'🚗',who:pick(['Marketplace buyer','Carl from work','A guy named Tank','Linda','Kevin (again)']),car,q:`Is the ${car} still for sale? Any problems with it?`,pay:ri(4,9)*60,opts:['yes still available, runs great, come see it','sold it yesterday sorry (it is not sold)','yes still avalable, runs grate']};
+ c.happy=100;c.wait=run.phase==='match';c.shuffled=shuffle(c.opts.map((t,i)=>({t,i})));run.clients.push(c);
+ text({icon:c.icon,from:c.who,msg:c.q+' (answer in 💼 CLIENTS)'});phoneDirty=true;}
+function clientTick(dt){const C=run.clients||[];if(run.phase==='match'&&Math.random()<dt/28)newClient();
+ for(const c of C){if(c.ok)continue;if(run.phase!=='match'){c.wait=false;c.happy-=dt*1.2;}if(c.happy<=0){c.ok=true;c.gone=true;toast(`${c.who} gave up and went somewhere else`,'#ff7070');rel('Wife',0);}}
+ run.clients=C.filter(c=>!(c.ok&&(c.doneT=(c.doneT||0)+dt)>6));}
+window.answerClient=(i,o)=>{const c=run.clients[i];if(!c||c.ok)return;
+ if(run.phase==='match'&&hands()>=.3)run.flow=Math.max(0,run.flow-6);
+ if(o===0){c.ok=true;const pay=Math.round(c.pay*(.4+.6*c.happy/100));if(c.svc){run.board.push({id:Date.now(),car:c.svc.n,kind:c.svc.k,label:`${c.svc.n} for ${c.who}`,done:false,pay,who:null});toast(`💼 ${c.who} booked a ${c.svc.n}. It is on the work board ($${pay}).`,'#7fe0a0');}
+  else{addCash(Math.round(pay*.2),`${c.who} put down a deposit`);run.gate=run.gate||null;toast(`🚗 ${c.who} is coming to see the ${c.car}`,'#7fe0a0');later(rnd(20,40),()=>gateVisit&&gateVisit(c.car,c.who));}jingle(1);}
+ else if(o===1){c.happy-=45;toast(`${c.who}: "That's not what I heard..."`,'#ff7070');if(c.happy<=0){c.ok=true;c.gone=true;}}
+ else{c.happy-=25;toast(`${c.who}: "...what?" (typo!)`,'#ffb060');c.shuffled=c.shuffled.map(x=>x.i===2?{t:x.t,i:2}:x);}
+ phoneDirty=true;renderPhone();};
+function delivery(){coach('door');
  if(run.door)return;const pk=run.pending[0];const nm=pk?(UPS.find(x=>x.id===pk)||{name:pk}).name:null;
  if(run.sched.packages||run.up.dropbox){toast('📦 Package left at the door'+(nm?': '+nm:''),'#9aa0b0');addLot(1);if(pk){run.pending.shift();applyUp(pk);}return;}
  const it=urgentItem({icon:'📦',from:'Front door',msg:nm?`*DING DONG* Your ${nm} is here! Needs a signature.`:'*DING DONG* Parts delivery. Needs a signature.',onTap:()=>walkTo('door',()=>signTask())});
@@ -923,6 +998,8 @@ function startTask(t){t.max=t.time=t.time||12;run.task=t;phoneDirty=true;beep(50
 function endTask(win){const t=run.task;if(!t)return;run.task=null;phoneDirty=true;const f=win?t.win:t.fail;f&&f();beep(win?990:200,.08,win?'square':'sawtooth');if(inMatch())sendHome();}
 const failT=()=>toast('Ran out of time','#ff7070');
 function repairTask(job){
+ if(job.kind==='knife')return startTask({kind:'forge',label:'Forging a custom knife',hits:0,need:5,pos:0,dir:1,time:18,win:()=>finishJob(job),fail:failT});
+ if(job.kind==='leather'||job.kind==='pinstripe'||job.kind==='neon'||job.kind==='arcade')return startTask({kind:'lugs',label:{leather:'Stitching the leather in order',pinstripe:'Pinstriping: follow the line order',neon:'Wiring the underglow in order',arcade:'Recapping the board in order'}[job.kind],order:shuffle([0,1,2,3,4]),k:0,time:16,win:()=>finishJob(job),fail:failT});
  if(job.kind==='detail')startTask({kind:'scrub',label:job.label,spots:Array.from({length:7},()=>({x:PX+30+rnd(0,150),y:PY+28+rnd(0,40),hp:1})),time:16,win:()=>finishJob(job),fail:failT});
  else if(job.kind==='fluids')startTask({kind:'bolts',label:job.label,bolts:[{x:PX+60,y:PY+40,done:0},{x:PX+110,y:PY+50,done:0}],stage:0,level:0,pour:false,time:16,win:()=>finishJob(job),fail:failT});
  else if(job.kind==='door'||job.kind==='bumper'){const bolts=[];for(let i=0;i<4;i++)bolts.push({x:PX+30+i*40+rnd(-8,8),y:PY+34+rnd(0,26),done:0});startTask({kind:'bolts',label:job.label,bolts,stage:0,level:0,pour:false,time:22,win:()=>finishJob(job),fail:failT,noPour:true});}
@@ -947,6 +1024,7 @@ function trashTask(){startTask({kind:'trash',label:'Taking out the trash',bx:PX+
 function taskDown(x,y){const t=run.task;if(!t)return false;if(x<PX||x>PX+PW||y<PY||y>PY+PH)return false;
  if(t.kind==='cookies'){const c=t.cookies.find(c=>c.hp>0&&Math.hypot(x-c.x,y-c.y)<11);if(c){t.drag={c,x,y,x0:x,y0:y};}return true;}
  if(t.kind==='bowl'){t.pour=true;return true;}
+ if(t.kind==='forge'){const good=t.pos>.42&&t.pos<.58;if(good){t.hits++;beep(1200,.05,'square',.05);t.spark=.2;if(t.hits>=t.need)endTask(true);}else{beep(160,.1,'sawtooth');t.time-=1.5;}return true;}
  if(t.kind==='bolts'){if(t.stage===0){for(const bo of t.bolts)if(!bo.done&&Math.hypot(x-bo.x,y-bo.y)<8){bo.done=1;beep(900,.03);}if(t.bolts.every(q=>q.done)){if(t.noPour){endTask(true);return true;}t.stage=1;}}else t.pour=true;return true;}
   if(t.kind==='lugs'){const cx=PX+70,cy=PY+50;for(let i=0;i<5;i++){const a=i/5*Math.PI*2-Math.PI/2,nx=cx+Math.cos(a)*22,ny=cy+Math.sin(a)*22;if(Math.hypot(x-nx,y-ny)<8){if(i===t.order[t.k]){t.k++;beep(700+t.k*80,.04);if(t.k>=5)endTask(true);}else{t.k=0;t.time-=1.5;beep(160,.1,'sawtooth');}}}return true;}
  if(t.kind==='show'){const a=t.asks[t.k];const z=t.zones.find(z=>x>=z[1]&&x<=z[1]+z[3]&&y>=z[2]&&y<=z[2]+z[4]);if(!z)return true;
@@ -969,6 +1047,7 @@ function taskUpdate(dt){const t=run.task;if(!t)return;t.time-=dt;
  if(t.kind==='cookies'){for(const c of t.cookies)if(c.hp>0&&(!t.drag||t.drag.c!==c)){c.hp-=c.rate*dt*1.4;if(c.hp<=0){c.hp=0;t.lost=(t.lost||0)+1;beep(150,.06,'sawtooth',.02);for(let i=0;i<6;i++)t.crumbs.push({x:c.x+rnd(-8,8),y:c.y,vy:rnd(-10,10)});}}
   t.crumbs.forEach(q=>{q.vy+=120*dt;q.y=Math.min(PY+PH-8,q.y+q.vy*dt);});if(t.heart>0)t.heart-=dt;
   if(t.time<=0){run.task=null;phoneDirty=true;cookieDone(t);return;}}
+ if(t.kind==='forge'){t.pos+=t.dir*dt*(.9+t.hits*.15);if(t.pos>1){t.pos=1;t.dir=-1;}if(t.pos<0){t.pos=0;t.dir=1;}if(t.spark>0)t.spark-=dt;}
  if(t.kind==='bowl'){if(t.pour){t.level+=40*dt;if(t.level>100){t.level=0;t.pour=false;toast('Kibble everywhere!','#ff7070');t.time-=1.5;}}if(t.time<=0&&t.good){run.task=null;phoneDirty=true;t.win();return;}}
  if(t.kind==='bolts'&&t.pour){t.level+=36*dt;if(t.level>105){t.level=0;t.pour=false;toast('Oil everywhere!','#ff7070');t.time-=2;}}
  if(t.kind==='show'&&t.flash>0)t.flash-=dt;if(t.time<=0)endTask(false);}
@@ -1172,6 +1251,8 @@ function updateBR(dt){
   if(Math.random()<dt*.12&&foes.length){const e=foes[0];hitEnemy(e,100,{name:'Simba',simba:1});}}
  else if(h<.3){me.vx=0;me.vy=0;}
  else if(M.fps){fpsUpdate(dt,me);}
+ else if(mapKeys()){const k=mapKeys(),sp=M.car?85:34;me.x+=k.x*sp*dt;me.y+=k.y*sp*dt;me.vx=k.x;me.vy=k.y;M.way=null;M.act=null;M.manualT=2.5;}
+ else if(M.manualT>0){M.manualT-=dt;}
  else{
   const sp=M.car?85:M.fly>0?75:30;
   if(M.car){M.car.x=me.x;M.car.y=me.y;}
@@ -1225,7 +1306,7 @@ function updateBR(dt){
    if(M.t>M.T*.45||Math.hypot(e.home.x-s.cx,e.home.y-s.cy)>s.to*.8){e.home={x:s.cx+rnd(-s.to*.5,s.to*.5),y:s.cy+rnd(-s.to*.5,s.to*.5)};}}}
  for(const e of [...M.enemies])if(e.hp<=0){M.enemies.splice(M.enemies.indexOf(e),1);const k=e.by||{name:'The storm'};M.fx.push({t:'boom',x1:e.x,y1:e.y,life:.5});
   feed(`${k.name} eliminated ${e.name}`,k.me?'#fff36a':k.simba?'#ffb060':'#fff');
-  if(k.me){M.best=M.best||{};M.best.kill=(M.best.kill||0)+1;if(dist(e,me)>95)M.best.snipe=e.name;M.view3d={style:pick(['orbit','low','high','orbit']),p:{x:e.x,y:e.y},t:0,replay:true,a0:rnd(0,6)};M.last3d=M.t;M.kills++;run.kills++;addBux(25,'elim');qp('elim');if(M.wpn)qp('wpnElim');M.roll++;king(.6);addFun(3);run.flow=Math.min(100,run.flow+6);beep(990,.05);setTimeout(()=>beep(1320,.06),60);if(M.roll===3)big('ON A ROLL!','#ffd25a');}
+  if(k.me){M.best=M.best||{};M.best.kill=(M.best.kill||0)+1;if(dist(e,me)>95)M.best.snipe=e.name;M.view3d={style:pick(['orbit','low','high','orbit']),p:{x:e.x,y:e.y},t:0,replay:true,a0:rnd(0,6)};M.last3d=M.t;M.kills++;run.kills++;addBux(25,'elim');streamTip('elim',4);qp('elim');if(M.wpn)qp('wpnElim');M.roll++;king(.6);addFun(3);run.flow=Math.min(100,run.flow+6);beep(990,.05);setTimeout(()=>beep(1320,.06),60);if(M.roll===3)big('ON A ROLL!','#ffd25a');}
   else if(k.simba){run.simbaKills++;addFun(10,'SIMBA GOT A KILL?!');big('SIMBA GOT A KILL','#ffb060',2.5);}
   else if(k.name==='Mom'){feed('Mom: did I do that?? :D','#c99ae8');addFun(4,'Mom got a kill');}}
  // the rest of the lobby fights each other off screen
@@ -1245,6 +1326,7 @@ function updateBR(dt){
  if(M.spect){M.spect.t+=dt;const k=M.spect.k;if(k&&M.enemies.includes(k)){M.cam.x+=(k.x-M.cam.x)*dt*3;M.cam.y+=(k.y-M.cam.y)*dt*3;}if(M.spect.t>5)return endMatch(false);return;}
  if(M.t>M.T*.8&&M.enemies.length===0&&M.others===0)endMatch(true);
 }
+function mapKeys(){if(!run||run.steve.x!==SPOT.couch||run.afk)return null;let x=0,y=0;if(keys.KeyW||keys.ArrowUp)y-=1;if(keys.KeyS||keys.ArrowDown)y+=1;if(keys.KeyA||keys.ArrowLeft)x-=1;if(keys.KeyD||keys.ArrowRight)x+=1;if(!x&&!y)return null;const l=Math.hypot(x,y);return {x:x/l,y:y/l};}
 function takeOff(fight){if(!inMatch())return;const me=M.squad[0];const nade=Math.random()<.6;M.fly=fight?2.5:5;M.flyCD=6;M.jumpT=1;
  if(nade){M.fx.push({t:'nade',x1:me.x,y1:me.y+3,life:.6});feed(pick(['Steve: *grenade jump*','Steve: *boom-jump*','Steve: nade under the feet, wings out']),'#7fe0a0');beep(120,.15,'sawtooth',.05);}
  else feed('Steve: *wings out*','#7fe0a0');
@@ -1338,8 +1420,9 @@ function shootAt(e,h,in3d){const me=M.squad[0];M.fx.push({t:'shot',x1:me.x,y1:me
  const d=GUNS[M.gun].d*(M.roll>=3?1.4:1);hitEnemy(e,d,me);run.flow=Math.min(100,run.flow+2);M.fx.push({t:'txt',x1:e.x,y1:e.y,s:String(Math.round(d)),life:.5,in3d});}
 function endMatch(win,why){
  M.ended=true;M.win=win;M.place=win?1:Math.max(2,M.players);M.endT=3;M.view3d=null;
- if(win){run.wins++;prog().sp++;if(!M.gotUp)qp('noGetUp');king(7);addBux(250,'VICTORY ROYALE');addFun(22,'VICTORY');addMood(-4);M.confetti=Array.from({length:70},()=>({x:rnd(0,TW),y:rnd(-TH,0),v:rnd(20,50),c:pick(['#ffd25a','#ff5a7a','#5ab0ff','#7fe0a0'])}));[660,880,1320].forEach((f,i)=>setTimeout(()=>beep(f,.12),i*120));}
- else if(M.place<=5){addFun(4,'Top 5');addBux(60,'top 5');}else{addFun(-5,'Early exit');if(M.place>20)crownDip(2,'Out early');}}
+ if(win){run.wins++;prog().sp++;streamTip('VICTORY',40);if(hustle().carry){hustle().carry=false;addCash(60,'Carried the kid to a win');}if(!M.gotUp)qp('noGetUp');king(7);addBux(250,'VICTORY ROYALE');addFun(22,'VICTORY');addMood(-4);M.confetti=Array.from({length:70},()=>({x:rnd(0,TW),y:rnd(-TH,0),v:rnd(20,50),c:pick(['#ffd25a','#ff5a7a','#5ab0ff','#7fe0a0'])}));[660,880,1320].forEach((f,i)=>setTimeout(()=>beep(f,.12),i*120));}
+ else if(M.place<=5){addFun(4,'Top 5');addBux(60,'top 5');}
+ if(!win&&hustle().carry){hustle().carry=false;toast('The dad wants a refund. No win, no pay.','#ff7070');}else{addFun(-5,'Early exit');if(M.place>20)crownDip(2,'Out early');}}
 function startLobby(){
  run.phase='lobby';run.lobbyT=60;run.afk=false;run.partyWait=0;run.partyWarned=false;const won=M.win,place=M.place,k=M.kills,pw=M.power,bst=M.best||{};
  if(!pw)run.recap={win:won,place,kills:k,crown:Math.round((run.king-(run.k0||run.king))*10)/10,best:bst.smash>=2?`Smashed ${bst.smash} buildings`:bst.snipe?`Sniped ${bst.snipe}`:bst.kill>=3?`${bst.kill}-kill game`:bst.tree?'Flew into a tree (iconic)':M.fished?`Fished ${M.fished} time${M.fished>1?'s':''}`:k?'Got on the board':'Survived the bus ride',life:9};M=lobbyScene();
@@ -1357,11 +1440,11 @@ function update(dt){
  {const before=hourNow();run.clock+=dt*(run.phase==='lobby'&&run.power?1:2);nightTick(before,dt);}
  for(const t of [...run.timers]){t.d-=dt;if(t.d<=0){run.timers.splice(run.timers.indexOf(t),1);t.fn();}}
  const prog=Math.min(1,run.clock/600);
- run.nextText-=dt;if(run.nextText<=0){run.nextText=(rnd(90,220))*(run.easy?1.4:1)*(run.up.dnd?1.5:1)*(isNight()?2:1);if(run.inbox.length<8)textEvent();}
- run.nextReal-=dt;if(run.nextReal<=0){run.nextReal=(rnd(45,80)-prog*10)*(run.easy?1.6:1);const r=Math.random();if(isNight()){if(r<.5)weirdNoise();else burglars();}else if(r<.3)delivery();else if(r<.6)gateVisit();else if(r<.82)weirdNoise();else if(run.clock>40)burglars();}
- progTick(dt);dogTick(dt);
+ if(run.clock>=50)run.nextText-=dt;if(run.nextText<=0){run.nextText=(rnd(90,220))*(run.easy?1.4:1)*(run.up.dnd?1.5:1)*(isNight()?2:1);if(run.inbox.length<8)textEvent();}
+ if(run.clock>=140)run.nextReal-=dt;if(run.nextReal<=0){run.nextReal=(rnd(45,80)-prog*10)*(run.easy?1.6:1);const r=Math.random();if(isNight()){if(r<.5)weirdNoise();else burglars();}else if(r<.3)delivery();else if(r<.6)gateVisit();else if(r<.82)weirdNoise();else if(run.clock>40)burglars();}
+ progTick(dt);clientTick(dt);{const H=hustle();H.rt-=dt;if(H.rt<=0){H.rt=60;H.rate=clamp(H.rate*rnd(.8,1.3),2,14);}if(H.live&&inMatch()&&Math.random()<dt/20)streamTip('viewers chilling',2);}dogTick(dt);
  if(run.dog&&run.dog.need==='snack'&&run.buffs.some(b=>b.name==='Cookies'&&!b.dog)){run.buffs.forEach(b=>{if(b.name==='Cookies')b.dog=1;});dogMet('Simba got a cookie crumb. Best day ever.');}
- {const s=run.simba;if(s.st==='sit'&&s.tired>=SLEEPY()&&!s.lapSleep){s.lapSleep=true;toast('💤 Simba fell asleep on your lap. Aiming is harder now. Click her to slide out.','#c98f4e');}if(s.st!=='sit')s.lapSleep=false;}pizzaTick(dt);if(run.pizzaEat>0)run.pizzaEat-=dt;if(run.pzBang>0)run.pzBang-=dt;
+ {const s=run.simba;if(s.st==='sit'&&s.tired>=SLEEPY()&&!s.lapSleep){s.lapSleep=true;toast('💤 Simba fell asleep on your lap. Aiming is harder now. Click her to slide out.','#c98f4e');}if(s.st!=='sit')s.lapSleep=false;}pizzaTick(dt);if(run.pizzaEat>0)run.pizzaEat+=0;if(!(M&&M.fps)&&!playingMap()&&!run.task){const l=keys.KeyA||keys.ArrowLeft,r=keys.KeyD||keys.ArrowRight;if((l||r)&&!(run.steve.x===SPOT.couch&&!run.afk&&inMatch())){run.steve.onArrive=null;run.steve.target=clamp(run.steve.x+(l?-30:30),SPOT.door,SPOT.gate);camX=clamp(run.steve.x-VW/2,0,HWW-VW);panHold=2;}}run.pizzaEat-=dt;if(run.pzBang>0)run.pzBang-=dt;
  if(run.pzGuy){const g=run.pzGuy;g.t+=dt;if(g.st==='fall'){if(g.t>1.4){g.st='crawl';}}else{g.x-=dt*(g.st==='flee'?14:6)*(g.st==='crawl'?.4:1);
   if(g.x<2.5&&g.st!=='crawl'&&(run.skill||{}).statue&&!g.hit){g.hit=1;g.st='fall';g.t=0;beep(90,.2,'sawtooth',.06);toast('💥 BONK! He backed right into the statue.','#ffb060');addFun(5,'Statue bonk');}
   if(g.x<-14)run.pzGuy=null;}}
@@ -1717,6 +1800,7 @@ function drawPanel(){
   t.crumbs.forEach(q=>R(q.x,q.y,2,2,'#b07a3a'));
   const sx=PX+PW-46,sy=PY+44,tan='#c98f4e';R(sx,sy+8,34,24,tan);R(sx+4,sy-6,26,18,tan);R(sx+2,sy-12,6,10,'#8a5a2e');R(sx+26,sy-12,6,10,'#8a5a2e');R(sx+9,sy,4,4,'#222');R(sx+21,sy,4,4,'#222');R(sx+14,sy+6,6,4,'#2a1a10');
   if(t.drag)R(sx+15,sy+10,4,5+Math.floor(performance.now()/90)%3,'#ff8aa0');if(t.heart>0)R(sx+12,sy-22-(1-t.heart)*8,8,6,'#ff5a7a');}
+ if(t.kind==='forge'){R(PX+20,PY+56,170,10,'#333');R(PX+20+170*.42,PY+56,170*.16,10,'#46c46e');R(PX+20+170*t.pos-2,PY+52,4,18,'#fff');R(PX+60,PY+30,90,8,'#c0c4ca');R(PX+60,PY+30,90,2,'#fff');R(PX+150,PY+29,22,10,'#6a3a1a');for(let i=0;i<t.hits;i++)R(PX+66+i*16,PY+44,10,4,'#ff8a2a');if(t.spark>0)for(let i=0;i<6;i++)R(PX+100+rnd(-20,20),PY+24+rnd(-10,4),2,2,'#ffd25a');}
  if(t.kind==='bowl'){R(PX+40,PY+60,60,16,'#5ab0ff');R(PX+44,PY+56,52,6,'#3a7ad8');R(PX+44,PY+62-20*t.level/100,52,Math.max(0,20*t.level/100),'#a06a2a');R(PX+120,PY+20,30,40,'#c8a050');R(PX+126,PY+26,18,10,'#e23b3b');
   R(PX+180,PY+18,12,60,'#000');R(PX+181,PY+19+58*(1-.85),10,58*.25,'rgba(70,196,110,.5)');R(PX+181,PY+77-58*t.level/100,10,58*t.level/100,'#a06a2a');}
  if(t.kind==='trash'){R(PX+176,PY+20,26,60,'#5a4030');R(PX+180,PY+24,18,52,'#6b4c38');R(t.bx-8,t.by-8,16,16,'#222');R(t.bx-3,t.by-11,6,4,'#333');}
@@ -1859,10 +1943,10 @@ function setupFPS(){
  const hold=(id,on,off)=>{const b=$(id);b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();on();});b.addEventListener('pointerup',e=>{e.stopPropagation();off&&off();});b.addEventListener('pointerleave',()=>off&&off());};
  hold('tFire',()=>{M.firing=true;},()=>{M.firing=false;});hold('tJump',fpsJump);hold('tRun',()=>{tch.run=!tch.run;$('tRun').classList.toggle('on',tch.run);});
 }
-window.addEventListener('keydown',e=>{if(M&&!M.fps&&inMatch()&&M.phase==='play'&&!M.ended&&!M.spect&&['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown'].includes(e.code)&&hands()>=.3&&mode==='play'){enterFPS();toast('🎮 You have control. ESC + AUTOPLAY hands it back.','#7fe0a0');}if(!M||!M.fps)return;keys[e.code]=true;if(e.code==='Space'){e.preventDefault();fpsJump();}if(e.code==='Escape'&&document.pointerLockElement!==fpsC)exitFPS();});
+window.addEventListener('keydown',e=>{if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;keys[e.code]=true;if(mode==='play'&&run&&!(M&&M.fps))houseKey(e);if(!M||!M.fps)return;if(e.code==='Space'){e.preventDefault();fpsJump();}if(e.code==='Escape'&&document.pointerLockElement!==fpsC)exitFPS();});
 window.addEventListener('keyup',e=>{keys[e.code]=false;});
 function enterFPS(){if(!fpsC)setupFPS();const me=M.squad[0];
- if(M.ang==null){M.ang=Math.atan2(M.storm.cy-me.y,M.storm.cx-me.x);M.pitch=0;}
+ {const hv=Math.hypot(me.vx||0,me.vy||0);M.ang=hv>.1?Math.atan2(me.vy,me.vx):-Math.PI/2;M.pitch=0;}toast('🎮 First person: W forward, A/D strafe, mouse or Q/E to turn','#7fe0a0');
  M.fps=true;M.view3d=null;M.way=null;M.fly=0;$('fpsWrap').style.display='block';
  if(!M.fpsTip){M.fpsTip=1;feed('Steve: ok, I got this','#9fe07f');}beep(660,.06);}
 function exitFPS(){if(M)M.fps=false;M&&(M.firing=false);if(fpsC){$('fpsWrap').style.display='none';}if(document.pointerLockElement)try{document.exitPointerLock();}catch(_){}}
@@ -2218,7 +2302,7 @@ function drawHUD(){
  if(s.st==='sleep')txt('z Z',(s.x+2-camX)*SC,(s.y-8)*SC,'#fff',7);
  const t=run.task;
  if(t){const X=PX*SC,Y=PY*SC;txt(t.label,X+8,Y+22,'#fff',7);
-  const hint={cookies:'TAP to eat · DRAG to Simba · before they crumble',bowl:'HOLD to pour kibble · release in the green',bolts:t.stage?'HOLD to pour · release in the green':t.noPour?'Click every bolt to swap it':'Click the caps to open them',lugs:'Click lug nuts in star order 1-3-5-2-4',show:t.asks&&t.asks[t.k]?`${t.who}: "Show me ${t.asks[t.k][0]}"`:'',sign:'Sign the pad, then press DONE',trash:'Drag the bag out the door',scrub:'Scrub off the dirt (hold & rub)'}[t.kind];
+  const hint={forge:'TAP when the marker is in the green to hammer',cookies:'TAP to eat · DRAG to Simba · before they crumble',bowl:'HOLD to pour kibble · release in the green',bolts:t.stage?'HOLD to pour · release in the green':t.noPour?'Click every bolt to swap it':'Click the caps to open them',lugs:'Click lug nuts in star order 1-3-5-2-4',show:t.asks&&t.asks[t.k]?`${t.who}: "Show me ${t.asks[t.k][0]}"`:'',sign:'Sign the pad, then press DONE',trash:'Drag the bag out the door',scrub:'Scrub off the dirt (hold & rub)'}[t.kind];
   txt(hint,X+8,Y+46,'#ffd25a',7);
   if(t.kind==='sign'){txt('CLEAR',(PX+50)*SC,(PY+PH-13)*SC,'#fff',7,'center');txt('DONE',(PX+173)*SC,(PY+PH-13)*SC,'#fff',7,'center');}
   if(t.kind==='lugs'){const cx=PX+70,cy=PY+50;for(let i=0;i<5;i++){const a=i/5*Math.PI*2-Math.PI/2;txt(String(t.order.indexOf(i)+1),(cx+Math.cos(a)*37)*SC,(cy+Math.sin(a)*37+3)*SC,'#fff',8,'center');}}}

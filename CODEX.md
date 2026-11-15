@@ -526,3 +526,58 @@ reports its native pipe unavailable. Run node tools/ui/check_pda.cjs on a host
 where Chrome can launch. Initial git pull --rebase was blocked by existing
 unstaged concurrent art changes. No commit or push; no edits to room/lobby art,
 frozen/, ref/, or gameplay rules.
+
+
+## Themes
+
+### Notes from Codex - 2026-11-15
+
+Completed the 60-file interface in tools/art/brief_themes.txt for all five
+theme folders: 300 required PNG exports, none missing. Classic remains code
+drawn. Read ASSETS.md, CODEX.md, house_layout.json, rooms_crops.json and the
+lobby manifest before authoring. No writes to index.html, frozen/ or ref/.
+
+| Theme | Required exports | Art / reuse | Palette ceiling |
+|---|---:|---|---:|
+| 16bit | 60 | Retained Pass 3 art, completed missing props/icons, space-ranger Steve poses | 64 |
+| rpg | 60 | Retained eight Pass 4 rooms; 52 files copied byte for byte from 16bit | 256 |
+| gritty | 60 | New original arcade paintings, neon, graffiti, grime, harsh shadows | 128 |
+| modern | 60 | New original stylized painterly art, rich materials and warm lighting | 256 |
+| halloween | 60 | 14 decorated modern variants; 46 files copied byte for byte from modern | 256 |
+
+Used built-in image generation for 154 separate original sources, followed
+by area downsampling and palette snapping through pixelize.py finalizers.
+Sources: tools/art/theme_sources/. Prompts/references: theme_jobs.json;
+successful astronaut retries: theme_retry_jobs.json. Original Pass 3/4 inputs
+are preserved in theme_original/ so rebuilding never requantizes old exports.
+Steve follows the current space-ranger identity (white suit, green panel,
+clear helmet, red pack), overriding the older house-hoodie description above.
+Kid retains the cap, black hair and darker tan skin; Simba remains a tan dog.
+No real-person face references or borrowed game characters were used.
+
+Modern/Halloween share a palette and restrained ordered surface dithering.
+Required sprites have binary alpha, tinted outlines and bottom-center floor
+anchors. Opaque textures retain UV bounds; floors wrap in XY, skies in X.
+Enemy/ally billboards are identical neutral grayscale tint masks. House
+wall/door/lift strips and runtime working areas remain registered. Four TV
+screen rectangles stay uniformly dark; bezels retain the exact transparent
+(12,12)-(612,272) opening. Removed white exterior letterboxing from generated
+wide house/sky sources. Halloween keeps its lower walk strip readable.
+
+Inventory: tools/art/themes_manifest.json, with the requested status strings.
+Its 77 additional existing 16bit lobby/map entries are retained legacy files,
+outside the requested 60-file interface; no new fighter animation pass was
+requested. Previews: tools/art/sheet_theme_<theme>.png for all five themes.
+Visually reviewed every sheet; corrected sky padding and TV-screen dithering.
+All 300 required files pass dimensions, palette ceilings, binary alpha,
+anchors, opacity, seams, dark screens, TV holes, reuse contracts, neutral
+masks, distinct water frames and frozen-file integrity checks.
+
+Rebuild: python tools/art/build_themes.py
+Validate: python tools/art/check_themes.py
+Workflow: tools/art/THEMES.md. Byte-reproduction report:
+tools/art/themes_reproducibility.json (300 assets, five sheets, two manifests).
+Game wiring and live in-game review remain with the concurrent game-code
+task. Initial pull was blocked by pre-existing unstaged changes. No commit
+or push, as requested. Existing CODEX.md bytes/encoding were preserved;
+this section was appended as ASCII because the file contains legacy bytes.
