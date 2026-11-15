@@ -1,7 +1,8 @@
-﻿"""Pass 3 approval lineup. Original pixel painting; no individual exports.
+"""Pass 3 approval lineup. Original pixel painting; no individual exports.
 
 Run: python tools/art/pixelize.py (Pillow required).
-All shapes are painted at native sprite resolution. Shared finalizer resizes,
+Characters use explicit clean clusters in cluster_art.py; the retained props
+use the original material painter below. Shared finalizer resizes,
 quantizes without diffusion, thresholds alpha, adds tinted 1px silhouettes,
 and centers the cropped result on its bottom anchor. Only lineup.png is saved.
 The table's 44px Steve limit takes precedence over its approximate 46px scale.
@@ -93,79 +94,13 @@ def pixelize(source,size):
     return result
 
 def dog(sitting=False):
-    p=Paint((52,48) if sitting else (54,46))
-    if sitting:
-        p.poly([(5,38),(1,32),(2,27),(5,33),(12,36),(18,39),(17,43),(8,42)],'fur')
-        p.oval((11,24,32,43),'fur');p.oval((12,32,25,44),'fur')
-        p.poly([(25,19),(33,20),(34,39),(38,43),(31,44),(28,37),(27,29)],'cream')
-        p.poly([(23,22),(28,24),(27,39),(30,43),(24,44),(22,36)],'fur')
-        hx,hy=26,10
-    else:
-        p.poly([(12,23),(5,21),(2,14),(3,9),(5,13),(6,18),(15,19)],'fur')
-        p.poly([(17,28),(21,29),(19,37),(15,42),(10,42),(15,36)],'fur',3)
-        p.poly([(36,27),(39,25),(40,38),(45,41),(39,42),(36,35)],'fur',3)
-        p.oval((9,13,39,31),'fur');p.poly([(18,28),(30,25),(39,22),(36,30),(23,33)],'cream')
-        p.poly([(13,26),(19,28),(16,37),(17,41),(13,43),(9,42),(12,37)],'fur')
-        p.poly([(30,25),(36,23),(36,39),(40,41),(39,43),(33,43),(32,35)],'fur')
-        hx,hy=34,6
-    p.poly([(hx-8,hy+16),(hx-5,hy+6),(hx+4,hy+5),(hx+8,hy+17),(hx+2,hy+22)],'fur')
-    p.poly([(hx-5,hy+5),(hx-7,hy-6),(hx-3,hy-4),(hx+1,hy+5)],'fur')
-    p.poly([(hx+3,hy+4),(hx+7,hy-5),(hx+9,hy-4),(hx+7,hy+8)],'fur')
-    p.line([(hx-5,hy-3),(hx-3,hy+3)],6);p.line([(hx+7,hy-2),(hx+5,hy+4)],6)
-    p.oval((hx-5,hy+3,hx+8,hy+15),'fur')
-    p.poly([(hx+3,hy+10),(hx+10,hy+11),(hx+12,hy+14),(hx+9,hy+17),(hx+2,hy+16),(hx,hy+13)],'dark')
-    p.line([(hx+10,hy+12),(hx+12,hy+12)],4,2);p.dot(hx+5,hy+8,5);p.dot(hx+6,hy+8,10)
-    p.line([(hx-6,hy+18),(hx+1,hy+21),(hx+7,hy+18)],27,3)
-    p.line([(hx-5,hy+17),(hx+2,hy+20),(hx+6,hy+18)],28)
-    for x,y in [(hx-4,hy+18),(hx,hy+20),(hx+4,hy+19)]:p.dot(x,y,23)
-    p.solid('rectangle',(hx+4,hy+18,hx+6,hy+20),29)
-    for x,y in [(15,22),(19,23),(24,19),(28,24)] if not sitting else [(15,31),(18,34),(23,28)]:
-        p.line([(x,y),(x+2,y+1)],9);p.dot(x+1,y+2,7)
-    return pixelize(p.im,(40,48) if sitting else (52,44))
+    from cluster_art import dog as paint_dog
+    return paint_dog(PAL, pixelize, sitting)
 
-def human(role='steve',seated=False):
-    size=(32,48) if seated else ((14,36) if role=='kid' else (20,44))
-    p=Paint(size);kid=role=='kid';wife=role=='wife';ox=0
-    # Native heights: kid 32px, adults fill their table limits.
-    top=4 if kid else 1;cx=8 if not seated else 11
-    if kid:cx=6
-    heady=top+4; torsoy=top+13; bottom=size[1]-2
-    if seated:
-        p.poly([(6,27),(21,27),(25,31),(24,40),(29,44),(28,46),(21,45),(19,34),(7,34)],'denim')
-        p.poly([(10,31),(20,32),(19,41),(23,45),(18,46),(14,42),(13,36),(7,35)],'denim',2)
-    else:
-        p.poly([(cx-4,torsoy+10),(cx+1,torsoy+11),(cx, bottom-5),(cx-3,bottom-1),(cx-6,bottom-1),(cx-4,bottom-7)],'denim')
-        p.poly([(cx+1,torsoy+10),(cx+5,torsoy+10),(cx+5,bottom-3),(cx+8,bottom-1),(cx+7,bottom),(cx+2,bottom),(cx,bottom-9)],'denim',2)
-    shirt='dark' if wife else ('gold' if kid else 'olive')
-    p.poly([(cx-4,torsoy-2),(cx+3,torsoy-3),(cx+6,torsoy+2),(cx+5,torsoy+12),(cx-4,torsoy+12),(cx-6,torsoy+5)],shirt)
-    if not kid and not wife:
-        p.poly([(cx-4,torsoy-3),(cx+1,torsoy-4),(cx+4,torsoy),(cx,torsoy+2),(cx-4,torsoy)],'olive')
-        p.line([(cx,torsoy),(cx+1,torsoy+7)],19);p.dot(cx+2,torsoy+3,10)
-        p.line([(cx-3,torsoy+9),(cx+2,torsoy+9)],19)
-    if wife:
-        p.line([(cx-3,torsoy-2),(cx-2,torsoy+5)],17,2);p.line([(cx+3,torsoy-2),(cx+3,torsoy+5)],17,2)
-        p.rect((cx-3,torsoy+4,cx+4,torsoy+12),'denim');p.dot(cx-2,torsoy+4,10);p.dot(cx+3,torsoy+4,10)
-        p.line([(cx-1,torsoy+7),(cx+2,torsoy+7),(cx+2,torsoy+9),(cx,torsoy+10)],18)
-    if seated:
-        p.poly([(cx+2,torsoy+1),(cx+5,torsoy+2),(cx+6,torsoy+9),(cx+12,torsoy+9),(cx+13,torsoy+12),(cx+4,torsoy+12),(cx+1,torsoy+7)],shirt)
-        p.rect((cx+11,torsoy+9,cx+15,torsoy+12),'skin');p.oval((cx+13,torsoy+7,cx+19,torsoy+11),'dark');p.dot(cx+15,torsoy+8,18);p.dot(cx+18,torsoy+9,30)
-    else:
-        p.poly([(cx+3,torsoy),(cx+6,torsoy+3),(cx+5,torsoy+10),(cx+2,torsoy+9)],shirt)
-        p.oval((cx+2,torsoy+9,cx+5,torsoy+13),'skin')
-    p.rect((cx,heady+7,cx+3,heady+11),'skin')
-    p.poly([(cx-3,heady),(cx+3,heady-1),(cx+5,heady+2),(cx+5,heady+4),(cx+7,heady+5),(cx+6,heady+6),(cx+4,heady+6),(cx+4,heady+9),(cx,heady+10),(cx-3,heady+6)],'skin')
-    hair='pink' if wife else ('gold' if kid else 'hair')
-    p.poly([(cx-4,heady+3),(cx-4,heady),(cx-2,heady-3),(cx+3,heady-3),(cx+5,heady),(cx+4,heady+1),(cx,heady),(cx-1,heady+4),(cx-2,heady+6)],hair)
-    if wife:
-        p.oval((cx-5,top-1,cx+1,top+4),'pink');p.line([(cx-4,heady+3),(cx+6,heady+3),(cx+6,heady+6),(cx+2,heady+6),(cx+1,heady+3)],23)
-        p.dot(cx+2,heady+3,26);p.dot(cx+5,heady+5,10)
-    elif not kid:
-        p.line([(cx-1,heady+7),(cx+1,heady+9),(cx+4,heady+8)],6);p.dot(cx+3,heady+7,5)
-    p.dot(cx+4,heady+3,4)
-    if not seated:
-        p.line([(cx-6,bottom),(cx-2,bottom),(cx-1,bottom-1)],4);p.line([(cx+2,bottom),(cx+7,bottom)],4)
-        p.dot(cx+3,bottom-2,18)
-    return pixelize(p.im,size)
+
+def human(role='steve', seated=False):
+    from cluster_art import human as paint_human
+    return paint_human(PAL, pixelize, role, seated)
 
 def lamb():
     p=Paint((24,20));p.oval((2,5,17,15),'cream')
@@ -198,8 +133,8 @@ def main():
     # Approval sheet only. No paths in assets/ are opened for writing.
     sheet=Image.new('RGBA',(404,150),PAL[0]+(255,));d=ImageDraw.Draw(sheet)
     font=ImageFont.load_default_imagefont()
-    d.text((10,7),'STEVE\'S DAY OFF / PASS 3 / MATERIAL & SCALE STUDY',fill=PAL[3],font=font)
-    d.text((10,20),'ORIGINAL PIXEL PAINTING / TOP-LEFT LIGHT / 32 COLORS',fill=PAL[6],font=font)
+    d.text((10,7),'STEVE\'S DAY OFF / PASS 3 / CLEAN CLUSTER STUDY',fill=PAL[3],font=font)
+    d.text((10,20),'DELIBERATE CLUSTERS / TOP-LEFT LIGHT / 32 COLORS',fill=PAL[6],font=font)
     floor=119;d.rectangle((0,floor,403,149),fill=PAL[1]);d.line((0,floor,403,floor),fill=PAL[31]);d.line((0,floor-2,403,floor-2),fill=PAL[31])
     items=[('DOOR',door(),11),('STAND',dog(),61),('SIT',dog(True),121),('STEVE',human(),172),('WIFE',human('wife'),210),('KID',human('kid'),247),('COUCH / STEVE',couch(),288),('LAMB',lamb(),265)]
     for label,sprite,x in items:
@@ -221,3 +156,4 @@ def main():
     print('lineup.png: 1616x600, exact 4x nearest-neighbor, <=32 colors, binary alpha; anchors verified.')
 
 if __name__=='__main__':main()
+

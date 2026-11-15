@@ -134,3 +134,23 @@ and no changes to index.html or frozen/.
 
 Owner approval requested: please review tools/art/lineup.png for the Pass 3
 art direction before any individual sprite exports (step 2).
+
+2026-11-14 (Pass 3, revised approval lineup): Replaced the rejected lineup
+with explicit native-resolution pixel clusters in tools/art/cluster_art.py.
+Removed procedural grain from all characters; kept the existing 32-color
+palette, textured couch, door and lamb, sheet dimensions and shared finalizer.
+Simba's local photos informed her broad chest, stocky build and blocky muzzle.
+Standing Simba now has four separated legs at ankle height, darker far legs,
+defined paws, medium upright ears with dark interiors, a highlighted eye,
+curved raised tail, and a lilac collar with lime buckle. Sitting Simba has
+lowered haunches, straight forelegs and an upward begging expression.
+People have larger heads, readable stylized faces, distinct arms/hands,
+asymmetric stances, deliberate camo, pink bun/glasses/overalls, and a blond
+kid with a yellow shirt, shorts and bare shins. Seated Steve holds a controller.
+Updated pixelize.py; added check_lineup.py and reproduction notes in
+tools/art/README.md. Validation passes palette membership, binary alpha,
+sprite limits, balanced bottom anchors, four standing leg separations,
+1616 x 600 exact 4x enlargement, and byte-identical regeneration. Visually
+reviewed the final sheet. Only the approval lineup is exported; individual
+assets remain pending owner approval. No git commands run; index.html,
+assets/ and frozen/ were not edited. Reference photos remain local only.
