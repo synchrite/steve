@@ -1153,10 +1153,11 @@ function drawTV(){
   R(TX,TY+72,TW,TH,'#2a7ac8');for(let i=0;i<40;i++){const x=TX+((i*41+t*10)%TW),y=TY+76+(i*17)%50;R(x,y,6,1,'#5aa8e8');}
   const iy=TY+92;b.fillStyle='#e8d08a';b.beginPath();b.ellipse(TX+150,iy+10,128,22,0,0,7);b.fill();b.fillStyle='#d8bc70';b.beginPath();b.ellipse(TX+150,iy+14,118,14,0,0,7);b.fill();
   b.fillStyle='rgba(255,255,255,.5)';for(let i=0;i<8;i++)b.fillRect(TX+30+i*30+Math.sin(t*2+i)*3,iy+30+Math.sin(t+i)*2,10,1);
+  const ISB=GFX==='16'&&TEXIM.island_bg;if(ISB)b.drawImage(ISB,TX,TY,TW,TH);
   // palms
-  [[TX+40,iy-2],[TX+262,iy+2]].forEach(([px,py],k)=>{for(let j=0;j<8;j++)R(px+j*(k?-1:1)*.6,py-j*4,3,4,'#8a6a3a');const tx=px+(k?-5:5),ty=py-32;[[-14,-2],[14,-2],[-10,4],[10,4],[0,-6]].forEach(([dx,dy])=>{R(tx+dx-6,ty+dy,14,3,'#2f8a3a');R(tx+dx-3,ty+dy+3,8,2,'#2f8a3a');});R(tx-2,ty+4,4,4,'#6a4a20');});
+  if(!ISB)[[TX+40,iy-2],[TX+262,iy+2]].forEach(([px,py],k)=>{for(let j=0;j<8;j++)R(px+j*(k?-1:1)*.6,py-j*4,3,4,'#8a6a3a');const tx=px+(k?-5:5),ty=py-32;[[-14,-2],[14,-2],[-10,4],[10,4],[0,-6]].forEach(([dx,dy])=>{R(tx+dx-6,ty+dy,14,3,'#2f8a3a');R(tx+dx-3,ty+dy+3,8,2,'#2f8a3a');});R(tx-2,ty+4,4,4,'#6a4a20');});
   // wooden shanty
-  const hx=TX+182,hy=iy-30;R(hx,hy,50,30,'#9a6a3a');for(let i=0;i<5;i++)R(hx,hy+i*6,50,1,'#7a4a24');R(hx-4,hy-8,58,8,'#6a4a2a');R(hx-2,hy-10,54,3,'#8a5a30');R(hx+20,hy+12,10,18,'#4a2a14');R(hx+6,hy+8,9,7,'#3a2a1a');R(hx+36,hy+8,9,7,'#3a2a1a');R(hx+37,hy+9,7,5,'#ffd25a');R(hx+48,hy+4,2,26,'#7a4a24');R(hx-8,hy+26,20,4,'#8a6a3a');
+  const hx=TX+182,hy=iy-30;if(!art('lobby_shack',hx+25,hy+30)){R(hx,hy,50,30,'#9a6a3a');for(let i=0;i<5;i++)R(hx,hy+i*6,50,1,'#7a4a24');R(hx-4,hy-8,58,8,'#6a4a2a');R(hx-2,hy-10,54,3,'#8a5a30');R(hx+20,hy+12,10,18,'#4a2a14');R(hx+6,hy+8,9,7,'#3a2a1a');R(hx+36,hy+8,9,7,'#3a2a1a');R(hx+37,hy+9,7,5,'#ffd25a');R(hx+48,hy+4,2,26,'#7a4a24');R(hx-8,hy+26,20,4,'#8a6a3a');}
   // other players wandering, shooting at the sky, dancing
   if(M&&!M.lob)M.lob=Array.from({length:7},(_,i)=>({x:TX+60+i*28,tx:TX+60+i*28,sk:pick(SKINS),act:pick(['walk','dance','shoot','dance','walk']),t:rnd(1,4),f:1}));
   const awayNow=!(run&&run.steve.x===SPOT.couch&&!run.task);
