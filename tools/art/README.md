@@ -7,7 +7,7 @@ alpha, bottom-center anchors, four separate standing legs, exact nearest-neighbo
 
 `cluster_art.py` contains the revised native-resolution character paintings:
 explicit silhouettes, hard shading clusters, and placed material details.
-`pixelize.py` owns the shared palette (36 colors: the original 32 plus saturated tee yellow and three kid skin tones) and finalizer, retained
+`pixelize.py` owns the shared palette (48 colors: the original 32, saturated tee yellow, three kid skin tones, and twelve room/material shades) and finalizer, retained
 textured door/couch/lamb, and approval-sheet composition. These scripts save only
 the lineup. The owner approved this lineup for step 2.
 
@@ -24,3 +24,4 @@ lineup adjustment without the couch, and defines the two new reclining dog
 poses with the same cluster primitives and shared finalizer. It checks table
 sizes, palette membership, binary alpha and bottom-center anchors before
 saving. It does not regenerate or change the approved lineup.
+

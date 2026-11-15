@@ -19,7 +19,10 @@ HEX = (
     '293948','40576a','648092','93a8a5',
     '353c2d','505b3c','758052','9a9e6b',
     '69435c','a76080','d98ba3','efb4bc',
-    '776080','b6a0c6','b6ce4c','b24943','b9ad98','f4cf24','b27a54','c58f67','dca77e')
+    '776080','b6a0c6','b6ce4c','b24943','b9ad98','f4cf24','b27a54','c58f67','dca77e',
+    # Room pass: plaster, walnut, upholstery, ceramic and garden shade ramps.
+    '65534b','957b61','bdab89','d6c6a5','f5dfa9','47352e',
+    'a57a50','b88859','cbb78e','abc1ba','54705b','814a43')
 PAL = [tuple(bytes.fromhex(c)) for c in HEX]
 BAYER = ((0,8,2,10),(12,4,14,6),(3,11,1,9),(15,7,13,5))
 MATS = {'fur':(6,7,8,9,10),'cream':(31,0,11),'wood':(3,6,7,2,9),

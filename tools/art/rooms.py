@@ -85,7 +85,11 @@ def house():
     p=Room(660,96,138)
     lines=(ROOT/'index.html').read_text(encoding='utf-8').splitlines()
     # Explicit static source selection. No JS execution, state or effect baking.
-    selected=list(range(1233,1242))+[1245,1246,1247,1248,1251,1252,1253,1254,1259,1260,1261,1262,1263,1264,1265,1266,1267,1268,1270,1273,1274,1275,1278,1281,1286,1287,1289,1292,1293,1294,1296,1297]
+    selected=list(range(1233,1243))+[1247,1248,1249,1250,1254,1255,1256,1257,1262,1263,1264,1265,1266,1267,1268,1269,1270,1271,1273,1276,1277,1278,1281,1289,1290,1292,1295,1296,1297,1298,1299]
+    # Fail visibly if game edits shift these static source lines. Never bake
+    # runtime fire, smoke, car, repairbot, turret, trap or board status into art.
+    assert 'R(156,HY+2,66' in lines[1254]
+    assert 'R(158,HY+2,112' in lines[1276]
     env={'HY':150,'FLOOR':234,'GX':200,'ly':0,'fh':22}
     for n in selected:
         line=lines[n-1]
@@ -99,7 +103,7 @@ def house():
             except (NameError,SyntaxError):continue
             colors=re.findall(r"'#([0-9a-fA-F]+)'",args[4])
             if not colors:continue
-            coords[0]+=200 if n>=1273 else 0
+            coords[0]+=200 if n>=1276 else 0
             p.box(*coords,colors[-1])
     # Readable wall finishes and trim, limited to unobstructed upper wall zones.
     for x0,x1,c in [(0,152,31),(156,222,10),(266,312,28),(316,352,10)]:
@@ -107,7 +111,7 @@ def house():
             p.line([(xx,155),(xx,159)],c)
     for xx in range(359,470,7):p.line([(xx,153),(xx,233)],16)
     # Garage corrugation must sit behind its fixtures: restore static fixtures.
-    for n in [1278,1281,1286,1287]:
+    for n in [1281,1289,1290]:
         line=lines[n-1].split('if(run)')[0]
         for m in re.finditer(r'R\(([^;]*?)\);',line):
             args=m.group(1).split(',')
@@ -275,17 +279,20 @@ def cctv(kind):
         p.box(64,38,17,16,0);p.line([(66,43),(78,43)],25);p.line([(66,47),(76,47)],17)
     return p.save('cctv_'+kind)
 
+from room_detail import install
+install(Room, nearest)
+
 def main():
     images={'house_bg':house()}
     for kind in ['yard','stove','door','couch','bath','kid','wife']:images['cctv_'+kind]=cctv(kind)
     sheet=Image.new('RGB',(1360,1040),PAL[0]);d=ImageDraw.Draw(sheet)
-    d.text((20,12),'PASS 3 / EMPTY ROOMS / 2x native detail / screens and runtime layers left clear',fill=PAL[3])
+    d.text((20,12),'ORIGINAL 16-BIT INTERIORS / layered materials, warm light and fixed gameplay geometry',fill=PAL[3])
     d.text((20,37),'house_bg / global buffer x 0..660, y 138..234 / garage GX=200',fill=PAL[3])
     sheet.paste(images['house_bg'],(20,58))
     for i,(name,im) in enumerate(list(images.items())[1:]):
         x=20+(i%4)*335;y=280+(i//4)*350
         d.text((x,y),name+' / 320 x 220',fill=PAL[3]);sheet.paste(im,(x,y+22))
-    d.text((20,996),'Original Pillow cluster painting / shared 36-color palette / opaque backgrounds / no baked CCTV overlays',fill=PAL[3])
+    d.text((20,996),'Original Pillow cluster painting / shared 48-color palette / opaque backgrounds / no baked CCTV overlays',fill=PAL[3])
     sheet.save(ROOT/'tools/art/sheet_rooms.png')
     for name,im in images.items():
         expected=(1320,192) if name=='house_bg' else (320,220)

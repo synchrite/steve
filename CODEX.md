@@ -401,3 +401,45 @@ scanlines, timestamps or blinking indicators are baked in. Empty lift includes
 fixed posts and resting platform; runtime owns moving elements. Exported, not
 wired: game integration remains for Claude. No git commands run. No edits to
 index.html, frozen/, ref/, approved lineup or existing character sprites.
+
+### Notes from Codex - 2026-11-14 (rich 16-bit room repaint)
+
+Rebuilt assets/house_bg.png (1320 x 192) and all seven cctv_*.png room
+backgrounds (320 x 220), plus tools/art/sheet_rooms.png. Original procedural
+Pillow pixel paintings; no tiles, characters or imagery copied from any game.
+Read AGENTS.md, this brief, house_layout.json, drawHouse() and drawCU().
+Retained the room order, wall X coordinates, door positions, existing furniture
+rectangles and runtime alignment. Added floor planes with staggered grain and
+receding courses, ceramic tile highlights, baseboards, layered crown molding,
+darker ceiling/corner bands, inset doorway shadows, furniture contact shadows,
+striped/floral wallpaper, bordered patterned rugs, upholstered cushion seams,
+book spines, clocks, lamps, dithered sunlight parallelograms and warm light pools.
+Kitchen has jars, pans and a hanging towel; bathroom has mirror glints and
+bottles; kid room has an original rocket poster, toys and gaming chair; craft
+corner has supplies and a laundry basket. Garage retains the empty lift, tool
+pegboard, workbench and toolbox, with tire stacks and oil stains outside the
+lift. Yard includes flowers, mailbox and distant garden layers.
+
+Appended twelve room/material shades to pixelize.py's shared palette, keeping
+all existing entries and indices (48 total). Drawing remains at exact native
+resolution, using hard colour clusters and selective ordered Bayer dithering;
+no blur, antialiasing, semi-transparent pixels or smooth gradients. All assets
+pass the shared surface_pixelize() finalizer. Existing character, lobby and
+3D assets were not regenerated. New colour hex values, in index order 36..47:
+#65534b #957b61 #bdab89 #d6c6a5 #f5dfa9 #47352e #a57a50 #b88859
+#cbb78e #abc1ba #54705b #814a43.
+
+Rebuild: python tools/art/rooms.py (Pillow required). Added room_detail.py for
+the reusable material, depth, light and dressing pass. Corrected the old room
+exporter's stale drawHouse line selections to the current static fixture lines;
+added source-line guards so subsequent shifts fail visibly. Runtime fire,
+smoke, moving car, repairbot, turret, traps and board status are excluded.
+Four TV screens remain uniformly dark. The painter explicitly protects the
+stove working area, lift interior and parked lot area from decorative overlays.
+
+Visually reviewed the final native-size contact sheet. Validation passed exact
+dimensions, opaque RGB, shared palette membership, four dark screen rectangles,
+fixed wall coordinates against house_layout.json, protected-zone pixel checks,
+and byte-identical regeneration of all eight exports and the contact sheet.
+No git commands run. No writes to index.html, frozen/ or ref/. Game code and
+wiring remain unchanged; no live in-game review was performed for this repaint.
