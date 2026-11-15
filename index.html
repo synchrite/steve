@@ -274,6 +274,8 @@ const UPS=[
  {id:'flowers',name:'Flowers for Your Wife',price:90,desc:'+30 wife mood. Buys you a lot more game time.',once:true},
  {id:'energy',name:'Energy Drinks',price:70,desc:'+30 fun right now.',once:true},
  {id:'pizza',name:'Pizza for the Squad',price:90,desc:'+1 squad heart.',once:true},
+ {id:'vcr',name:'Old VCR + Tough-Guy Movie',price:120,desc:'Plays a gangster movie at the front door. Needed for the Movie Night prank.'},
+ {id:'crackers',name:'Firecrackers (3)',price:50,desc:'For the Big Finale prank. Each prank uses one.',once:true},
 ];
 
 // ================= layout =================
@@ -679,10 +681,18 @@ window.openPizza=()=>{view={type:'pizza'};phoneDirty=true;renderPhone();};
 window.orderPizza=i=>{if(run.pizza)return;const z=PIZZAS[i];if(run.cash<z.p){toast('Not enough cash for pizza','#ff7070');return;}addCash(-z.p,'Pizza order');run.pizza={z,st:'oven',t:rnd(20,30)};toast(`🍕 Ordered ${z.n}! About a minute.`,'#ffb060');beep(880,.06);view=null;phoneDirty=true;renderPhone();
  later(2,()=>feed('Steve: PIZZA IS COMING','#9fe07f'));};
 function pizzaTick(dt){const z=run.pizza;if(!z)return;if(z.st==='oven'||z.st==='car'){z.t-=dt;if(z.t<=0){if(z.st==='oven'){z.st='car';z.t=rnd(18,26);toast('🍕 Your pizza is out for delivery','#ffb060');}
+   else if((run.skill||{}).movie&&run.up.vcr){z.st='door';z.t=99;prankDoor(z);}
    else{z.st='door';z.t=35;z.it=urgentItem({icon:'🍕',from:'Front door',msg:"*KNOCK KNOCK* Pizza's here!",onTap:()=>walkTo('door',()=>takePizza())});simbaAlarm(14);beep(700,.12,'sine');setTimeout(()=>beep(700,.12,'sine'),180);setTimeout(()=>beep(520,.25,'sine'),360);}}
   phoneDirty=true;}
- else if(z.st==='door'){z.t-=dt;if(z.t<=0){z.st='porch';clearUrgent(z.it);z.it=urgentItem({icon:'🍕',from:'Porch',msg:'The driver left your pizza on the porch. It\'s getting cold.',onTap:()=>walkTo('door',()=>takePizza())});toast('🍕 He left it on the porch','#ffb060');phoneDirty=true;}}}
-function takePizza(){const z=run.pizza;if(!z||z.st==='oven'||z.st==='car')return;const cold=z.st==='porch',k=cold?.5:1,P=z.z;clearUrgent(z.it);run.pizza=null;
+ else if(z.st==='door'){z.t-=dt;if(z.t<=0){z.st='porch';run.pzGuy={x:4,st:'leave',t:0};clearUrgent(z.it);z.it=urgentItem({icon:'🍕',from:'Porch',msg:'The driver left your pizza on the porch. It\'s getting cold.',onTap:()=>walkTo('door',()=>takePizza())});toast('🍕 He left it on the porch','#ffb060');phoneDirty=true;}}}
+const VCR_LINES=["VCR: \"Who sent you? Put the box down real slow, pal.\"","VCR: \"I'm countin' to three. ONE...\"","VCR: \"This is my porch. Nobody delivers on my porch.\""];
+function prankDoor(z){const sk=run.skill,boom=sk.finale&&(run.crackers||0)>0;toast('📼 The VCR starts playing through the door...','#ffb060');
+ VCR_LINES.forEach((l,i)=>later(1+i*1.6,()=>{if(run.voice!==undefined)run.voice={who:'VCR',t:l.slice(6),life:1.6};toast(l,'#ffd25a');beep(110+i*20,.3,'sawtooth',.03);}));
+ later(5.6,()=>{if(boom){run.crackers--;for(let i=0;i<14;i++)setTimeout(()=>beep(rnd(80,200),.05,'square',.06),i*60+Math.random()*40);toast('🧨 BANG BANG BANG BANG!','#ff5a3a');run.pzBang=1.2;}
+  toast('🍕 The driver screams, drops the pizza and runs!','#ffb060');addCash(z.z.p,'Free pizza (he ran)');addFun(boom?20:10,boom?'BIG FINALE':'Movie Night prank');
+  z.st='porch';z.hot=true;z.it=urgentItem({icon:'🍕',from:'Porch',msg:'The pizza is on the porch. Still hot. Go get it!',onTap:()=>walkTo('door',()=>takePizza())});phoneDirty=true;
+  run.pzGuy={x:4,st:'flee',t:0};simbaAlarm(14);});}
+function takePizza(){if(run.pizza&&run.pizza.st==='door')run.pzGuy={x:4,st:'leave',t:0};const z=run.pizza;if(!z||z.st==='oven'||z.st==='car')return;const cold=z.st==='porch'&&!z.hot,k=cold?.5:1,P=z.z;clearUrgent(z.it);run.pizza=null;
  addFun(Math.round(P.fun*k),cold?'Cold pizza (still good)':'HOT PIZZA');run.wife.mood=Math.min(100,run.wife.mood+P.fam*k);rel('Wife',P.fam>15?3:1);rel('Kid',3);if(P.heart)run.hearts=Math.min(3,run.hearts+1);
  run.pizzaEat=8;jingle(2);say(pick(['Pizza time!','Oh yeah. Pepperoni.','Family dinner on the couch!','I could eat the whole box']));toast('🍕 Everyone eats pizza on the couch','#ffb060');phoneDirty=true;}
 function delivery(){
@@ -1151,7 +1161,10 @@ function update(dt){
  const prog=Math.min(1,run.clock/600);
  run.nextText-=dt;if(run.nextText<=0){run.nextText=(rnd(90,220))*(run.easy?1.4:1)*(run.up.dnd?1.5:1)*(isNight()?2:1);if(run.inbox.length<8)textEvent();}
  run.nextReal-=dt;if(run.nextReal<=0){run.nextReal=(rnd(45,80)-prog*10)*(run.easy?1.6:1);const r=Math.random();if(isNight()){if(r<.5)weirdNoise();else burglars();}else if(r<.3)delivery();else if(r<.6)gateVisit();else if(r<.82)weirdNoise();else if(run.clock>40)burglars();}
- pizzaTick(dt);if(run.pizzaEat>0)run.pizzaEat-=dt;
+ pizzaTick(dt);if(run.pizzaEat>0)run.pizzaEat-=dt;if(run.pzBang>0)run.pzBang-=dt;
+ if(run.pzGuy){const g=run.pzGuy;g.t+=dt;if(g.st==='fall'){if(g.t>1.4){g.st='crawl';}}else{g.x-=dt*(g.st==='flee'?14:6)*(g.st==='crawl'?.4:1);
+  if(g.x<2.5&&g.st!=='crawl'&&(run.skill||{}).statue&&!g.hit){g.hit=1;g.st='fall';g.t=0;beep(90,.2,'sawtooth',.06);toast('💥 BONK! He backed right into the statue.','#ffb060');addFun(5,'Statue bonk');}
+  if(g.x<-14)run.pzGuy=null;}}
  if(run.door){run.door.t-=dt;if(run.door.t<=0){const pk=run.door.pk;clearUrgent(run.door.it);run.door=null;
   if(pk){run.pendTries[pk]=(run.pendTries[pk]||0)+1;if(run.pendTries[pk]>=3){run.pending.splice(run.pending.indexOf(pk),1);const u=UPS.find(x=>x.id===pk);addCash(Math.round(u.price*.5));toast(`📦 Missed it 3 times. ${u.name} went back to the warehouse (50% refund).`,'#ff7070');}else{toast(`📦 Missed the delivery. They'll try again later (${run.pendTries[pk]}/3).`,'#ffb27a');run.pkgT=rnd(40,90);}}
   else toast('Parts went back. They\'ll redeliver.','#9aa0b0');}}
@@ -1434,7 +1447,11 @@ function drawHouse(){
   if(g.st==='steal')R(x-6,FLOOR-14,6,4,'#c8202a');}
 
  b.translate(-GX,0);HSKIP=false;
- if(run&&run.pizza&&(run.pizza.st==='door'||run.pizza.st==='porch')){const pz=run.pizza,x=2,y=FLOOR;if(pz.st==='door'){R(x,y-20,8,12,'#c0302a');R(x+1,y-26,6,6,'#a8744a');R(x,y-28,8,3,'#c0302a');R(x+7,y-27,3,1,'#c0302a');R(x+1,y-8,2,8,'#2a2a40');R(x+5,y-8,2,8,'#2a2a40');R(x+6,y-17,9,3,'#e8d0a0');R(x+6,y-17,9,1,'#c0302a');}else{R(x+4,y-3,10,3,'#e8d0a0');R(x+4,y-3,10,1,'#c0302a');}}
+ if(run&&(run.skill||{}).statue){R(0,FLOOR-11,4,11,'#8a8e94');R(0,FLOOR-14,4,4,'#a0a4aa');R(1,FLOOR-13,1,1,'#555');R(-1,FLOOR-2,6,2,'#6a6e74');}
+ if(run&&run.pzGuy){const g=run.pzGuy,x=Math.round(g.x),y=FLOOR;if(g.st==='fall'||g.st==='crawl'){R(x-8,y-6,12,6,'#c0302a');R(x-13,y-6,5,5,'#a8744a');R(x-14,y-7,6,2,'#c0302a');R(x+4,y-4,7,2,'#2a2a40');if(g.st==='fall'&&Math.floor(g.t*6)%2){R(x-12,y-12,2,2,'#ffd25a');R(x-8,y-14,2,2,'#ffd25a');}}
+  else{const st=Math.floor(g.t*10)%2;R(x,y-20,8,12,'#c0302a');R(x+1,y-26,6,6,'#a8744a');R(x,y-28,8,3,'#c0302a');R(x+1,y-8,2,8-st*2,'#2a2a40');R(x+5,y-8,2,6+st*2,'#2a2a40');if(g.st==='flee'){R(x-2,y-24+st,2,4,'#a8744a');R(x+8,y-25-st,2,4,'#a8744a');}}}
+ if(run&&run.pzBang>0)for(let i=0;i<5;i++)if(Math.random()<.5){const fx=8+Math.random()*20,fy=FLOOR-4-Math.random()*20;R(fx,fy,3,3,'#fff6a0');R(fx-2,fy+1,7,1,'#ff7a3a');}
+ if(run&&run.pizza&&(run.pizza.st==='door'||run.pizza.st==='porch')){const pz=run.pizza,x=4,y=FLOOR;if(pz.st==='door'){R(x,y-20,8,12,'#c0302a');R(x+1,y-26,6,6,'#a8744a');R(x,y-28,8,3,'#c0302a');R(x+7,y-27,3,1,'#c0302a');R(x+1,y-8,2,8,'#2a2a40');R(x+5,y-8,2,8,'#2a2a40');R(x+6,y-17,9,3,'#e8d0a0');R(x+6,y-17,9,1,'#c0302a');}else{R(x+4,y-3,10,3,'#e8d0a0');R(x+4,y-3,10,1,'#c0302a');}}
  if(run&&run.pizzaEat>0){R(54,198,14,3,'#e8d0a0');R(56,196,10,2,'#e8a040');R(58,196,2,1,'#c0302a');R(62,196,2,1,'#c0302a');}
 
  if(run){
@@ -2062,12 +2079,17 @@ function renderIShop(){const el=$('ishop'),tabs=[['featured','⭐ FEATURED'],['s
 window.ishopBuy=id=>{const it=IT(id);if(LOCK.own.includes(id)||LOCK.bux<it.p)return;LOCK.bux-=it.p;LOCK.own.push(id);saveLock();jingle(it.r>=3?3:2);window.ishopEquip(id);toast('Unlocked: '+it.n,'#7fe8ff');};
 window.ishopEquip=id=>{const it=IT(id);LOCK[it.k==='pick'?'pick':it.k]=id;saveLock();beep(990,.06);renderIShop();};
 function openShop(){mode='shop';
- show(`<h2>SHOP · $${run.cash}</h2><p>Upgrades ship to the front door. Sign for them or they go back after 3 tries.${run.pending.length?' On the way: '+run.pending.map(id=>(UPS.find(x=>x.id===id)||{}).name).join(', '):''}</p><div class="shop">${UPS.filter(u=>u.stack?(u.id==='trap'?run.trap:run.fence)+run.pending.filter(x=>x===u.id).length<u.stack:(u.once||(!run.up[u.id]&&!run.pending.includes(u.id)))).map(u=>`<button class="up" ${run.cash<u.price?'disabled':''} onclick="buy('${u.id}')"><b>${u.name}${u.id==='trap'?` (${run.trap}/2)`:u.id==='fence'?` (lvl ${run.fence})`:''}</b>${u.desc}<span class="pr">$${u.price}</span></button>`).join('')}</div><button class="big" onclick="closeShop()">BACK ◀</button>`);}
+ show(`<h2>SHOP · $${run.cash}</h2><p>Upgrades ship to the front door. Sign for them or they go back after 3 tries.${run.pending.length?' On the way: '+run.pending.map(id=>(UPS.find(x=>x.id===id)||{}).name).join(', '):''}</p><div class="shop">${UPS.filter(u=>u.stack?(u.id==='trap'?run.trap:run.fence)+run.pending.filter(x=>x===u.id).length<u.stack:(u.once||(!run.up[u.id]&&!run.pending.includes(u.id)))).map(u=>`<button class="up" ${run.cash<u.price?'disabled':''} onclick="buy('${u.id}')"><b>${u.name}${u.id==='trap'?` (${run.trap}/2)`:u.id==='fence'?` (lvl ${run.fence})`:''}</b>${u.desc}<span class="pr">$${u.price}</span></button>`).join('')}</div><h3 style="margin:14px 0 6px;color:#ff9a5a">🎬 PRANK SKILL TREE (front door)</h3><div class="shop">${PRANKS.map(k=>{const own=(run.skill||{})[k.id],ok=k.need(run);return `<button class="up" ${own||!ok||run.cash<k.price?'disabled':''} onclick="buySkill('${k.id}')"><b>${own?'✔ ':''}${k.name}</b>${k.desc}<br><i style="opacity:.75">${k.req}</i><span class="pr">${own?'OWNED':'$'+k.price}</span></button>`;}).join('')}</div><button class="big" onclick="closeShop()">BACK ◀</button>`);}
+const PRANKS=[
+ {id:'statue',name:'1. Lawn Statue',price:40,desc:'A stone statue by the porch. Leaving drivers back right into it.',req:'No requirement',need:()=>true},
+ {id:'movie',name:'2. Movie Night',price:80,desc:'The VCR plays a tough-guy movie through the door. The driver panics, drops the pizza and runs. Free pizza.',req:'Needs: Lawn Statue + Old VCR',need:r=>(r.skill||{}).statue&&r.up.vcr},
+ {id:'finale',name:'3. Big Finale',price:120,desc:'Firecrackers go off with the movie. Huge fun boost. Uses one firecracker.',req:'Needs: Movie Night + firecrackers',need:r=>(r.skill||{}).movie}];
+window.buySkill=id=>{const k=PRANKS.find(x=>x.id===id);run.skill=run.skill||{};if(run.skill[id]||!k.need(run)||run.cash<k.price)return;run.cash-=k.price;run.skill[id]=1;jingle(2);toast('Prank unlocked: '+k.name,'#ff9a5a');openShop();};
 window.closeShop=()=>{hide();mode='play';};
 function applyUp(id){if(id==='trap')run.trap++;else if(id==='fence')run.fence++;else run.up[id]=1;const u=UPS.find(x=>x.id===id);toast('📦 Installed: '+(u?u.name:id),'#7fe0a0');phoneDirty=true;}
 window.buy=id=>{const u=UPS.find(x=>x.id===id);if(run.cash<u.price)return;run.cash-=u.price;beep(990,.08);
  if(!u.once){run.pending.push(id);toast('Ordered '+u.name+'. It ships to the front door.','#9aa0b0');run.pkgT=Math.min(run.pkgT||99,rnd(15,40));openShop();return;}
- if(id==='energy')run.fun=Math.min(100,run.fun+30);else if(id==='pizza')run.hearts=Math.min(3,run.hearts+1);else if(id==='flowers')run.wife.mood=Math.min(100,run.wife.mood+30);else run.up[id]=1;openShop();};
+ if(id==='energy')run.fun=Math.min(100,run.fun+30);else if(id==='pizza')run.hearts=Math.min(3,run.hearts+1);else if(id==='crackers'){run.crackers=(run.crackers||0)+3;toast('🧨 Firecrackers: '+run.crackers,'#ff9a5a');}else if(id==='flowers')run.wife.mood=Math.min(100,run.wife.mood+30);else run.up[id]=1;openShop();};
 setInterval(()=>{if(mode==='shop'&&run&&run.party.length)run.partyWait+=.25;},250);
 function score(){return run.wins*1000+run.kills*100+run.cash+run.sales*150+run.simbaKills*500+run.stops*200+run.spots*50+run.board.filter(j=>j.done).length*100;}
 function summary(){const r=run.rel;return `<p>Relationships: ${REL_KEYS.map(k=>k+' '+Math.round(r[k])).join(' · ')}</p><p>Wins ${run.wins} · Elims ${run.kills} · Spotted ${run.spots} · Simba elims ${run.simbaKills} · Cars sold ${run.sales} · Jobs done ${run.board.filter(j=>j.done).length}/${run.board.length} · Burglars stopped ${run.stops} · Cash $${run.cash}</p>
