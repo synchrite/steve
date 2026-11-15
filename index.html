@@ -412,15 +412,15 @@ const feed=(t,c='#fff')=>{if(run){const m=/^(Steve|Mom|TacoTuesday|Taco|Dano|Dan
 const big=(t,c='#ffd25a',life=2)=>{if(!M)return;M.msgs.push({t,c,life});if(M.msgs.length>2)M.msgs.shift();};
 function say(t,life=3){if(run)run.say={t,life};}
 const REL_KEYS=['Wife','Kid','Mom','Dan','Dad','Brother','Sister','Simba'];
-function relName(from){from=from||'';for(const k of REL_KEYS)if(from.startsWith(k))return k;if(from.startsWith('Wife'))return 'Wife';return null;}
-function rel(who,d){if(!run||!who||!(who in run.rel))return;run.rel[who]=clamp(run.rel[who]+d,0,100);}
+function relName(from){from=from||'';if(/^(Girlfriend|Fianc)/.test(from))return 'Wife';for(const k of REL_KEYS)if(from.startsWith(k))return k;if(from.startsWith('Wife'))return 'Wife';return null;}
+function rel(who,d){if(!run||!who||!(who in run.rel))return;if(who==='Wife'&&d>0)love(d*1.5);run.rel[who]=clamp(run.rel[who]+d,0,100);}
 function trombone(){[392,370,349,294].forEach((f,i)=>setTimeout(()=>beep(f,i===3?.5:.18,'sawtooth',.035),i*190));}
 function crownDip(n,why){if(!run)return;run.king=clamp(run.king-n,0,100);pop('-'+n+'👑',480,'#ff7070');toast(`👑 -${n} · ${why}`,'#ff7070');trombone();}
 function jingle(l){const seq=l>=3?[523,659,784,1047,1319]:l>=2?[660,880,1100,1320]:[700,990];seq.forEach((f,i)=>setTimeout(()=>beep(f,.08,'triangle',.045),i*75));}
 function pop(t,x,c){if(!run)return;(run.pops||(run.pops=[])).push({t,x,c,life:1.3});}
 function king(d){if(!run)return;if(d>0)d*=1.35;const was=run.king;run.king=clamp(run.king+d,0,100);if(d>=.5)pop('+'+d.toFixed(1)+'👑',480,'#ffc23a');if(Math.floor(was/10)<Math.floor(run.king/10)&&run.king<100){jingle(3);toast(`👑 KING OF FORTNITE ${Math.floor(run.king/10)*10}%`,'#ffc23a');}if(was<100&&run.king>=100&&mode==='play')later(.5,kingWin);}
 function deed(brag){if(run)run.lastDeed={t:performance.now(),brag};}
-function toast(t,c){if(!run)return;const T=run.tick||(run.tick=[]);if(T.length&&T[T.length-1].t===t)return;T.push({t,c,at:performance.now(),clock:typeof clockStr==='function'?clockStr():''});if(T.length>40)T.shift();renderTicker();}
+function toast(t,c){if(!run)return;t=partnerName(t);const T=run.tick||(run.tick=[]);if(T.length&&T[T.length-1].t===t)return;T.push({t,c,at:performance.now(),clock:typeof clockStr==='function'?clockStr():''});if(T.length>40)T.shift();renderTicker();}
 function renderTicker(){let el=$('ticker');if(!el){el=document.createElement('div');el.id='ticker';el.innerHTML='<div class="tk-clock"></div><div class="tk-msg"></div><button class="tk-log" onclick="toggleTickLog()">LOG</button><div class="tk-hist"></div>';($('stage')||document.body).appendChild(el);}
  const T=run.tick||[],now=performance.now(),cur=T.filter(q=>now-q.at<9000).slice(-2);
  el.querySelector('.tk-clock').textContent=weekday()+' '+clockStr();
@@ -432,7 +432,7 @@ function later(d,fn){run.timers.push({d,fn});}
 function addLot(n,w){run.lot=clamp(run.lot+n,0,100);pop((n>0?'+':'')+n,288,n>0?'#5ab0ff':'#ff7070');if(w)toast((n>0?'+':'')+n+' LOT · '+w,n>0?'#5ab0ff':'#ff7070');}
 function addCash(n,w){run.cash+=n;if(w)toast((n>0?'+$':'-$')+Math.abs(n)+' · '+w,n>0?'#7fe0a0':'#ff7070');}
 function addFun(n,w){run.fun=clamp(run.fun+n,0,100);pop((n>0?'+':'')+n,180,n>0?'#ffd25a':'#ff7070');if(w)toast((n>0?'+':'')+n+' FUN · '+w,n>0?'#ffd25a':'#ff7070');}
-function addMood(n,w){run.wife.mood=clamp(run.wife.mood+n,0,100);pop((n>0?'+':'')+n+'❤',405,n>0?'#ff9ac0':'#ff7070');if(w)toast((n>0?'+':'')+n+' ❤ WIFE · '+w,n>0?'#ff9ac0':'#ff7070');}
+function addMood(n,w){run.wife.mood=clamp(run.wife.mood+n,0,100);if(n>0)love(n*.4);pop((n>0?'+':'')+n+'❤',405,n>0?'#ff9ac0':'#ff7070');if(w)toast((n>0?'+':'')+n+' ❤ WIFE · '+w,n>0?'#ff9ac0':'#ff7070');}
 const gameMin=()=>(14*60+Math.floor(run?run.clock:0))%1440;
 const hourNow=()=>gameMin()/60;
 const DAYS=['Fri','Sat','Sun','Mon','Tue','Wed','Thu'];const weekday=()=>DAYS[((run?run.day:1)-1)%7];const isWeekend=()=>['Sat','Sun'].includes(weekday());
@@ -475,7 +475,7 @@ function hands(){if(run.bath)return 0;
 let itemId=0;
 function buzz(call){if(run&&run.ringer==='silent')return;if(run&&run.ringer==='vibrate'){const p=$('phone');p.classList.remove('buzz');void p.offsetWidth;p.classList.add('buzz');const pl=$('pill');pl.classList.add('alert');return;}const p=$('phone');p.classList.remove('buzz');void p.offsetWidth;p.classList.add('buzz');beep(call?520:880,.09);if(call)setTimeout(()=>beep(620,.09),180);}
 function dueNow(){return run.phase==='match'?run.match:run.match+1;}
-function text(o){o.id=++itemId;o.kind=o.kind||'text';o.due=o.urgent?null:dueNow();run.inbox.unshift(o);phoneDirty=true;buzz(false);if((run.ringer||'ring')!=='silent'&&typeof setPhone==='function')setPhone(true);return o;}
+function text(o){o.id=++itemId;if(o.from)o.from=partnerName(o.from);if(o.msg)o.msg=partnerName(o.msg);o.kind=o.kind||'text';o.due=o.urgent?null:dueNow();run.inbox.unshift(o);phoneDirty=true;buzz(false);if((run.ringer||'ring')!=='silent'&&typeof setPhone==='function')setPhone(true);return o;}
 function options(replies,typed){const n=typed.length,out=[];let complete=null;
  for(const [s,v] of replies){const w=s.split(' ');if(w.slice(0,n).join(' ')!==typed.join(' '))continue;if(w.length===n)complete=[s,v];else if(!out.includes(w[n]))out.push(w[n]);}
  return {next:out,complete};}
@@ -510,7 +510,7 @@ window.predictReply=()=>{const v=view;if(!v||v.type!=='thread'||v.stage!=='compo
 function confident(){if(!run.buffs.some(b=>b.k==='conf'))toast('😎 CONFIDENT · Steve is playing better','#7fe0a0');run.buffs=run.buffs.filter(b=>b.k!=='conf');run.buffs.push({k:'conf',name:'Confident',t:25});run.flow=Math.min(100,run.flow+8);}
 function reaction(v){if(v.item.convo)return '';if(v.brag==='ok')return pick(['wow!! look at you','ok thats actually impressive','my hero 😄']);if(v.brag==='bad')return pick(['ok mr hero','brag much lol','cool cool cool']);if(v.item.ngTxt&&v.result&&v.result[0]===v.item.ngTxt)return pick(['oh nice! nothing much, just saying hi','look at you, touching grass','proud of you lol']);const r0=v.result&&v.result[0];if(!v.fail&&['k','yes','no'].includes(r0))return {k:pick(['k what?','...k?','did you even read it','k?? KAY?']),yes:pick(['yes WHAT?','yes to which part lol','ok but WHICH one','yes...?']),no:pick(['no?? to what','ok rude','no as in no?','wait what']),}[r0];if(v.snooze)return pick(['ok','np','👍','k']);if(v.fail)return pick(['nvm found another one','ok forget it','wow ok','never mind then']);if(v.predict)return pick(['???','what','are you ok','did the dog type this','lol what','huh']);const sc=v.result[1];return v.item.react?v.item.react(sc):sc>0?pick(['❤️','ok thanks!','👍','perfect','ty!!','sounds good']):sc<0?pick(['...wow','seriously?','ok then','k.']):pick(['ok','👌','k','cool']);}
 function tvMessage(o){const m=o.tvm||pick(['call me when you get a sec','no rush, just checking in','give me a ring later','ok bye']);run.tvMsg={from:o.from,t:m,life:7};if(M)M.feed.push({t:`📺 ${o.from}: ${m}`,c:'#cfe9ff',life:7});}
-function ringCall(o){if((run.ringer||'ring')!=='ring'){buzz(true);later(rnd(2,4),()=>tvMessage(o));return;}if(run.call){voicemail(o);return;}o.ring=7;o.step=0;o.score=0;o.live=false;run.call=o;phoneDirty=true;buzz(true);}
+function ringCall(o){if(o.from)o.from=partnerName(o.from);if((run.ringer||'ring')!=='ring'){buzz(true);later(rnd(2,4),()=>tvMessage(o));return;}if(run.call){voicemail(o);return;}o.ring=7;o.step=0;o.score=0;o.live=false;run.call=o;phoneDirty=true;buzz(true);}
 window.answerCall=()=>{const c=run.call;if(!c)return;c.live=true;c.lines.forEach(l=>{if(!l.r.some(q=>q[0]==='yes'))l.r.push(['yes',0],['k',0]);});view={type:'call',replies:c.lines[0].r,typed:[],auto:bestWords(c.lines[0].r),at:-2.8,log:[{who:'them',t:c.lines[0].q}]};phoneDirty=true;
  if(c.from==='Mom'&&inMatch()&&M.mode!=='solo'){M.momAFK=8;feed('Mom stopped moving. She\'s on the phone with you.','#c99ae8');}};
 window.ignoreCall=()=>{const c=run.call;if(!c)return;run.call=null;voicemail(c);view=null;phoneDirty=true;};
@@ -539,6 +539,7 @@ function paintPhone(){
   <div class="sec">RELATIONSHIPS</div>${REL_KEYS.map(k=>`<div style="display:flex;align-items:center;gap:6px;margin:6px 2px;font-size:8px"><span style="width:62px">${k}</span><span style="flex:1;height:8px;background:#222;border:2px solid #000"><i style="display:block;height:100%;width:${r[k]}%;background:${r[k]>65?'#ff9ac0':r[k]>35?'#f0b43c':'#e23b3b'}"></i></span><span style="width:52px;color:#9aa0b0;font-size:7px">${lab(r[k])}</span></div>${run.story&&run.story[k]&&run.story[k].note?`<div style="font-size:7px;color:#b0a0ff;margin:-3px 2px 6px 70px">📖 ${run.story[k].note}</div>`:''}`).join('')}
   <div class="sec">TODAY</div><div class="tx" style="padding:2px">Wins ${run.wins} · Elims ${run.kills} · Spotted ${run.spots}<br>Cars sold ${run.sales} · Jobs ${run.board.filter(j=>j.done).length}/${run.board.length}<br>Burglars stopped ${run.stops} · Simba elims ${run.simbaKills}<br>Party: ${run.party.length?run.party.join(', '):'solo'}</div></div></div>`;return;}
  if(view&&view.type==='history'){const h=run.threads[view.name]||[];el.innerHTML=`<div class="thread"><div class="who"><span>${view.icon} ${view.name}</span><button onclick="openContacts()">BACK</button></div><div class="log" id="log">${h.map(m=>`<div class="bub ${m.who}">${/^\[photo:/.test(m.t)?`<div class="photo">🐕</div><i style="font-size:7px;opacity:.7">${m.t.slice(8,-1)}</i>`:m.t}</div>`).join('')}</div><div class="sugg"><button class="big1" onclick="window._newMsg=true;textContact(${view.i})">NEW MESSAGE</button></div></div>`;const lg=$('log');if(lg)lg.scrollTop=lg.scrollHeight;return;}
+ if(view&&view.type==='life'){el.innerHTML=lifeHTML();return;}
  if(view&&view.type==='skills'){const P=prog(),bar=(v,c)=>`<span style="display:inline-block;width:60px;height:7px;background:#222;border:2px solid #000;vertical-align:middle"><i style="display:block;height:100%;width:${v}%;background:${c}"></i></span>`,fb=(f,l)=>`<button style="width:100%;font:inherit;font-size:8px;padding:6px;margin:2px 0" onclick="favor('${f}')">${l}</button>`;
   el.innerHTML=`<div class="thread"><div class="who"><span>⭐ Skills · ${P.sp} SP</span><button onclick="closeView()">BACK</button></div><div class="log" style="padding:4px;font-size:8px">
   <div class="tx" style="padding:2px">Earn SP from jobs and wins. Shortcuts cost goodwill: push anyone too far and they stop feeding you, playing with you and doing favors.</div>
@@ -575,7 +576,7 @@ function paintPhone(){
   el.innerHTML=`<div class="thread"><div class="who">${head}</div><div class="log" id="log">${bubbles}${typingThem}${composing}</div>${foot}</div>`;
   const lg=$('log');if(lg)lg.scrollTop=lg.scrollHeight;return;}
  const pzLine=run.pizza?`<div class="sec" style="color:#ffb060">🍕 PIZZA: ${run.pizza.st==='oven'?'in the oven':run.pizza.st==='car'?'out for delivery':run.pizza.st==='door'?'AT THE DOOR!':'on the porch (getting cold)'} ${run.pizza.st==='door'||run.pizza.st==='porch'?'':'· '+Math.ceil(run.pizza.t)+'s'}</div>`:'';
- const nb=pzLine+`<div style="display:flex;gap:6px;margin-bottom:6px"><button onclick="openPizza()" style="flex:1;font:inherit;font-size:8px;background:#b0481a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">🍕 ORDER</button><button onclick="openContacts()" style="flex:2;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📇 NEW CALL / MSG</button><button onclick="openStats()" style="flex:1;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📊 STATS</button></div><div style="display:flex;gap:6px;margin-bottom:6px"><button onclick="view={type:'hustle'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#b08a1a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">💸 HUSTLES</button><button onclick="view={type:'clients'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#2a7a8a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">💼 CLIENTS ${clientsWaiting()?'('+clientsWaiting()+')':''}</button><button onclick="view={type:'skills'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#2f8f50;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">⭐ SKILLS ${prog().sp?'('+prog().sp+' SP)':''}</button></div>${prog().netOff?`<button onclick="payBills()" style="font:inherit;font-size:8px;width:100%;background:#a02a2a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer;margin-bottom:6px">📵 INTERNET OFF · PAY $${prog().debt}</button>`:`<div class="sec">🧾 Bills $${billAmt()} in ${Math.ceil(prog().billT)}s</div>`}`;
+ const nb=pzLine+`<div style="display:flex;gap:6px;margin-bottom:6px"><button onclick="openPizza()" style="flex:1;font:inherit;font-size:8px;background:#b0481a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">🍕 ORDER</button><button onclick="openContacts()" style="flex:2;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📇 NEW CALL / MSG</button><button onclick="openStats()" style="flex:1;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📊 STATS</button></div><div style="display:flex;gap:6px;margin-bottom:6px"><button onclick="view={type:'hustle'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#b08a1a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">💸 HUSTLES</button><button onclick="view={type:'clients'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#2a7a8a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">💼 CLIENTS ${clientsWaiting()?'('+clientsWaiting()+')':''}</button><button onclick="view={type:'life'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#b0306a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">${STAGES[life().st].i} LIFE${life().boxes?' 📦':''}</button><button onclick="view={type:'skills'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#2f8f50;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">⭐ SKILLS ${prog().sp?'('+prog().sp+' SP)':''}</button></div>${prog().netOff?`<button onclick="payBills()" style="font:inherit;font-size:8px;width:100%;background:#a02a2a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer;margin-bottom:6px">📵 INTERNET OFF · PAY $${prog().debt}</button>`:`<div class="sec">🧾 Bills $${billAmt()} in ${Math.ceil(prog().billT)}s</div>`}`;
  if(!run.inbox.length){el.innerHTML=nb+'<div class="empty">All caught up.<br><br>Go play.</div>';return;}
  const snz=run.inbox.some(x=>x.due!=null)&&run.snoozed!==run.match+':'+run.phase?`<button onclick="snoozeAll()" style="font:inherit;font-size:8px;width:100%;background:#5a4ab0;color:#fff;border:3px solid #000;padding:8px;cursor:pointer;margin-bottom:6px">😴 SNOOZE ALL (push to next break)</button>`:'';
  const snoozedN=run.inbox.filter(x=>x.snoozeT>0).length;
@@ -841,6 +842,47 @@ function takePizza(){if(run.pizza&&run.pizza.st==='door')run.pzGuy={x:4,st:'leav
  addFun(Math.round(P.fun*k),cold?'Cold pizza (still good)':'HOT PIZZA');run.wife.mood=Math.min(100,run.wife.mood+P.fam*k);rel('Wife',P.fam>15?3:1);rel('Kid',3);if(P.heart)run.hearts=Math.min(3,run.hearts+1);
  run.pizzaEat=8;jingle(2);say(pick(['Pizza time!','Oh yeah. Pepperoni.','Family dinner on the couch!','I could eat the whole box']));toast('🍕 Everyone eats pizza on the couch','#ffb060');phoneDirty=true;}
 
+
+// ================= life ladder: girlfriend -> moves in (with kid) -> engaged -> married =================
+const STAGES=[
+ {n:'Girlfriend',i:'💘',goal:'Be a good boyfriend. She is "just staying over a lot".',ms:[[12,'🪥 She left a toothbrush here. It is a statement.'],[28,'🗄 She has a drawer now. You lost the drawer.'],[45,'📺 She knows your gamertag. She thinks it is "cute".'],[65,'👵 Met her mom. She asked about your "career".'],[85,'🧴 Your bathroom has 14 bottles you cannot identify.']]},
+ {n:'Moving In',i:'📦',goal:'Unpack the boxes. Bond with the kid. Survive the throw pillows.',ms:[[20,'🧒 Kid called you "Steve" instead of "that guy".'],[45,'🎮 Kid carried you in a match. He will not let it go.'],[70,'🛋 You can no longer sit on the couch. The pillows live there now.']]},
+ {n:'Engaged',i:'💍',goal:'Plan the wedding. Have opinions about napkins.',ms:[[25,'🎂 Cake tasting. You voted for "pizza cake". Vetoed.'],[50,'🪑 Seating chart. Uncle Dan cannot sit near the DJ.'],[75,'🎶 First dance song chosen. It is not the Victory Royale music.']]},
+ {n:'Married',i:'💒',goal:'Happily ever after. She unlocks Wife Demands. You unlock "honey-do lists".',ms:[]}];
+const BOXES=["Her 41 throw pillows","A kid. Wait, she mentioned the kid. Twice.","Candles that smell like 'Cozy Autumn Linen'","A Live Laugh Love sign. It goes over your TV.","Her ex's old Xbox. It is better than yours.","A cat-shaped lamp (there is no cat)","The kid's 600 Pokemon cards. Do NOT touch the shiny one.","Decorative towels you are not allowed to use"];
+function life(){if(!run.life){run.life={st:0,love:0,ms:0,boxes:0,ring:null,log:[]};run.kidAway=true;}return run.life;}
+const PN=()=>STAGES[life().st].n==='Moving In'?'Girlfriend':['Girlfriend','Girlfriend','Fiancée','Wife'][life().st];
+function partnerName(t){if(!run||!run.life||run.life.st>=3||typeof t!=='string')return t;const n=PN();return t.replace(/\bWife\b/g,n).replace(/\bwife\b/g,n.toLowerCase()).replace(/\bWIFE\b/g,n.toUpperCase());}
+function love(n){const L=life();if(L.st>=3||n<=0)return;L.love=Math.min(100,L.love+n);const S=STAGES[L.st];
+ while(L.ms<S.ms.length&&L.love>=S.ms[L.ms][0]){const m=S.ms[L.ms][1];L.log.push(m);L.ms++;toast('💕 '+m,'#ff9ac0');jingle(1);}
+ if(L.love>=100&&L.st===0&&!L.asked){L.asked=true;later(3,()=>text({icon:'❤️',from:'Wife',fam:true,urgent:true,msg:"so... my lease is up. what if me and the kid just... moved in? 👉👈",replies:[['YES. absolutely. yes',1],['wait you have a kid?',0],['let me finish this match',-1]],onReply:v=>{if(v<0){addMood(-10);toast('She is moving in anyway. You agreed. Apparently.','#ffb060');}moveIn(v);}}));}
+ if(L.love>=100&&L.st===1&&!L.boxes&&!L.ringHint){L.ringHint=true;toast('💍 You should probably buy a ring. The phone LIFE page has some... options.','#ffd25a');}
+ if(L.love>=100&&L.st===2)wedding();phoneDirty=true;}
+function stageUp(){const L=life();L.st++;L.love=0;L.ms=0;L.asked=false;prog().sp+=2;toast(`${STAGES[L.st].i} NEW LIFE STAGE: ${STAGES[L.st].n.toUpperCase()} · +2 SKILL POINTS`,'#ff9ac0');jingle(3);phoneDirty=true;}
+function moveIn(v){const L=life();if(L.st)return;stageUp();L.boxes=BOXES.length;run.kidAway=false;run.kid.x=SPOT.door+8;run.kid.tx=90;
+ toast(v===0?'🧒 Yes. She has a kid. You have met him. Four times.':'🚚 A U-Haul backs into the lot. It hits a car.','#ffd25a');rel('Kid',10);if(v===0)addMood(-4);}
+window.unpack=()=>{const L=life();if(!L.boxes)return;walkTo('door',()=>{const b=BOXES[BOXES.length-L.boxes];L.boxes--;addFun(2);love(6);toast('📦 Unpacked: '+b,'#e0c080');if(!L.boxes)toast('📦 All unpacked! It is OUR house now. She rearranged your setup.','#7fe0a0');phoneDirty=true;renderPhone();});};
+window.buyRing=k=>{const L=life();if(L.st!==1||L.ring)return;const c=k==='pop'?2:k==='real'?400:120;if(run.cash<c)return toast('Not enough cash','#ff7070');run.cash-=c;L.ring=k;
+ toast({pop:'🍭 Bought a Ring Pop. Cherry. Bold move.',real:'💎 Bought a real ring. Your bank account is crying.',pawn:'🪙 Bought a ring at the pawn shop. It came with a "story".'}[k],'#ffd25a');renderPhone();};
+window.propose=()=>{const L=life();if(L.st!==1||!L.ring)return;if(L.love<70)return toast('She is in the middle of a show. Maybe build up to it. (Love 70+)','#ffb060');
+ const mid=inMatch()&&!run.afk;walkTo('kitchen',()=>{const k=L.ring;
+  const line=mid?'"Did you just propose... while respawning?" ...yes. YES. Pause it though.':k==='pop'?'"...is this a Ring Pop?" ...yes. But you are buying a real one. And I am eating this.':k==='pawn'?'"Why does it say TO BRENDA?" ...yes. We are getting that engraving fixed.':'"Oh my gosh. OH MY GOSH. YES!"';
+  toast('💍 '+line,'#ff9ac0');if(mid)addMood(-5);else addMood(20);if(k==='real')rel('Wife',10);rel('Kid',5);toast('🧒 Kid: "Does this mean I get two Christmases?"','#ffd25a');stageUp();renderPhone();});};
+function wedding(){const L=life();if(L.st!==2||L.wed)return;L.wed=true;later(4,()=>{stageUp();addCash(200,'Wedding gifts (mostly cash, one air fryer)');addMood(30);rel('Wife',15);rel('Mom',10);
+ toast('💒 You are MARRIED! The DJ played the Victory Royale music anyway. Uncle Dan cried.','#ff9ac0');toast('💍 Wife Demands skills unlocked','#7fe0a0');});}
+function lifeTick(dt){const L=life();if(L.st>=3)return;
+ if(L.st===0){run.kid.x=-400;run.kid.tx=-400;run.kid.job=null;}
+ if(run.wife.mood>60&&!onStrike('Wife'))love(dt*(inMatch()&&!run.afk?.02:.12));}
+function lifeHTML(){const L=life(),S=STAGES[L.st],b=(t,f,c)=>`<button style="width:100%;font:inherit;font-size:8px;padding:6px;margin:2px 0;background:${c||'#2a2f3e'};color:#fff;border:3px solid #000" onclick="${f}">${t}</button>`;
+ return `<div class="thread"><div class="who"><span>💕 Life · ${S.i} ${S.n}</span><button onclick="closeView()">BACK</button></div><div class="log" style="padding:4px;font-size:8px">
+ <div style="display:flex;gap:3px;margin:4px 0">${STAGES.map((x,i)=>`<div style="flex:1;text-align:center;padding:3px;border:2px solid #000;background:${i<L.st?'#2f8f50':i===L.st?'#b0306a':'#333'};color:#fff;font-size:7px">${x.i}<br>${x.n}</div>`).join('')}</div>
+ <div class="tx">${S.goal}</div>${L.st<3?`<div class="sec">LOVE</div><div style="height:9px;background:#222;border:2px solid #000"><i style="display:block;height:100%;width:${L.love}%;background:#ff5a9a"></i></div><div class="tx" style="color:#9aa0b0">Grows while she is happy. Chores, nice texts, pizza and flowers help. Gaming all night does not.</div>`:''}
+ ${L.boxes?b(`📦 UNPACK A BOX (${L.boxes} left)`,'unpack()','#8a6a3a'):''}
+ ${L.st===1&&!L.ring?`<div class="sec">RING SHOPPING</div>${b('🍭 Ring Pop ($2)',"buyRing('pop')")}${b('🪙 Pawn shop ring ($120)',"buyRing('pawn')")}${b('💎 Real ring ($400)',"buyRing('real')",'#3a5a9a')}`:''}
+ ${L.st===1&&L.ring?b('💍 PROPOSE '+(L.love<70?'(needs love 70)':''),'propose()','#b0306a'):''}
+ ${L.st===2?'<div class="tx">Wedding happens when the planning bar fills.</div>':''}
+ <div class="sec">SCRAPBOOK</div>${L.log.length?L.log.map(m=>`<div class="tx" style="padding:2px">${m}</div>`).join(''):'<div class="tx">Nothing yet. Go be charming.</div>'}</div></div>`;}
+
 // ================= progression: skills, strain, bills =================
 const TREE=[
  {k:'ai',n:'🤖 AI',t:['Auto-Reply: AI answers a text for you now and then. Family can tell (-rel).','AI Car Listings: sells cars online, a little cash every minute.','AI Voice Clone: declines calls for you. They know it is not you.']},
@@ -857,7 +899,7 @@ function billAmt(){const P=prog();return 45+P.sk.ai*15+P.sk.bot*12+(run.up.assis
 function bills(){coach('bills');const P=prog(),amt=billAmt()+P.debt;if(run.cash>=amt){run.cash-=amt;P.debt=0;if(P.netOff){P.netOff=false;toast('📶 Internet is back on','#7fe0a0');}toast(`🧾 Paid bills: -$${amt} (internet, power, subscriptions)`,'#cfd3dd');}
  else{P.debt=amt;P.netOff=true;toast(`🧾 Can't pay $${amt}. INTERNET SHUT OFF. Sell cars, do jobs.`,'#ff5a5a');beep(150,.4,'sawtooth',.05);}phoneDirty=true;}
 window.payBills=()=>{const P=prog();if(run.cash<P.debt)return toast('Not enough cash yet','#ff7070');P.debt=0;bills();renderPhone();};
-function progTick(dt){const P=prog();
+function progTick(dt){const P=prog();lifeTick(dt);
  for(const w in P.strain){P.strain[w]=Math.max(0,P.strain[w]-dt*.06);if(P.strike[w]&&P.strain[w]<40){P.strike[w]=false;toast({Wife:'💍 Your wife is talking to you again.',Kid:'🧒 The kid is back.',Family:'📱 Family is answering again.'}[w],'#7fe0a0');}}
  P.billT-=dt;if(P.billT<=0){P.billT=150;bills();}
  if(P.sk.bot>=1&&Math.random()<dt/30)addLot(1);
@@ -869,7 +911,7 @@ function progTick(dt){const P=prog();
   if(P.sk.kid>=3&&!onStrike('Kid')){addCash(20,'Kid washed a car');strain('Kid',7);}
   if(P.sk.wife>=3&&!onStrike('Wife')){addCash(40,'Wife handled a customer');strain('Wife',8);}}
  if(P.sk.kid>=2&&run.door&&!onStrike('Kid')&&!run.kid.job){const d=run.door;clearUrgent(d.it);run.door=null;if(d.pk){const i=run.pending.indexOf(d.pk);if(i>=0)run.pending.splice(i,1);applyUp(d.pk);}else addLot(2);toast('🧒 Kid signed for the package','#ffd25a');strain('Kid',6);}}
-window.buySkill2=k=>{const P=prog(),lv=P.sk[k];if(lv>=3)return;const cost=lv+1;if(P.sp<cost)return toast('Not enough skill points','#ff7070');P.sp-=cost;P.sk[k]++;jingle(2);
+window.buySkill2=k=>{const P=prog(),lv=P.sk[k];if(lv>=3)return;if(k==='kid'&&life().st<1)return toast('You do not have a kid. Yet. (Life stage: Moving In)','#ffb060');if(k==='wife'&&life().st<3)return toast('Wife Demands? You are not even married. Bold. (Life stage: Married)','#ffb060');const cost=lv+1;if(P.sp<cost)return toast('Not enough skill points','#ff7070');P.sp-=cost;P.sk[k]++;jingle(2);
  if(k==='bot'&&P.sk.bot===2)run.up.repairbot=1;if(k==='bot'&&P.sk.bot===3)run.up.assistant=1;toast('Skill: '+TREE.find(b=>b.k===k).t[lv].split(':')[0],'#7fe0a0');renderPhone();};
 window.favor=f=>{const P=prog();
  if(f==='mom'){if(onStrike('Family'))return toast('Mom left you on read.','#ff7070');joinParty('Mom');rel('Mom',-3);strain('Family',10);toast('Mom: "Fine, ONE game. You never call."','#c99ae8');}
@@ -1074,7 +1116,7 @@ const SCHED=[
 function askWife(job){const w=run.wife;if(onStrike('Wife'))return toast('Wife: "No. Do it yourself."','#ff9ac0');if(w.mood<55&&!hasSk('wife',2)){toast('"Ask me again when you\'ve done something yourself."','#ff9ac0');return;}if(w.job)return toast('She is already helping','#ff9ac0');strain('Wife',w.mood<55?18:8);
  job.who='wife';w.job={job,t:24};w.st='walk';w.tx=SPOT.lift-14;addMood(-10);toast('Wife: "Fine. You owe me."','#ff9ac0');}
 function hireOut(job){job.who='mike';view={type:'thread',openT:performance.now(),item:{icon:'🛠️',from:"Mike's Auto",msg:`Can you take the ${job.car}? ${job.label.split(':')[0]}.`,replies:[['can you take it',1],['can you take it today',1],['k',0]],react:()=>pick(['yep bring it by','on it, done by 5','sure thing'])},typed:[],hint:['can','you','take','it','today'],log:[{who:'me',t:'(new message to Mike)'}],stage:'compose',at:0,after:()=>later(14,()=>{job.done=true;job.who=null;addCash(job.pay,"Mike's: "+job.label.split(':')[0]);addLot(3);toast(`🛠️ Mike's finished the ${job.car}`,'#7fe0a0');})};phoneDirty=true;setPhone(true);}
-function askKid(job){const k=run.kid;if(onStrike('Kid'))return toast('Kid: "No way. I quit."','#ffd25a');if(k.job)return toast('Kid is busy','#ffd25a');strain('Kid',12);job.who='kid';k.job={job,t:30};k.st='walk';k.tx=SPOT.lift-4;toast('Kid: "Do I get V-Bucks?"','#ffd25a');}
+function askKid(job){const k=run.kid;if(run.kidAway)return toast('What kid? (He moves in later)','#ffb060');if(onStrike('Kid'))return toast('Kid: "No way. I quit."','#ffd25a');if(k.job)return toast('Kid is busy','#ffd25a');strain('Kid',12);job.who='kid';k.job={job,t:30};k.st='walk';k.tx=SPOT.lift-4;toast('Kid: "Do I get V-Bucks?"','#ffd25a');}
 
 // ================= Simba =================
 const SLEEPY=()=>run.up.treats?1.5:3;
@@ -2308,7 +2350,7 @@ function drawHUD(){
  const my=(TY+TH+7)*SC;{const g=ctx.createLinearGradient(0,my-4,0,my+30);g.addColorStop(0,'#3a3530');g.addColorStop(.5,'#1e1b18');g.addColorStop(1,'#2c2824');ctx.fillStyle=g;ctx.fillRect(0,my-4,cv.width,34);ctx.fillStyle='#8a7a5a';ctx.fillRect(0,my-4,cv.width,1);ctx.fillStyle='#050807';ctx.fillRect(2,my-1,446,28);}
  hits.push({x:0,y:my-4,w:450,h:34,fn:openDeck});
  {const kx=(TX+60)*SC,kw=(TW-120)*SC,ky=TY*SC-14;ctx.fillStyle='#000';ctx.fillRect(kx-2,ky-2,kw+4,10);ctx.fillStyle='#3a2a10';ctx.fillRect(kx,ky,kw,6);ctx.fillStyle=run.king>=100?'#fff':'#ffc23a';ctx.fillRect(kx,ky,kw*run.king/100,6);txt(`👑 KING OF FORTNITE ${Math.floor(run.king)}%`,kx+kw/2,ky+16,'#ffd25a',7,'center');}
- {const M4=[['AIM',run.flow],['FUN',run.fun],['LOT',run.lot],['WIFE',run.wife.mood]];M4.forEach(([l,v],k)=>{const x=6+k*90;ctx.font=`bold ${Math.round(6*TXK)}px ${FONT}`;ctx.fillStyle='#5affd8';ctx.textAlign='left';ctx.fillText(l,x,my+7);ctx.textAlign='right';ctx.fillStyle=v<30?'#ff6a5a':'#fff';ctx.fillText(Math.round(v)+'%',x+84,my+7);ctx.textAlign='left';led(x,my+11,84,13,v/100);});
+ {const M4=[['AIM',run.flow],['FUN',run.fun],['LOT',run.lot],[PN().toUpperCase().slice(0,6),run.wife.mood]];M4.forEach(([l,v],k)=>{const x=6+k*90;ctx.font=`bold ${Math.round(6*TXK)}px ${FONT}`;ctx.fillStyle='#5affd8';ctx.textAlign='left';ctx.fillText(l,x,my+7);ctx.textAlign='right';ctx.fillStyle=v<30?'#ff6a5a':'#fff';ctx.fillText(Math.round(v)+'%',x+84,my+7);ctx.textAlign='left';led(x,my+11,84,13,v/100);});
   const gx=370;// mini handheld = quests, mini phone = money, mini player = relationships
   ctx.fillStyle='#000';ctx.fillRect(gx-1,my-3,15,29);ctx.fillStyle='#2ac0b0';ctx.fillRect(gx,my-2,13,27);ctx.fillStyle='#9bbc0f';ctx.fillRect(gx+2,my,9,8);ctx.fillStyle='#8a1a3a';ctx.fillRect(gx+8,my+14,3,3);ctx.fillStyle='#222';ctx.fillRect(gx+2,my+14,4,2);
   const qd=quests().filter(q=>q.done).length;ctx.font=`bold ${Math.round(6*TXK)}px ${FONT}`;ctx.fillStyle='#9bbc0f';ctx.fillText('QUESTS',gx+18,my+7);ctx.fillStyle='#fff';ctx.fillText(qd+'/'+quests().length,gx+18,my+20);
