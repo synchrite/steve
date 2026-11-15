@@ -144,7 +144,7 @@ body.mob #cuWrap{flex:0 0 auto}body.mob #cuBtns{display:none!important}body.mob 
 .thread .who{font-size:11px}.thread .who button{font-size:9px}.legend{font-size:9px}
 @media (max-height:500px){.legend,.notch{display:none}.sugg button{padding:7px}#menuBtn{font-size:13px;padding:9px}}
 </style></head><body>
-<header><h1>STEVE'S DAY OFF</h1><div><button id="gfx">GRAPHICS: 16-BIT</button> <button id="mute">SOUND: ON</button></div></header>
+<header><h1>STEVE'S DAY OFF</h1><div><button id="gfx">GRAPHICS: RPG</button> <button id="mute">SOUND: ON</button></div></header>
 <div id="game">
  <div id="lcol"><button id="menuBtn" class="colbtn">☰ MENU</button></div>
  <div id="stage"><canvas id="c" width="960" height="720"></canvas><div id="ov"></div></div>
@@ -1893,9 +1893,9 @@ const ART={};ART_LIST.forEach(n=>{const im=new Image();im.onload=()=>{ART[n]=im;
 // right after the buffer, so each art pixel is 1.5 screen pixels instead of 3 (twice the detail).
 const ART_Q=[];
 function hiImg(im,x,y,w,h){b.drawImage(im,x,y,w,h);}
-// graphics mode: CLASSIC = the original blocky pixel art, 16-BIT = Codex's sprites where they exist
+// graphics mode: CLASSIC = the original blocky pixel art, RPG = Codex's sprites where they exist
 let GFX='classic';try{GFX=localStorage.getItem('steveGfx')||'classic';}catch(e){}
-function setGfx(m){GFX=m;try{localStorage.setItem('steveGfx',m);}catch(e){}$('gfx').textContent='GRAPHICS: '+(m==='16'?'16-BIT':'CLASSIC');}
+function setGfx(m){GFX=m;try{localStorage.setItem('steveGfx',m);}catch(e){}$('gfx').textContent='GRAPHICS: '+(m==='16'?'RPG':'CLASSIC');}
 $('gfx').onclick=()=>setGfx(GFX==='16'?'classic':'16');setGfx(GFX);
 function art(n,x,y,flip){if(GFX!=='16')return false;const im=ART[n];if(!im)return false;const w=im.naturalWidth/2,h=im.naturalHeight/2;b.save();if(flip){b.translate(x,0);b.scale(-1,1);b.drawImage(im,-w/2,y-h,w,h);}else b.drawImage(im,x-w/2,y-h,w,h);b.restore();return true;}
 function clipNow(){return {y0:HY-12};}
