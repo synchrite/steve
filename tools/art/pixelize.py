@@ -93,6 +93,14 @@ def pixelize(source,size):
     assert all(c[:3] in PAL for c in result.getdata() if c[3])
     return result
 
+def surface_pixelize(source, size):
+    """Opaque textures keep their UV bounds: no silhouette outline or trimming."""
+    source = source.convert('RGB').resize(size, Image.Resampling.NEAREST)
+    palette = Image.new('P', (1, 1))
+    palette.putpalette([v for c in PAL for v in c] + [0] * (768-len(PAL)*3))
+    return source.quantize(palette=palette, dither=Image.Dither.NONE).convert('RGB')
+
+
 def dog(sitting=False):
     from cluster_art import dog as paint_dog
     return paint_dog(PAL, pixelize, sitting)

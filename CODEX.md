@@ -205,3 +205,75 @@ The approved tools/art/lineup.png and original drawing code remain unchanged.
 No git commands run; index.html and frozen/ were not touched. House-view
 integration review remains for the game-code handoff; this step reviews the
 requested exported asset sheet.
+
+## 3D and map textures
+
+All files below are in `assets/tex/`. Exported, not wired; game-code integration
+remains for Claude. Opaque textures retain exact UV bounds. Billboards face
+front and use bottom-center anchors, with alpha restricted to 0 or 255.
+
+| File | Size | Content / use |
+|---|---|---|
+| `tex_grass.png` | 32 x 32 | Seamless XY; olive grass clumps |
+| `tex_sand.png` | 32 x 32 | Seamless XY; pale sand ripples |
+| `tex_snow.png` | 32 x 32 | Seamless XY; cream-white snow and cool depressions |
+| `tex_desert.png` | 32 x 32 | Seamless XY; warm ochre sand ridges |
+| `tex_water0.png` | 32 x 32 | Seamless XY; blue-slate water, frame 0 |
+| `tex_water1.png` | 32 x 32 | Seamless XY; shifted ripples, frame 1 |
+| `tex_building.png` | 64 x 96 | Hit 2; red roof top quarter, siding, middle window, lower-right door |
+| `tex_rock.png` | 64 x 64 | Hit 3; staggered stone blocks and cracks |
+| `tex_cliff.png` | 64 x 128 | Hits 1/4; snow cap, cool fractured cliff face |
+| `sky_day.png` | 512 x 120 | Horizontal wrap; blue-slate sky, low soft-edged pixel clouds |
+| `sky_dusk.png` | 512 x 120 | Horizontal wrap; purple-orange storm sky |
+| `bb_tree.png` | 48 x 96 | Leafy clustered tree, exposed trunk |
+| `bb_palm.png` | 48 x 96 | Splayed fronds, coconuts and curved trunk |
+| `bb_bush.png` | 48 x 32 | Rounded leaf clumps |
+| `bb_chest.png` | 32 x 24 | Gold loot chest, bands and latch |
+| `bb_vend.png` | 32 x 56 | Red vending machine, glass display and collection slot |
+| `bb_steve.png` | 32 x 48 | Original white astronaut, GREEN panel, clear bubble helmet, visible RED side pack pods |
+| `bb_enemy.png` | 32 x 48 | Neutral gray/white player mask for runtime tinting |
+| `bb_ally.png` | 32 x 48 | Identical neutral player mask for runtime tinting |
+| `island_bg.png` | 600 x 260 | Prep TV backdrop: ocean, sky, sand island and palms; no characters or shack |
+| `map_island.png` | 1000 x 1000 | Generic map using genMap coast formula and biome layout |
+
+2026-11-14 (3D and map textures): Read fpsRender(), drawTopDown(), genMap(),
+islandWorld(), islandRender() and buildGrid() in the current index.html.
+Created 21 original procedural Pillow paintings in the approved Pass 3
+clean-cluster style via tools/art/textures3.py. Shared 36-color palette is
+unchanged; material colors are its nearest blue-slate, olive, cream, ochre,
+red and purple equivalents of the procedural rendering. Enemy/ally are an
+explicit exception required for tinting: neutral RGB gray bands 48, 104,
+172 and 228, with identical geometry and binary alpha. Steve follows the
+owner's current GREEN chest / RED rocket-pack request over the older avatar
+color description above. No borrowed character designs.
+
+Every asset uses tools/art/pixelize.py: billboards use its existing outline,
+palette and bottom-anchor finalizer; added surface_pixelize() for opaque
+textures, preserving the entire UV rectangle without outlining or trimming.
+Neutral masks receive grayscale band conversion after the shared finalizer.
+Existing character exports and the approved lineup were not regenerated.
+
+map_island is intentionally GENERIC: genMap randomizes the 64 coast radii,
+mountain X, lake coordinates, town positions/types, roads and tree placements
+per match. This painting uses the same coast formula with a fixed seed,
+center (500,500), roughly 440 coast radius, snowy north (y<250), southeast
+desert, southwest swamp, mountain around (500,380), central lake and a river
+running south. Representative towns/roads are scenery and must not be used
+as exact current-match navigation or collision data. The circular raycaster
+shore also differs from genMap's ragged top-down coast. North is at the top.
+
+Preview: tools/art/sheet3.png (1320 x 1720), all 21 assets labeled; floor
+samples repeat 2 x 2; small textures and billboards are enlarged with nearest
+neighbor. Sky/backdrop previews are native size; map preview is reduced to
+60%, and the original 1000 x 1000 export is authoritative. Visually reviewed
+the sheet, including front-visible red pack pods and character-free backdrop.
+Validation: tools/art/check_textures3.py passes dimensions, palette/grayscale
+membership, opacity, binary sprite alpha, balanced bottom-center anchors,
+exact opposing floor edges in X/Y, sky edges in X, distinct water frames,
+identical tint masks and byte-identical regeneration of PNGs and sheet.
+Rebuild with Pillow: python tools/art/textures3.py; validate with
+python tools/art/check_textures3.py. This session used the existing Pillow
+installation in C:/Users/synchrite/ComfyUI/venv/Scripts/python.exe.
+No git commands run. No writes to index.html, frozen/, ref/, burglars,
+car_lift, lobby_shack, house_bg or tv_frame. Integration preview in the game
+is left for the game-code handoff because these filenames are not wired.
