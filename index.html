@@ -411,7 +411,7 @@ function walkTo(spot,fn){
  if(run.task){toast("Finish what you're doing first",'#ff8b8b');return false;}
  if(inMatch())run.afk=true;run.steve.target=SPOT[spot]??spot;run.steve.onArrive=fn;return true;}
 function hands(){if(run.bath)return 0;
- let h=1;if(run.afk||run.steve.x!==SPOT.couch||!run.power)h=0;
+ let h=run.simba.lapSleep?.75:1;if(run.afk||run.steve.x!==SPOT.couch||!run.power)h=0;
  if(run.task)h=0;
  if(run.call&&run.call.live)h=Math.min(h,run.up.headset?.8:.45);
  if(view&&view.type==='thread')h=Math.min(h,.6);
@@ -816,6 +816,19 @@ window.favor=f=>{const P=prog();
   addCash(amt,`${who} sent money`);rel(who,big?-15:-8);strain('Family',big?35:20);toast(big?`${who}: "...ok. Please don't tell anyone."`:`${who}: "This better not be for that game."`,'#ffb060');}
  if(f==='sandwich'){if(onStrike('Wife'))return toast('Wife: "Make it yourself."','#ff7070');addFun(15,'Sandwich');addMood(-6);strain('Wife',15);rel('Wife',-3);toast('🥪 Wife: "Here. Your sandwich. Your Majesty."','#ff9ac0');}
  renderPhone();};
+const DOGNEEDS=[['out','🚪 Simba is scratching at the door. She needs to go out.'],['in','🐕 Simba is barking outside. Let her back in.'],['food','🥣 Simba is staring at her empty bowl. Dinner time.'],['snack','🦴 Simba is doing her best sit. She wants a treat (cookies count).'],['toy','🧸 Simba drops the lamb at your feet. Throw it!']];
+function dogTick(dt){const d=run.dog||(run.dog={i:0,t:rnd(50,80),need:null,wait:0,happy:60});
+ if(!d.need){d.t-=dt;if(d.t<=0){const n=DOGNEEDS[d.i%DOGNEEDS.length];d.need=n[0];d.wait=0;toast(n[1],'#c98f4e');if(d.need==='out'||d.need==='in')beep(500,.1,'sine');phoneDirty=true;}return;}
+ d.wait+=dt;d.happy=Math.max(0,d.happy-dt*.15);
+ if(d.need==='toy'&&run.lamb.st==='fly'){dogMet('Good throw! Simba sprints after it');return;}
+ if(d.need==='in'&&d.wait>4&&Math.random()<dt*.5)beep(420,.08,'square',.02);
+ if(d.wait>25&&Math.random()<dt*.2){run.flow=Math.max(0,run.flow-4);if(Math.random()<.4)toast({out:'Simba whines at the door...',in:'WOOF WOOF WOOF (from outside)',food:'Simba nudges the bowl across the floor. Clang.',snack:'Simba stares into your soul',toy:'Simba squeaks the lamb. Repeatedly.'}[d.need],'#c98f4e');}
+ if(d.need==='out'&&d.wait>70){d.need=null;d.i++;d.t=rnd(50,80);addMood(-10,'Simba had an accident');addLot(-3);rel('Simba',-4);toast('💦 Too late. Simba had an accident on the rug.','#ff7070');}}
+function dogMet(msg){const d=run.dog;d.need=null;d.i++;d.t=rnd(45,90);d.happy=Math.min(100,d.happy+12);rel('Simba',3);addFun(2);toast('🐕 '+msg,'#c98f4e');phoneDirty=true;}
+function dogDoor(){const d=run.dog,s=run.simba;if(!d)return false;
+ if(d.need==='out'){walkTo('door',()=>{s.st='outside';dogMet('Simba bolts out into the yard');});return true;}
+ if(d.need==='in'){walkTo('door',()=>{s.st='roam';s.x=20;s.t=5;dogMet('Simba runs in, tracking a little mud');});return true;}return false;}
+function dogKitchen(){const d=run.dog;if(!d||d.need!=='food')return false;walkTo('stove',()=>startTask({kind:'bowl',label:"Filling Simba's bowl",level:0,pour:false,time:10,win:()=>dogMet('Simba inhales the whole bowl'),fail:()=>toast('Simba is still hungry','#ff7070')}));return true;}
 function delivery(){
  if(run.door)return;const pk=run.pending[0];const nm=pk?(UPS.find(x=>x.id===pk)||{name:pk}).name:null;
  if(run.sched.packages||run.up.dropbox){toast('📦 Package left at the door'+(nm?': '+nm:''),'#9aa0b0');addLot(1);if(pk){run.pending.shift();applyUp(pk);}return;}
@@ -891,21 +904,42 @@ function showTask(car,who){if(isWeekend()){addMood(-4,"It's the weekend!");addFu
   win:()=>{const p=ri(5,9)*100;addCash(p,'Sold the '+car);addLot(6);run.sales++;king(3);jingle(3);deed(pick(['just sold a car','sold a jeep today','closed a sale']));big('SOLD! +$'+p,'#7fe0a0');},fail:()=>addLot(1,`${who} will "think about it"`)});
  if(run.gate){clearUrgent(run.gate.it);run.gate=null;}}
 function signTask(){const pk=run.door&&run.door.pk;startTask({kind:'sign',label:pk?'Signing for your order':'Signing for parts',prog:0,pts:[],ink:0,glitch:Array.from({length:ri(2,5)},()=>({y:rnd(22,70),a:rnd(-.3,.3),c:pick(['rgba(120,255,160,.25)','rgba(255,255,255,.18)','rgba(0,0,0,.35)'])})),scr:Array.from({length:ri(0,4)},()=>[rnd(0,180),rnd(0,60),rnd(10,50),rnd(-1,1)]),time:14,win:()=>{if(pk){const i=run.pending.indexOf(pk);if(i>=0)run.pending.splice(i,1);applyUp(pk);}else addLot(2,'Parts in');},fail:()=>addLot(-2)});if(run.door){clearUrgent(run.door.it);run.door=null;}}
+// cookies: eat them before they crumble; drag one to Simba; crumbs hit the floor and Simba cleans up
+function cookieTask(){toast('🍪 Fresh cookies! Eat them before they crumble. Drag one to Simba.','#ffd25a');
+ startTask({kind:'cookies',label:'Warm cookies from your wife',time:12,eaten:0,fed:0,crumbs:[],drag:null,
+  cookies:Array.from({length:6},(_,i)=>({x:PX+34+(i%3)*30,y:PY+36+Math.floor(i/3)*26,hp:1,rate:rnd(.05,.11)})),
+  win:()=>{const t=run.task0;},fail:()=>{}});run.task.win=run.task.fail=()=>cookieEnd();}
+function cookieEnd(){const t=run.cookieT0||{};}
+function cookieDone(t){if(t.eaten)addFun(t.eaten*3,`Ate ${t.eaten} cookie${t.eaten>1?'s':''}`);if(t.eaten)run.buffs.push({k:'snack',name:'Cookies',t:20+t.eaten*4});
+ if(t.fed){rel('Simba',4*t.fed);run.simba.tired+=t.fed*.6;run.dog&&(run.dog.happy=Math.min(100,(run.dog.happy||50)+15*t.fed));toast(t.fed>=2?'🐕 Simba is SO happy. Tail going crazy.':'🐕 Simba loved that cookie','#c98f4e');}
+ if(t.lost){run.crumbs=(run.crumbs||0)+t.lost;toast(`${t.lost} cookie${t.lost>1?'s':''} crumbled onto the floor`,'#c8904a');}}
 function trashTask(){startTask({kind:'trash',label:'Taking out the trash',bx:PX+24,by:PY+56,grab:false,time:10,win:()=>addMood(12,'Trash is out'),fail:()=>{}});}
 function taskDown(x,y){const t=run.task;if(!t)return false;if(x<PX||x>PX+PW||y<PY||y>PY+PH)return false;
+ if(t.kind==='cookies'){const c=t.cookies.find(c=>c.hp>0&&Math.hypot(x-c.x,y-c.y)<11);if(c){t.drag={c,x,y,x0:x,y0:y};}return true;}
+ if(t.kind==='bowl'){t.pour=true;return true;}
  if(t.kind==='bolts'){if(t.stage===0){for(const bo of t.bolts)if(!bo.done&&Math.hypot(x-bo.x,y-bo.y)<8){bo.done=1;beep(900,.03);}if(t.bolts.every(q=>q.done)){if(t.noPour){endTask(true);return true;}t.stage=1;}}else t.pour=true;return true;}
   if(t.kind==='lugs'){const cx=PX+70,cy=PY+50;for(let i=0;i<5;i++){const a=i/5*Math.PI*2-Math.PI/2,nx=cx+Math.cos(a)*22,ny=cy+Math.sin(a)*22;if(Math.hypot(x-nx,y-ny)<8){if(i===t.order[t.k]){t.k++;beep(700+t.k*80,.04);if(t.k>=5)endTask(true);}else{t.k=0;t.time-=1.5;beep(160,.1,'sawtooth');}}}return true;}
  if(t.kind==='show'){const a=t.asks[t.k];const z=t.zones.find(z=>x>=z[1]&&x<=z[1]+z[3]&&y>=z[2]&&y<=z[2]+z[4]);if(!z)return true;
   if(z===a){t.interest++;beep(880,.05);}else{t.interest--;beep(200,.08,'sawtooth');}t.flash=.3;t.k++;if(t.k>=3)endTask(t.interest>=2);return true;}
  if(t.kind==='sign'){if(x>PX+150&&x<PX+196&&y>PY+PH-24&&y<PY+PH-8){if(t.ink>=40)endTask(true);else{toast('Sign it first','#ff8b8b');beep(160,.08,'sawtooth');}return true;}if(x>PX+20&&x<PX+150&&y>PY+PH-24){t.pts=[];t.ink=0;return true;}t.signing=true;t.pts.push(null);}if(t.kind==='trash'&&Math.hypot(x-t.bx,y-t.by)<14)t.grab=true;return true;}
 function taskMove(x,y,d){const t=run.task;if(!t)return;
+ if(t.kind==='cookies'&&t.drag){t.drag.x=x;t.drag.y=y;}
  if(t.kind==='sign'&&t.signing&&x>PX+16&&x<PX+196&&y>PY+18&&y<PY+PH-28){const l=t.pts[t.pts.length-1];if(l)t.ink=(t.ink||0)+Math.hypot(x-l[0],y-l[1]);t.pts.push([x,y]);}
  if(t.kind==='trash'&&t.grab){t.bx=x;t.by=y;if(x>PX+176&&y>PY+20)endTask(true);}
  if(t.kind==='scrub'&&mouse.down){for(const s of t.spots)if(Math.hypot(x-s.x,y-s.y)<9)s.hp-=d*.05;t.spots=t.spots.filter(s=>s.hp>0);if(!t.spots.length)endTask(true);}}
 function taskUp(){const t=run.task;if(!t)return;
+ if(t.kind==='cookies'&&t.drag){const g=t.drag,c=g.c;t.drag=null;
+  if(g.x>PX+PW-50&&g.y>PY+40){c.hp=0;t.fed++;beep(700,.05,'triangle');beep(900,.05,'triangle');t.heart=1;}
+  else if(Math.hypot(g.x-g.x0,g.y-g.y0)<6){c.hp=0;t.eaten++;beep(300+t.eaten*60,.05);for(let i=0;i<3;i++)t.crumbs.push({x:c.x+rnd(-5,5),y:c.y,vy:rnd(-20,0)});}
+  if(t.cookies.every(c=>c.hp<=0)){t.time=.01;}}
+ if(t.kind==='bowl'&&t.pour){t.pour=false;if(t.level>=60&&t.level<=85){t.time=.01;t.good=1;}else if(t.level>0){toast(t.level<60?'Simba stares at the half-empty bowl':'Kibble everywhere!','#ff7070');t.level=0;t.time-=1.5;}}
  if(t.kind==='bolts'&&t.pour){t.pour=false;if(t.level>=66&&t.level<=88)endTask(true);else if(t.level>0){toast(t.level<66?'Not enough oil':'Too much oil','#ff7070');t.level=0;t.time-=2;}}
  if(t.kind==='sign')t.signing=false;if(t.kind==='trash')t.grab=false;}
 function taskUpdate(dt){const t=run.task;if(!t)return;t.time-=dt;
+ if(t.kind==='cookies'){for(const c of t.cookies)if(c.hp>0&&(!t.drag||t.drag.c!==c)){c.hp-=c.rate*dt*1.4;if(c.hp<=0){c.hp=0;t.lost=(t.lost||0)+1;beep(150,.06,'sawtooth',.02);for(let i=0;i<6;i++)t.crumbs.push({x:c.x+rnd(-8,8),y:c.y,vy:rnd(-10,10)});}}
+  t.crumbs.forEach(q=>{q.vy+=120*dt;q.y=Math.min(PY+PH-8,q.y+q.vy*dt);});if(t.heart>0)t.heart-=dt;
+  if(t.time<=0){run.task=null;phoneDirty=true;cookieDone(t);return;}}
+ if(t.kind==='bowl'){if(t.pour){t.level+=40*dt;if(t.level>100){t.level=0;t.pour=false;toast('Kibble everywhere!','#ff7070');t.time-=1.5;}}if(t.time<=0&&t.good){run.task=null;phoneDirty=true;t.win();return;}}
  if(t.kind==='bolts'&&t.pour){t.level+=36*dt;if(t.level>105){t.level=0;t.pour=false;toast('Oil everywhere!','#ff7070');t.time-=2;}}
  if(t.kind==='show'&&t.flash>0)t.flash-=dt;if(t.time<=0)endTask(false);}
 
@@ -922,7 +956,7 @@ function askKid(job){const k=run.kid;if(onStrike('Kid'))return toast('Kid: "No w
 
 // ================= Simba =================
 const SLEEPY=()=>run.up.treats?1.5:3;
-function simbaClick(){
+function simbaClick(){if(run.simba.st==='outside')return toast('Simba is outside','#c98f4e');if(run.simba.lapSleep){run.simba.lapSleep=false;run.simba.st='roam';run.simba.t=6;toast('You slide out from under the sleeping dog','#c98f4e');return;}
  const s=run.simba;if(run.lamb.st==='simba'&&s.st!=='tug'&&s.st!=='sleep'){s.st='tug';s.tug=45;toast('Tug-of-war! Keep tapping Simba','#ffd25a');return;}
  if(s.st==='sleep'||s.st==='fetch'||s.st==='return'||s.st==='kid')return;
  if(s.tired>=SLEEPY()&&s.st!=='gamer'){simbaSleep();return;}
@@ -936,7 +970,7 @@ function simbaSleepRel(){rel('Simba',4);}
 function simbaSleep(){simbaSleepRel();const s=run.simba;s.st='sleep';s.t=run.up.treats?60:45;s.tired=0;s.x=100;s.y=FLOOR;s.wig=0;run.lamb.st='floor';run.lamb.x=128;run.lamb.y=FLOOR;
  toast('"Go to sleep fast, Simba. You can dream about treats."','#ffd25a');addFun(4);beep(500,.15,'triangle');}
 function throwLamb(vx,vy){rel('Simba',2);const l=run.lamb,s=run.simba;l.st='air';l.vx=clamp(vx,-300,300);l.vy=clamp(vy,-300,80);s.st='fetch';s.wig=0;s.tired+=1;beep(600,.06);}
-function simbaUpdate(dt){
+function simbaUpdate(dt){if(run.simba.st==='outside')return;
  const s=run.simba,l=run.lamb;s.t-=dt;if(l.st==='simba'){l.x=s.x+(s.face>0?22:-4);l.y=s.y-8;}
  const home=SPOT.couch+18;
  if(s.st==='roam'){s.x+=clamp(s.tx-s.x,-26*dt,26*dt);s.face=s.tx>s.x?1:-1;if(Math.abs(s.tx-s.x)<1)s.tx=rnd(60,140);
@@ -969,7 +1003,7 @@ function familyUpdate(dt){
  if(w.mood>40)w.warned=false;
  if(w.mood<5&&inMatch()&&M.phase==='play'&&run.power){powerOut();}
  if(w.job){if(Math.abs(w.x-w.tx)<1){w.st='help';w.job.t-=dt;if(w.job.t<=0){finishJob(w.job.job,'Wife');w.job=null;w.st='walk';w.tx=SPOT.craft;}}}
- else if(w.st==='cookies'){if(Math.abs(w.x-w.tx)<1){run.buffs.push({k:'snack',name:'Cookies',t:30});addFun(8,'Wife brought cookies 🍪');rel('Wife',3);w.st='walk';w.tx=SPOT.kitchen;}}
+ else if(w.st==='cookies'){if(Math.abs(w.x-w.tx)<1){rel('Wife',3);w.st='walk';w.tx=SPOT.kitchen;if(!run.task&&run.steve.x===SPOT.couch&&!run.afk)cookieTask();else{run.buffs.push({k:'snack',name:'Cookies',t:30});addFun(8,'Wife left cookies 🍪');}}}
  else if(w.t<=0){w.t=rnd(10,18);
   if(w.mood>70&&!onStrike('Wife')&&(w.cookieT-=15)<=0){w.cookieT=60;w.st='cookies';w.tx=SPOT.couch+14;}
   else{w.st='walk';w.tx=pick([SPOT.kitchen,SPOT.craft,SPOT.craft,90]);}}
@@ -1282,7 +1316,9 @@ function update(dt){
  const prog=Math.min(1,run.clock/600);
  run.nextText-=dt;if(run.nextText<=0){run.nextText=(rnd(90,220))*(run.easy?1.4:1)*(run.up.dnd?1.5:1)*(isNight()?2:1);if(run.inbox.length<8)textEvent();}
  run.nextReal-=dt;if(run.nextReal<=0){run.nextReal=(rnd(45,80)-prog*10)*(run.easy?1.6:1);const r=Math.random();if(isNight()){if(r<.5)weirdNoise();else burglars();}else if(r<.3)delivery();else if(r<.6)gateVisit();else if(r<.82)weirdNoise();else if(run.clock>40)burglars();}
- progTick(dt);pizzaTick(dt);if(run.pizzaEat>0)run.pizzaEat-=dt;if(run.pzBang>0)run.pzBang-=dt;
+ progTick(dt);dogTick(dt);
+ if(run.dog&&run.dog.need==='snack'&&run.buffs.some(b=>b.name==='Cookies'&&!b.dog)){run.buffs.forEach(b=>{if(b.name==='Cookies')b.dog=1;});dogMet('Simba got a cookie crumb. Best day ever.');}
+ {const s=run.simba;if(s.st==='sit'&&s.tired>=SLEEPY()&&!s.lapSleep){s.lapSleep=true;toast('💤 Simba fell asleep on your lap. Aiming is harder now. Click her to slide out.','#c98f4e');}if(s.st!=='sit')s.lapSleep=false;}pizzaTick(dt);if(run.pizzaEat>0)run.pizzaEat-=dt;if(run.pzBang>0)run.pzBang-=dt;
  if(run.pzGuy){const g=run.pzGuy;g.t+=dt;if(g.st==='fall'){if(g.t>1.4){g.st='crawl';}}else{g.x-=dt*(g.st==='flee'?14:6)*(g.st==='crawl'?.4:1);
   if(g.x<2.5&&g.st!=='crawl'&&(run.skill||{}).statue&&!g.hit){g.hit=1;g.st='fall';g.t=0;beep(90,.2,'sawtooth',.06);toast('💥 BONK! He backed right into the statue.','#ffb060');addFun(5,'Statue bonk');}
   if(g.x<-14)run.pzGuy=null;}}
@@ -1595,7 +1631,7 @@ function drawHouse(){
  }
  b.restore();
 }
-function drawSimba(t){
+function drawSimba(t){if(run&&run.simba.st==='outside')return;
  const s=run.simba,x=Math.round(s.x),y=s.y,tan='#c98f4e',dk='#8a5a2e';
  if(s.st==='sit'||s.st==='gamer'){if(art('simba_lap',42,212))return;}
  else if(s.st==='sleep'){if(art('simba_sleep',x+12,y))return;}
@@ -1626,6 +1662,14 @@ function drawPanel(){
   R(PX+24,PY+PH-38,PW-60,1,'#3a4a3a');R(PX+24,PY+PH-46,5,6,'#3a4a3a');
   b.strokeStyle='#14201a';b.lineWidth=2;b.beginPath();let pen=false;t.pts.forEach(p=>{if(!p){pen=false;return;}if(!pen){b.moveTo(p[0],p[1]);pen=true;}else b.lineTo(p[0]+(Math.random()<.02?rnd(-2,2):0),p[1]);});b.stroke();b.lineWidth=1;
   R(PX+20,PY+PH-24,60,16,'#555');R(PX+150,PY+PH-24,46,16,t.ink>=40?'#2f8f50':'#444');R(PX+PW-30,PY+16,6,3,'#46c46e');}
+ if(t.kind==='cookies'){R(PX+18,PY+24,110,62,'#e8e8e8');R(PX+22,PY+28,102,54,'#f4f4f0');
+  for(const c of t.cookies){if(c.hp<=0)continue;const d=t.drag&&t.drag.c===c,x=d?t.drag.x:c.x,y=d?t.drag.y:c.y,r=9;b.fillStyle=c.hp<.35?'#b07a3a':'#c8904a';b.beginPath();b.arc(x,y,r,0,7);b.fill();R(x-4,y-3,2,2,'#4a2a14');R(x+2,y-1,2,2,'#4a2a14');R(x-1,y+3,2,2,'#4a2a14');
+   if(c.hp<.6){b.strokeStyle='#6a3a1a';b.beginPath();b.moveTo(x-r+2,y);b.lineTo(x,y-2);b.lineTo(x+r-3,y+3);b.stroke();}if(c.hp<.3){b.beginPath();b.moveTo(x-2,y-r+2);b.lineTo(x+1,y+r-2);b.stroke();}}
+  t.crumbs.forEach(q=>R(q.x,q.y,2,2,'#b07a3a'));
+  const sx=PX+PW-46,sy=PY+44,tan='#c98f4e';R(sx,sy+8,34,24,tan);R(sx+4,sy-6,26,18,tan);R(sx+2,sy-12,6,10,'#8a5a2e');R(sx+26,sy-12,6,10,'#8a5a2e');R(sx+9,sy,4,4,'#222');R(sx+21,sy,4,4,'#222');R(sx+14,sy+6,6,4,'#2a1a10');
+  if(t.drag)R(sx+15,sy+10,4,5+Math.floor(performance.now()/90)%3,'#ff8aa0');if(t.heart>0)R(sx+12,sy-22-(1-t.heart)*8,8,6,'#ff5a7a');}
+ if(t.kind==='bowl'){R(PX+40,PY+60,60,16,'#5ab0ff');R(PX+44,PY+56,52,6,'#3a7ad8');R(PX+44,PY+62-20*t.level/100,52,Math.max(0,20*t.level/100),'#a06a2a');R(PX+120,PY+20,30,40,'#c8a050');R(PX+126,PY+26,18,10,'#e23b3b');
+  R(PX+180,PY+18,12,60,'#000');R(PX+181,PY+19+58*(1-.85),10,58*.25,'rgba(70,196,110,.5)');R(PX+181,PY+77-58*t.level/100,10,58*t.level/100,'#a06a2a');}
  if(t.kind==='trash'){R(PX+176,PY+20,26,60,'#5a4030');R(PX+180,PY+24,18,52,'#6b4c38');R(t.bx-8,t.by-8,16,16,'#222');R(t.bx-3,t.by-11,6,4,'#333');}
  if(t.kind==='scrub'){R(PX+16,PY+24,180,50,'#c8202a');R(PX+50,PY+16,100,14,'#c8202a');t.spots.forEach(s=>{R(s.x-6*s.hp,s.y-4*s.hp,12*s.hp,8*s.hp,'#6a4a2a');});}}
 
@@ -2079,7 +2123,7 @@ function drawHUD(){
  const H=(s,x,y,c='#ffd25a')=>{const q=(x-camX)*SC;if(q>-40&&q<1000)txt(s,q,y*SC,c,7,'center');};
  const jobs=run.board.filter(j=>!j.done).length;if(jobs)H(`${jobs} jobs`,218+GX,154,'#3a3a5a');
  const vms=run.inbox.filter(x=>x.kind==='vm').length;if(vms)H(`📼${vms}`,143,210);
- if(run.door)H('DING DONG',12,188,'#ff8b8b');if(run.pizza&&run.pizza.st==='door')H('🍕 PIZZA!',12,180,'#ffb060');if(run.gate)H('HONK!',306+GX,FLOOR-24,'#fff');if(run.noise)H('*clunk*',222+GX,198,'#ff8b8b');if(run.stove.st==='boiling')H('BOILING OVER',186,192,'#ff8b8b');if(run.stove.st==='burning')H('🔥 SMOKE!',186,186,'#ff5a5a');
+ if(run.dog&&run.dog.need){const n=run.dog.need;if(n==='out')H('🚪 LET ME OUT',12,172,'#c98f4e');else if(n==='in')H('🐕 LET ME IN',12,172,'#c98f4e');else if(n==='food')H('🥣 FEED ME',186,170,'#c98f4e');else if(n==='snack')H('🦴 TREAT?',run.simba.x+12,FLOOR-40,'#c98f4e');else if(n==='toy')H('🧸 THROW IT',run.simba.x+12,FLOOR-40,'#c98f4e');}if(run.simba.lapSleep)txt('💤 SIMBA ASLEEP ON LAP · heavy hands · click her',(TX+20)*SC,(TY+TH-58)*SC,'#c98f4e',8);if(run.door)H('DING DONG',12,188,'#ff8b8b');if(run.pizza&&run.pizza.st==='door')H('🍕 PIZZA!',12,180,'#ffb060');if(run.gate)H('HONK!',306+GX,FLOOR-24,'#fff');if(run.noise)H('*clunk*',222+GX,198,'#ff8b8b');if(run.stove.st==='boiling')H('BOILING OVER',186,192,'#ff8b8b');if(run.stove.st==='burning')H('🔥 SMOKE!',186,186,'#ff5a5a');
  if(run.burglars&&run.burglars.st!=='flee')H(run.burglars.st==='steal'?'STEALING!':run.burglars.stun>0?'💫':'!!',run.burglars.x+8+GX,FLOOR-30,'#ff3a3a');
  const w=run.wife;H(w.job?'helping':w.st==='craft'?'crafting':w.st==='cookies'?'🍪':'',w.x+3,FLOOR-26,'#ff9ac0');if(run.kid.job)H('helping',run.kid.x+3,FLOOR-22,'#ffd25a');else if(run.kid.st==='xbox')H('🎮',run.kid.x+3,FLOOR-30,'#ffd25a');
  if(!run.power)H('talk to me',w.x+3,FLOOR-34,'#ff9ac0');
@@ -2091,7 +2135,7 @@ function drawHUD(){
  if(s.st==='sleep')txt('z Z',(s.x+2-camX)*SC,(s.y-8)*SC,'#fff',7);
  const t=run.task;
  if(t){const X=PX*SC,Y=PY*SC;txt(t.label,X+8,Y+22,'#fff',7);
-  const hint={bolts:t.stage?'HOLD to pour · release in the green':t.noPour?'Click every bolt to swap it':'Click the caps to open them',lugs:'Click lug nuts in star order 1-3-5-2-4',show:t.asks&&t.asks[t.k]?`${t.who}: "Show me ${t.asks[t.k][0]}"`:'',sign:'Sign the pad, then press DONE',trash:'Drag the bag out the door',scrub:'Scrub off the dirt (hold & rub)'}[t.kind];
+  const hint={cookies:'TAP to eat · DRAG to Simba · before they crumble',bowl:'HOLD to pour kibble · release in the green',bolts:t.stage?'HOLD to pour · release in the green':t.noPour?'Click every bolt to swap it':'Click the caps to open them',lugs:'Click lug nuts in star order 1-3-5-2-4',show:t.asks&&t.asks[t.k]?`${t.who}: "Show me ${t.asks[t.k][0]}"`:'',sign:'Sign the pad, then press DONE',trash:'Drag the bag out the door',scrub:'Scrub off the dirt (hold & rub)'}[t.kind];
   txt(hint,X+8,Y+46,'#ffd25a',7);
   if(t.kind==='sign'){txt('CLEAR',(PX+50)*SC,(PY+PH-13)*SC,'#fff',7,'center');txt('DONE',(PX+173)*SC,(PY+PH-13)*SC,'#fff',7,'center');}
   if(t.kind==='lugs'){const cx=PX+70,cy=PY+50;for(let i=0;i<5;i++){const a=i/5*Math.PI*2-Math.PI/2;txt(String(t.order.indexOf(i)+1),(cx+Math.cos(a)*37)*SC,(cy+Math.sin(a)*37+3)*SC,'#fff',8,'center');}}}
@@ -2138,7 +2182,7 @@ cv.addEventListener('pointerdown',e=>{
  if(bx>20&&bx<64&&by>200&&by<232&&run.steve.x!==SPOT.couch&&!run.task){boardOpen=false;run.steve.target=SPOT.couch;run.steve.onArrive=()=>{run.afk=false;};return;}
  if(bx>24&&bx<76&&by>204&&by<232&&run.drool.some(d=>!d.tv)){run.drool=run.drool.filter(d=>d.tv);toast('🧻 Wiped up the drool','#cfe9ff');jingle(1);return;}
  if(Math.abs(bx-(w.x+3))<7&&by>FLOOR-26){if(!run.power){walkTo(w.x,tryPower)||(!inMatch()&&tryPower());}else toast(w.mood>60?'Wife: "Go win one for me 😘"':w.mood>30?'Wife: "Mm-hm."':'Wife: "Don\'t."','#ff9ac0');return;}
- if(bx<16&&by>186){if(run.pizza&&(run.pizza.st==='door'||run.pizza.st==='porch'))walkTo('door',()=>takePizza());else if(run.door)walkTo('door',()=>signTask());else if(run.inbox.some(x=>x.from.startsWith('Wife (she')))walkTo('door',()=>trashTask());return;}
+ if(run.dog&&run.dog.need==='food'&&Math.abs(bx-SPOT.stove)<24&&by>160){dogKitchen();return;}if(bx<16&&by>186){if(dogDoor())return;if(run.pizza&&(run.pizza.st==='door'||run.pizza.st==='porch'))walkTo('door',()=>takePizza());else if(run.door)walkTo('door',()=>signTask());else if(run.inbox.some(x=>x.from.startsWith('Wife (she')))walkTo('door',()=>trashTask());return;}
  if(bx>132&&bx<152&&by>208){walkTo('machine',playMachine);return;}
  if(gx>182&&gx<236&&by>190){const j=run.board.find(j=>!j.done&&!j.who&&j.kind!=='hire');if(j)walkTo('lift',()=>repairTask(j));else toast('No jobs left on the board','#9aa0b0');return;}
  if(gx>196&&gx<240&&by>152&&by<184){walkTo('board',()=>{boardOpen=true;});return;}
