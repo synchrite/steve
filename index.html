@@ -180,6 +180,17 @@ body:not(.gfx-rpg) .sugg button.hint{background:linear-gradient(#d4f5b0,#8fd462)
 #unlock .pips{display:flex;gap:4px;margin:14px 0 10px}#unlock .pips i{flex:1;height:8px;background:#ccc;border:2px solid #000}#unlock .pips i.on{background:#2f8f50}
 #unlock button{font:inherit;font-size:1.1em;background:#2f8f50;color:#fff;border:3px solid #000;padding:8px 18px;cursor:pointer}
 @keyframes upop{0%{transform:scale(2) rotate(8deg);opacity:0}100%{transform:scale(1) rotate(8deg);opacity:1}}
+#gfxBtn{display:none!important}
+body.solo #cuWrap{display:none!important}
+body.solo:not(.phoneUp) #rcol{flex:0 0 120px!important}body.solo:not(.phoneUp) #phone{display:none!important}body.solo:not(.phoneUp) #rtop{display:flex;flex-direction:column;gap:6px}
+body.solo.phoneUp #rcol{display:flex!important;position:fixed;z-index:30;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,92vw);height:min(86vh,760px);flex-basis:auto}
+body.solo.phoneUp #rcol #rtop{display:none}body.solo.phoneUp #phone{flex:1;font-size:1.25em}
+body.solo.phoneUp #stage{filter:blur(3px) brightness(.45)}
+#phoneBtn{position:fixed;transform:translateX(-100%);z-index:31;font:inherit;font-size:calc(13px*var(--ui,1));background:#2a2f3e;color:#fff;border:3px solid #000;box-shadow:3px 3px 0 #000;padding:8px 12px;cursor:pointer}
+#phoneBtn i{font-style:normal;background:#e23b3b;border:2px solid #000;padding:0 5px;margin-left:4px}
+body.phoneUp #phoneBtn{top:auto!important;bottom:3vh;left:50%!important;transform:translateX(-50%);background:#2f8f50}
+#devbar{position:absolute;left:4px;top:4px;z-index:32;display:flex;gap:3px;align-items:center;background:#000c;border:2px solid #ffd25a;padding:3px;font-size:10px;color:#ffd25a}
+#devbar button{font:inherit;font-size:10px;background:#3a3020;color:#ffd25a;border:1px solid #ffd25a;padding:2px 5px;cursor:pointer}
 #ishop .close{background:#a02a2a;padding:10px 16px;font-size:13px}#menuHelp{max-width:640px;font-size:10px;line-height:2;color:#cfd3dd;display:none}
 #rot{display:none}
 /* maximal layout: the game takes the full height, one panel column takes exactly the rest */
@@ -267,7 +278,7 @@ body.gfx-rpg #phone button:hover{background:#e0e6cb!important}body.gfx-rpg #phon
 House: ◀ ▶ to look around · stove, front door, lift, work board, machine, gate · GET UP to go AFK (costs a squad heart mid-match, free in breaks) · click the lift, work board, answering machine, front door, gate, burglars, or your wife.<br>
 Simba: drag-fling the lamb toy · click her for tug-of-war, to wiggle her off your lap, or to put her to sleep when she's tired · scrub drool off the TV.</div>
 <div id="rcolTpl"></div>
-<div id="menu"><h2>PAUSED</h2><button class="go" onclick="closeMenu()">▶ RESUME</button><button id="mGfx" onclick="$('gfx').click();menuLabels()"></button><button id="mSnd" onclick="$('mute').click();menuLabels()"></button><button onclick="const h=$('menuSnd');h.style.display=h.style.display==='block'?'none':'block'">🔊 SOUND OPTIONS</button><div id="menuSnd"><label>MASTER<input type="range" min="0" max="1" step=".05" oninput="setVol('m',this.value)"></label><label>MUSIC<input type="range" min="0" max="1" step=".05" oninput="setVol('mu',this.value)"></label><label>EFFECTS<input type="range" min="0" max="1" step=".05" oninput="setVol('fx',this.value)"></label></div><button onclick="toggleFS()">⛶ FULL SCREEN</button><button id="mPz" onclick="UI.pz=!UI.pz;if(!UI.pz)unzoomPhone();saveUI();menuLabels()"></button><button id="mLock" onclick="toggleUnlock()"></button><button onclick="resetUI()">↺ RESET LAYOUT</button><button onclick="openTips()">? HOW TO PLAY</button><div id="menuHelp"></div><button onclick="if(confirm('Start over? This run will be lost.'))location.reload()">↺ NEW GAME</button></div>
+<div id="menu"><h2>PAUSED</h2><button class="go" onclick="closeMenu()">▶ RESUME</button><button id="mGfx" onclick="closeMenu();openThemes()"></button><button id="mDev" onclick="toggleDev()"></button><button id="mSnd" onclick="$('mute').click();menuLabels()"></button><button onclick="const h=$('menuSnd');h.style.display=h.style.display==='block'?'none':'block'">🔊 SOUND OPTIONS</button><div id="menuSnd"><label>MASTER<input type="range" min="0" max="1" step=".05" oninput="setVol('m',this.value)"></label><label>MUSIC<input type="range" min="0" max="1" step=".05" oninput="setVol('mu',this.value)"></label><label>EFFECTS<input type="range" min="0" max="1" step=".05" oninput="setVol('fx',this.value)"></label></div><button onclick="toggleFS()">⛶ FULL SCREEN</button><button id="mPz" onclick="UI.pz=!UI.pz;if(!UI.pz)unzoomPhone();saveUI();menuLabels()"></button><button id="mLock" onclick="toggleUnlock()"></button><button onclick="resetUI()">↺ RESET LAYOUT</button><button onclick="openTips()">? HOW TO PLAY</button><div id="menuHelp"></div><button onclick="if(confirm('Start over? This run will be lost.'))location.reload()">↺ NEW GAME</button></div>
 <div id="ishop"></div><div id="deck"></div><div id="themes"></div><div id="rot">↻<br>Turn your phone sideways<br>to play</div>
 <div id="err"></div>
 <script>
@@ -474,6 +485,7 @@ function hands(){if(run.bath)return 0;
  if(run.task)h=0;
  if(run.call&&run.call.live)h=Math.min(h,run.up.headset?.8:.45);
  if(view&&view.type==='thread')h=Math.min(h,.6);
+ if(document.body.classList.contains('phoneUp'))h=Math.min(h,.3);
  const s=run.simba.st;if(s==='sit')h*=.45;if(s==='tug')h*=.5;if(s==='gamer')h=0;
  return h;}
 
@@ -927,7 +939,7 @@ window.favor=f=>{const P=prog();
  if(f==='sandwich'){if(onStrike('Wife'))return toast('Wife: "Make it yourself."','#ff7070');addFun(15,'Sandwich');addMood(-6);strain('Wife',15);rel('Wife',-3);toast('🥪 Wife: "Here. Your sandwich. Your Majesty."','#ff9ac0');}
  renderPhone();};
 const DOGNEEDS=[['out','🚪 Simba is scratching at the door. She needs to go out.'],['in','🐕 Simba is barking outside. Let her back in.'],['food','🥣 Simba is staring at her empty bowl. Dinner time.'],['snack','🦴 Simba is doing her best sit. She wants a treat (cookies count).'],['toy','🧸 Simba drops the lamb at your feet. Throw it!']];
-function dogTick(dt){if(!on('dog'))return;if(run.clock<200)return;const d=run.dog||(run.dog={i:0,t:rnd(20,40),need:null,wait:0,happy:60});
+function dogTick(dt){if(!on('dog'))return;if(run.dog&&!run.dog.need&&(run.door||run.gate||run.noise||run.burglars))return;if(run.clock<200)return;const d=run.dog||(run.dog={i:0,t:rnd(20,40),need:null,wait:0,happy:60});
  if(!d.need){d.t-=dt;if(d.t<=0){const n=DOGNEEDS[d.i%DOGNEEDS.length];d.need=n[0];d.wait=0;toast(n[1],'#c98f4e');coach('dog');if(d.need==='out'||d.need==='in')beep(500,.1,'sine');phoneDirty=true;}return;}
  d.wait+=dt;d.happy=Math.max(0,d.happy-dt*.15);
  if(d.need==='toy'&&run.lamb.st==='fly'){dogMet('Good throw! Simba sprints after it');return;}
@@ -972,20 +984,34 @@ const FEATS=[
  {k:'texts',at:1,t:'📱 Phone + Quests',d:'People text Steve now. Almost everything can wait until the match ends.<br><br>Open the phone, tap a message, tap words to reply.<br>Quests for the day are listed on the TV between matches.'},
  {k:'dog',at:2,t:'🐕 Simba has needs',d:'Simba has a routine: out, in, dinner, a treat, her toy. A bubble shows what she wants.<br><br>Walk Steve over with <b>A/D</b> and press <b>E</b>, or click the spot. Steve also needs the bathroom sometimes. Do it between matches.'},
  {k:'door',at:3,t:'🚪 Shop + Doorbell',d:'<b>SHOP</b> and <b>💎 ITEMS</b> are open between matches. Upgrades get delivered.<br><br>When it rings, someone has to answer the door. Getting up mid-match costs a squad heart. Breaks are free.'},
- {k:'girl',at:4,t:'💘 Your girlfriend',d:'She is "just staying over a lot." Her mood drops while you game and rises when you do things.<br><br>Happy: cookies. Really unhappy: the power mysteriously goes out.<br>The <b>LIFE</b> page on the phone shows where this is going. 👀'},
- {k:'lot',at:5,t:'🚗 The car lot',d:'Buyers honk at the gate. Sell them a car or the <b>LOT</b> meter drops.<br><br>The job board in the garage pays skill points. Spend them in <b>SKILLS</b> on the phone.'},
- {k:'bills',at:6,t:'🧾 Bills + Pizza',d:'Bills arrive every few minutes. No money, no internet, no Couch Royale.<br><br>Reward yourself: <b>🍕 ORDER</b> pizza on the phone. It really shows up at the door.'},
- {k:'clients',at:7,t:'💼 Clients',d:'Customers text about cars and odd services (knives, leatherwork...). They wait politely until the match ends.<br><br>Fast, correct replies pay a bonus.'},
- {k:'burglars',at:8,t:'🦹 Burglars',d:'Weird noise in the garage? Could be nothing. Could be two guys in ski masks.<br><br>Get up and scare them off, or buy traps in the shop.'},
- {k:'hustles',at:9,t:'💸 Hustles',d:'Sell bux on a sketchy website, stream your matches, carry kids for cash.<br><br>That is everything. Go be king of the couch. 👑'}];
+ {k:'multi',at:4,t:'🧠 Multitasking',d:'Steve can now keep the phone open next to the TV. The close-up camera is back too.<br><br>Reading during a match still slows his aim a little. Replying does more.'},
+ {k:'girl',at:5,t:'💘 Your girlfriend',d:'She is "just staying over a lot." Her mood drops while you game and rises when you do things.<br><br>Happy: cookies. Really unhappy: the power mysteriously goes out.<br>The <b>LIFE</b> page on the phone shows where this is going. 👀'},
+ {k:'lot',at:6,t:'🚗 The car lot',d:'Buyers honk at the gate. Sell them a car or the <b>LOT</b> meter drops.<br><br>The job board in the garage pays skill points. Spend them in <b>SKILLS</b> on the phone.'},
+ {k:'bills',at:7,t:'🧾 Bills + Pizza',d:'Bills arrive every few minutes. No money, no internet, no Couch Royale.<br><br>Reward yourself: <b>🍕 ORDER</b> pizza on the phone. It really shows up at the door.'},
+ {k:'clients',at:8,t:'💼 Clients',d:'Customers text about cars and odd services (knives, leatherwork...). They wait politely until the match ends.<br><br>Fast, correct replies pay a bonus.'},
+ {k:'burglars',at:9,t:'🦹 Burglars',d:'Weird noise in the garage? Could be nothing. Could be two guys in ski masks.<br><br>Get up and scare them off, or buy traps in the shop.'},
+ {k:'hustles',at:10,t:'💸 Hustles',d:'Sell bux on a sketchy website, stream your matches, carry kids for cash.<br><br>That is everything. Go be king of the couch. 👑'}];
 const FEAT_N=FEATS.length-1;
+const DEV=()=>{try{return localStorage.getItem('steveDev')==='1';}catch(e){return false;}};
+if(/[?&]dev=1/.test(location.search))try{localStorage.setItem('steveDev','1');}catch(e){}
+window.toggleDev=()=>{try{localStorage.setItem('steveDev',DEV()?'0':'1');}catch(e){}if(run&&DEV()){run.unl=FEAT_N;}applySolo();devBar();menuLabels&&menuLabels();toast(DEV()?'🛠 Dev mode ON: everything unlocked':'🛠 Dev mode off (applies next game)','#ffd25a');};
+function devBar(){let el=$('devbar');if(!DEV()){if(el)el.remove();return;}if(!el){el=document.createElement('div');el.id='devbar';$('stage').appendChild(el);}
+ el.innerHTML=`<b>🛠 DEV</b><button onclick="run.unl=Math.min(FEAT_N,(run.unl||0)+1);applySolo();phoneDirty=true">+1 UNLOCK</button><button onclick="run.unl=0;applySolo();phoneDirty=true">RESET</button><button onclick="run.unl=FEAT_N;applySolo();phoneDirty=true">ALL</button><button onclick="if(inMatch())endMatch(true)">WIN MATCH</button><button onclick="addCash(500,'dev')">+$500</button><button onclick="window.DEVSPD=(window.DEVSPD||1)>=4?1:(window.DEVSPD||1)*2;this.textContent='SPEED x'+DEVSPD">SPEED x${window.DEVSPD||1}</button><span id="devU"></span>`;}
+// before Multitasking, the phone is its own screen: looking at it means not looking at the TV
+function applySolo(){if(!run)return;const solo=!on('multi');document.body.classList.toggle('solo',solo);if(!solo)document.body.classList.remove('phoneUp');let b=$('phoneBtn');
+ if(!b){b=document.createElement('button');b.id='phoneBtn';b.onclick=()=>phoneUp(!document.body.classList.contains('phoneUp'));document.body.appendChild(b);}
+ {const r=$('stage').getBoundingClientRect();b.style.left=(r.right-10)+'px';b.style.top=(r.top+10)+'px';}
+ const n=run.inbox?run.inbox.length:0;b.innerHTML=document.body.classList.contains('phoneUp')?'📺 BACK TO TV':'📱 PHONE'+(n?` <i>${n}</i>`:'');b.style.display=solo&&on('texts')?'block':'none';const u=$('devU');if(u)u.textContent=`unlocks ${run.unl||0}/${FEAT_N}`;}
+window.phoneUp=v=>{document.body.classList.toggle('phoneUp',!!v);if(v){phoneDirty=true;if(inMatch()&&!run.afk)toast('📱 Eyes on the phone. Steve is barely playing.','#ffb060');}applySolo();};
+setInterval(applySolo,500);
 const on=k=>{if(!run)return true;const f=FEATS.find(x=>x.k===k);return !f||(run.unl||0)>=f.at;};
 const allOn=()=>(run.unl||0)>=FEAT_N;
+const urgentNow=()=>!!(run.door||run.gate||run.noise||(run.burglars&&run.burglars.st!=='flee')||(run.dog&&run.dog.need)||(run.pizza&&run.pizza.st==='door'));
 function unlockCard(f,first){run.coached=run.coached||{};run.coached.start=1;const oc=$('coach');if(oc)oc.style.display='none';let el=$('unlock');if(!el){el=document.createElement('div');el.id='unlock';($('stage')||document.body).appendChild(el);}
  el.innerHTML=`<div class="uc">${first?'':'<div class="new">NEW!</div>'}<h3>${f.t}</h3><div class="d">${f.d}</div><div class="pips">${FEATS.map((x,i)=>`<i class="${i<=(run.unl||0)?'on':''}"></i>`).join('')}</div><button onclick="$('unlock').style.display='none'">${first?"LET'S PLAY":"GOT IT"}</button></div>`;el.style.display='flex';if(!first)jingle(3);}
 function unlockNext(){if(allOn())return;run.unl=(run.unl||0)+1;const f=FEATS.find(x=>x.at===run.unl);try{localStorage.setItem('steveUnlMax',Math.max(+localStorage.getItem('steveUnlMax')||0,run.unl));}catch(e){}
  if(f){run.coached=run.coached||{};['text','dog','door','client','bills'].forEach(k=>run.coached[k]=1);later(1.2,()=>unlockCard(f));}phoneDirty=true;}
-function realEvent(){const pool=[];
+function realEvent(){if(urgentNow())return;const pool=[];
  if(isNight()){if(on('burglars'))pool.push(weirdNoise,burglars);}
  else{if(on('door'))pool.push(delivery);if(on('lot'))pool.push(gateVisit,gateVisit);if(on('burglars')){pool.push(weirdNoise);if(run.clock>40)pool.push(burglars);}}
  if(pool.length)pick(pool)();}
@@ -1525,7 +1551,7 @@ function update(dt){
  {const before=hourNow();run.clock+=dt*(run.phase==='lobby'&&run.power?1:2);nightTick(before,dt);}
  for(const t of [...run.timers]){t.d-=dt;if(t.d<=0){run.timers.splice(run.timers.indexOf(t),1);t.fn();}}
  const prog=Math.min(1,run.clock/600);
- if(run.clock>=50)run.nextText-=dt;if(run.nextText<=0){run.nextText=(rnd(90,220))*(run.easy?1.4:1)*(run.up.dnd?1.5:1)*(isNight()?2:1);if(run.inbox.length<8&&on('texts'))textEvent();}
+ if(run.clock>=50)run.nextText-=dt;if(run.nextText<=0){run.nextText=(rnd(90,220))*(run.easy?1.4:1)*(allOn()&&!DEV()?1:1.6)*(run.up.dnd?1.5:1)*(isNight()?2:1);if(run.inbox.length<8&&on('texts'))textEvent();}
  if(run.clock>=140)run.nextReal-=dt;if(run.nextReal<=0){run.nextReal=(rnd(45,80)-prog*10)*(run.easy?1.6:1)*(allOn()?1:1.5);realEvent();}
  progTick(dt);clientTick(dt);{const H=hustle();H.rt-=dt;if(H.rt<=0){H.rt=60;H.rate=clamp(H.rate*rnd(.8,1.3),2,14);}if(H.live&&inMatch()&&Math.random()<dt/20)streamTip('viewers chilling',2);}dogTick(dt);
  if(run.dog&&run.dog.need==='snack'&&run.buffs.some(b=>b.name==='Cookies'&&!b.dog)){run.buffs.forEach(b=>{if(b.name==='Cookies')b.dog=1;});dogMet('Simba got a cookie crumb. Best day ever.');}
@@ -2463,7 +2489,7 @@ function drawHUD(){
 
 // ================= frame / input =================
 function draw(){if(M&&M.fps)try{fpsDraw();}catch(e){console.warn(e);}const BK=HI()?2:1;if(B.width!==VW*BK){B.width=VW*BK;B.height=240*BK;}b.setTransform(BK,0,0,BK,0,0);b.imageSmoothingEnabled=false;drawHouse();drawTV();if(run)drawPanel();ctx.imageSmoothingEnabled=false;ctx.drawImage(B,0,0,cv.width,720);flushArt();if(run)drawHUD();cuRot+=1/60;drawCU();}
-function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;try{if(mode==='play')update(dt);draw();if(phoneDirty){renderPhone();phoneDirty=false;}phoneTick();}catch(e){const el=$('err');el.style.display='block';el.textContent='Something broke: '+e.message+'\n'+(e.stack||'').split('\n').slice(0,3).join('\n')+'\nSend this to Claude.';}requestAnimationFrame(loop);}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;try{if(mode==='play'){for(let i=0;i<(window.DEVSPD||1);i++)update(dt);}draw();if(phoneDirty){renderPhone();phoneDirty=false;}phoneTick();}catch(e){const el=$('err');el.style.display='block';el.textContent='Something broke: '+e.message+'\n'+(e.stack||'').split('\n').slice(0,3).join('\n')+'\nSend this to Claude.';}requestAnimationFrame(loop);}
 function pos(e){const R=cv.getBoundingClientRect(),rot=document.body.classList.contains('rot'),r=rot?{width:R.height,height:R.width}:R,cx=rot?e.clientY-R.top:e.clientX-R.left,cy=rot?R.right-e.clientX:e.clientY-R.top,k=Math.min(r.width/cv.width,r.height/720),ox=(r.width-cv.width*k)/2,oy=(r.height-720*k)/2;const x=(cx-ox)/k,y=(cy-oy)/k;return {x,y,bx:x/SC,by:y/SC};}
 const inTV=(x,y)=>x>=TX&&x<=TX+TW&&y>=TY&&y<=TY+TH;
 cv.addEventListener('contextmenu',e=>{e.preventDefault();if(mode!=='play'||!run)return;const p=pos(e);if(inTV(p.bx,p.by))lobbyClick(p.bx,p.by,2);});
@@ -2505,7 +2531,7 @@ window.addEventListener('pointerup',()=>{mouse.down=false;if(mode!=='play'||!run
 {const g=$('game'),lc=$('lcol'),rc=document.createElement('div');rc.id='rcol';lc.appendChild($('cuWrap'));const fs=document.createElement('button');fs.id='fsBtn';fs.className='colbtn';fs.textContent='⛶ FULL SCREEN';fs.onclick=()=>toggleFS();const rt=document.createElement('div');rt.id='rtop';const gb=document.createElement('button');gb.id='gfxBtn';gb.onclick=()=>openThemes();gb.textContent='🎨 GFX: '+THEME().n;rt.appendChild(gb);rt.appendChild(fs);rc.appendChild(rt);rc.appendChild($('phone'));g.appendChild(rc);const pl=document.createElement('button');pl.id='pill';document.body.appendChild(pl);$('menuHelp').innerHTML=$('help').innerHTML;}
 window.toggleFS=()=>{const d=document,el=d.documentElement;if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d);return;}const rq=el.requestFullscreen||el.webkitRequestFullscreen;if(rq){Promise.resolve(rq.call(el)).then(()=>{try{screen.orientation.lock('landscape').catch(()=>{});}catch(e){}}).catch(()=>{});}else toast('On iPhone: Share → Add to Home Screen for full screen','#9aa0b0');};
 document.addEventListener('fullscreenchange',()=>{$('fsBtn').textContent=document.fullscreenElement?'✕ EXIT FULL':'⛶ FULL SCREEN';});
-let preMenu=null;window.menuLabels=()=>{$('mPz').textContent='📱 PHONE ZOOM ON HOVER/TAP: '+(UI.pz?'ON':'OFF');$('mLock').textContent=document.body.classList.contains('unlock')?'🔒 LOCK UI':'🔓 UNLOCK UI (move & resize panels)';$('mGfx').textContent=$('gfx').textContent;$('mSnd').textContent=$('mute').textContent;};
+let preMenu=null;window.menuLabels=()=>{$('mPz').textContent='📱 PHONE ZOOM ON HOVER/TAP: '+(UI.pz?'ON':'OFF');$('mLock').textContent=document.body.classList.contains('unlock')?'🔒 LOCK UI':'🔓 UNLOCK UI (move & resize panels)';$('mGfx').textContent='🎨 GRAPHICS STYLE';$('mDev').textContent=DEV()?'🛠 DEV MODE: ON':'🛠 DEV MODE: OFF';$('mSnd').textContent=$('mute').textContent;};
 window.openMenu=()=>{menuLabels();if(mode==='play'){preMenu='play';mode='pause';}$('menu').classList.add('on');};
 window.closeMenu=()=>{$('menu').classList.remove('on');if(preMenu){mode=preMenu;preMenu=null;}};
 $('menuBtn').onclick=openMenu;layoutCols();
@@ -2546,7 +2572,7 @@ window.toggleUnlock=()=>{const on=!document.body.classList.contains('unlock');co
  else{document.body.classList.remove('unlock');UI.free={};FREE_IDS.forEach(id=>{const el=$(id);if(el&&el.classList.contains('free'))UI.free[id]={x:parseFloat(el.style.left),y:parseFloat(el.style.top),w:el.offsetWidth,h:el.offsetHeight};});saveUI();menuLabels();}};
 window.resetUI=()=>{UI.free={};saveUI();location.reload();};
 setTimeout(()=>{for(const id in (UI.free||{}))freeEl(id,UI.free[id]);},0);
-window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!(M&&M.fps)){$('menu').classList.contains('on')?closeMenu():openMenu();}});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('phoneUp')){phoneUp(false);return;}if(e.key==='Escape'&&!(M&&M.fps)){$('menu').classList.contains('on')?closeMenu():openMenu();}});
 {const t=$('cuTitle'),w=$('cuWrap');let d=null;
  // drag the CCTV title to float it anywhere; double-tap the title to dock it back
  t.addEventListener('pointerdown',e=>{const r=w.getBoundingClientRect();d={dx:e.clientX-r.left,dy:e.clientY-r.top,moved:false};t.setPointerCapture(e.pointerId);e.preventDefault();});
@@ -2660,14 +2686,14 @@ function dayOver(){mode='over';const left=run.board.filter(j=>!j.done).length;sa
 function gameOver(why){mode='over';saveBest();
  const msg={fun:['Steve put the controller down','"Eh, I\'m not feeling it anymore. C\'mon Simba."'],lot:['The lot needs Steve','Too many missed buyers and blown jobs. Steve has to go run the business.'],squad:['Nobody wants to play','Steve went AFK one too many times. Nobody will party up with him today. Except Mom.']}[why];
  show(`<h2>${msg[0]}</h2><p>${msg[1]} (${clockStr()} PM)</p>${summary()}<button class="big" onclick="startRun()">ONE MORE GAME ▶</button>`);}
-window.startRun=(easy)=>{try{AC=AC||new AudioContext();AC.resume&&AC.resume();}catch(e){}newRun();run.easy=easy!==false&&easy!=='vet';run.unl=easy==='vet'?FEAT_N:easy===undefined?Math.min(FEAT_N,(()=>{try{return +localStorage.getItem('steveUnlMax')||0}catch(e){return 0}})()):0;run.ringer='ring';$('ringer').textContent='🔔 RING';hide();mode='play';phoneDirty=true;view=null;boardOpen=false;beep(660,.08);
+window.startRun=(easy)=>{try{AC=AC||new AudioContext();AC.resume&&AC.resume();}catch(e){}newRun();run.easy=easy!==false&&easy!=='vet';setTimeout(()=>{applySolo();devBar();},0);run.unl=(easy==='vet'||DEV())?FEAT_N:easy===undefined?Math.min(FEAT_N,(()=>{try{return +localStorage.getItem('steveUnlMax')||0}catch(e){return 0}})()):0;run.ringer='ring';$('ringer').textContent='🔔 RING';hide();mode='play';phoneDirty=true;view=null;boardOpen=false;beep(660,.08);
  toast('2:00 PM. Prep phase: the clock is stopped. Invite people, then READY.','#7fe0a0');
  if(!allOn())later(.5,()=>unlockCard(FEATS[0],true));
  later(allOn()?3:12,()=>text({icon:'👵',from:'Mom',fam:true,msg:'Are you playing today? 😊 Invite me!',replies:R_MOM,onReply:(v)=>{addFun(3);if(v>0)joinParty('Mom');}}));};
 show(`<h2>STEVE'S DAY OFF</h2>
  <p>Steve runs a used car lot out of his garage. Today he just wants to play some <b>Couch Royale</b>.</p>
  <p>Life keeps getting in the way. You start with just the couch and the TV; the rest of Steve's life shows up one match at a time.</p>
- <div><button class="big" style="background:#2f8f50" onclick="startRun(true)">PLAY ▶</button> <button class="big" onclick="startRun('vet')">VETERAN ▶</button></div>
- <p style="color:#9aa0b0">Veteran: everything unlocked from the start, normal pace.</p>`);
+ <div><button class="big" style="background:#2f8f50" onclick="startRun(true)">PLAY ▶</button> </div>
+ <p style="color:#9aa0b0;font-size:11px"><button onclick="toggleDev();this.textContent=DEV()?'🛠 DEV MODE: ON':'🛠 DEV MODE: OFF'" style="font:inherit;background:#2a2f3e;color:#cfd3dd;border:2px solid #000;padding:4px 8px;cursor:pointer">🛠 DEV MODE: OFF</button> starts with every feature on, plus a test bar.</p>`);
 requestAnimationFrame(t=>{last=t;loop(t);});
 </script></body></html>
