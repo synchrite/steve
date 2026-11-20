@@ -174,6 +174,12 @@ body:not(.gfx-rpg) .sugg button.hint{background:linear-gradient(#d4f5b0,#8fd462)
 #ticker .tk-clock{color:#5affd8;white-space:nowrap;font-size:.9em}#ticker .tk-msg{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}#ticker .tk-msg i{color:#556;margin:0 8px;font-style:normal}
 #ticker .tk-log{font:inherit;font-size:.8em;background:#2a2f3e;color:#fff;border:2px solid #000;padding:2px 6px;cursor:pointer}
 #ticker .tk-hist{display:none;position:absolute;left:0;right:0;bottom:100%;max-height:50vh;overflow:auto;background:#0a0b10f5;border:2px solid #5affd8;padding:6px;font-size:.9em;line-height:1.6}
+#unlock{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(5,6,12,.55)}
+#unlock .uc{position:relative;max-width:min(560px,90%);background:#fff8e6;color:#1a1a22;border:4px solid #000;box-shadow:8px 8px 0 #000;padding:18px 22px;font-size:calc(13px*var(--ui,1));line-height:1.55}
+#unlock h3{margin:0 0 10px;font-size:1.5em}#unlock .new{position:absolute;top:-16px;right:-12px;background:#e23b6a;color:#fff;border:3px solid #000;padding:4px 10px;transform:rotate(8deg);font-weight:bold;animation:upop .6s ease-out}
+#unlock .pips{display:flex;gap:4px;margin:14px 0 10px}#unlock .pips i{flex:1;height:8px;background:#ccc;border:2px solid #000}#unlock .pips i.on{background:#2f8f50}
+#unlock button{font:inherit;font-size:1.1em;background:#2f8f50;color:#fff;border:3px solid #000;padding:8px 18px;cursor:pointer}
+@keyframes upop{0%{transform:scale(2) rotate(8deg);opacity:0}100%{transform:scale(1) rotate(8deg);opacity:1}}
 #ishop .close{background:#a02a2a;padding:10px 16px;font-size:13px}#menuHelp{max-width:640px;font-size:10px;line-height:2;color:#cfd3dd;display:none}
 #rot{display:none}
 /* maximal layout: the game takes the full height, one panel column takes exactly the rest */
@@ -418,7 +424,7 @@ function trombone(){[392,370,349,294].forEach((f,i)=>setTimeout(()=>beep(f,i===3
 function crownDip(n,why){if(!run)return;run.king=clamp(run.king-n,0,100);pop('-'+n+'👑',480,'#ff7070');toast(`👑 -${n} · ${why}`,'#ff7070');trombone();}
 function jingle(l){const seq=l>=3?[523,659,784,1047,1319]:l>=2?[660,880,1100,1320]:[700,990];seq.forEach((f,i)=>setTimeout(()=>beep(f,.08,'triangle',.045),i*75));}
 function pop(t,x,c){if(!run)return;(run.pops||(run.pops=[])).push({t,x,c,life:1.3});}
-function king(d){if(!run)return;if(d>0)d*=1.35;const was=run.king;run.king=clamp(run.king+d,0,100);if(d>=.5)pop('+'+d.toFixed(1)+'👑',480,'#ffc23a');if(Math.floor(was/10)<Math.floor(run.king/10)&&run.king<100){jingle(3);toast(`👑 KING OF FORTNITE ${Math.floor(run.king/10)*10}%`,'#ffc23a');}if(was<100&&run.king>=100&&mode==='play')later(.5,kingWin);}
+function king(d){if(!run)return;if(d>0)d*=1.35;const was=run.king;run.king=clamp(run.king+d,0,100);if(d>=.5)pop('+'+d.toFixed(1)+'👑',480,'#ffc23a');if(Math.floor(was/10)<Math.floor(run.king/10)&&run.king<100){jingle(3);toast(`👑 KING OF THE COUCH ${Math.floor(run.king/10)*10}%`,'#ffc23a');}if(was<100&&run.king>=100&&mode==='play')later(.5,kingWin);}
 function deed(brag){if(run)run.lastDeed={t:performance.now(),brag};}
 function toast(t,c){if(!run)return;t=partnerName(t);const T=run.tick||(run.tick=[]);if(T.length&&T[T.length-1].t===t)return;T.push({t,c,at:performance.now(),clock:typeof clockStr==='function'?clockStr():''});if(T.length>40)T.shift();renderTicker();}
 function renderTicker(){let el=$('ticker');if(!el){el=document.createElement('div');el.id='ticker';el.innerHTML='<div class="tk-clock"></div><div class="tk-msg"></div><button class="tk-log" onclick="toggleTickLog()">LOG</button><div class="tk-hist"></div>';($('stage')||document.body).appendChild(el);}
@@ -576,7 +582,7 @@ function paintPhone(){
   el.innerHTML=`<div class="thread"><div class="who">${head}</div><div class="log" id="log">${bubbles}${typingThem}${composing}</div>${foot}</div>`;
   const lg=$('log');if(lg)lg.scrollTop=lg.scrollHeight;return;}
  const pzLine=run.pizza?`<div class="sec" style="color:#ffb060">🍕 PIZZA: ${run.pizza.st==='oven'?'in the oven':run.pizza.st==='car'?'out for delivery':run.pizza.st==='door'?'AT THE DOOR!':'on the porch (getting cold)'} ${run.pizza.st==='door'||run.pizza.st==='porch'?'':'· '+Math.ceil(run.pizza.t)+'s'}</div>`:'';
- const nb=pzLine+`<div style="display:flex;gap:6px;margin-bottom:6px"><button onclick="openPizza()" style="flex:1;font:inherit;font-size:8px;background:#b0481a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">🍕 ORDER</button><button onclick="openContacts()" style="flex:2;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📇 NEW CALL / MSG</button><button onclick="openStats()" style="flex:1;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📊 STATS</button></div><div style="display:flex;gap:6px;margin-bottom:6px"><button onclick="view={type:'hustle'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#b08a1a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">💸 HUSTLES</button><button onclick="view={type:'clients'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#2a7a8a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">💼 CLIENTS ${clientsWaiting()?'('+clientsWaiting()+')':''}</button><button onclick="view={type:'life'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#b0306a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">${STAGES[life().st].i} LIFE${life().boxes?' 📦':''}</button><button onclick="view={type:'skills'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#2f8f50;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">⭐ SKILLS ${prog().sp?'('+prog().sp+' SP)':''}</button></div>${prog().netOff?`<button onclick="payBills()" style="font:inherit;font-size:8px;width:100%;background:#a02a2a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer;margin-bottom:6px">📵 INTERNET OFF · PAY $${prog().debt}</button>`:`<div class="sec">🧾 Bills $${billAmt()} in ${Math.ceil(prog().billT)}s</div>`}`;
+ const nb=pzLine+`<div style="display:flex;gap:6px;margin-bottom:6px">${on('bills')?`<button onclick="openPizza()" style="flex:1;font:inherit;font-size:8px;background:#b0481a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">🍕 ORDER</button>`:''}${on('texts')?`<button onclick="openContacts()" style="flex:2;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📇 NEW CALL / MSG</button>`:''}<button onclick="openStats()" style="flex:1;font:inherit;font-size:8px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">📊 STATS</button></div><div style="display:flex;gap:6px;margin-bottom:6px">${on('hustles')?`<button onclick="view={type:'hustle'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#b08a1a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">💸 HUSTLES</button>`:''}${on('clients')?`<button onclick="view={type:'clients'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#2a7a8a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">💼 CLIENTS ${clientsWaiting()?'('+clientsWaiting()+')':''}</button>`:''}${on('girl')?`<button onclick="view={type:'life'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#b0306a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">${STAGES[life().st].i} LIFE${life().boxes?' 📦':''}</button>`:''}${on('lot')?`<button onclick="view={type:'skills'};renderPhone()" style="flex:1;font:inherit;font-size:8px;background:#2f8f50;color:#fff;border:3px solid #000;padding:8px;cursor:pointer">⭐ SKILLS ${prog().sp?'('+prog().sp+' SP)':''}</button>`:''}</div>${!on('bills')?'':prog().netOff?`<button onclick="payBills()" style="font:inherit;font-size:8px;width:100%;background:#a02a2a;color:#fff;border:3px solid #000;padding:8px;cursor:pointer;margin-bottom:6px">📵 INTERNET OFF · PAY $${prog().debt}</button>`:`<div class="sec">🧾 Bills $${billAmt()} in ${Math.ceil(prog().billT)}s</div>`}`;
  if(!run.inbox.length){el.innerHTML=nb+'<div class="empty">All caught up.<br><br>Go play.</div>';return;}
  const snz=run.inbox.some(x=>x.due!=null)&&run.snoozed!==run.match+':'+run.phase?`<button onclick="snoozeAll()" style="font:inherit;font-size:8px;width:100%;background:#5a4ab0;color:#fff;border:3px solid #000;padding:8px;cursor:pointer;margin-bottom:6px">😴 SNOOZE ALL (push to next break)</button>`:'';
  const snoozedN=run.inbox.filter(x=>x.snoozeT>0).length;
@@ -643,7 +649,7 @@ const MOM_Q=[
  {m:'Is it safe to put my phone in rice? It is not wet I just wanted to know',i:'only if it gets wet mom',o:'it is fine mom',r:['ok good, I already did it','the rice is fine too']},
  {m:'What does LOL mean? I thought it meant lots of love',i:'it means laughing out loud',o:'it means funny',r:['oh no. I said it at a funeral','well I still mean love']},
  {m:'Does Simba like carrots?',i:'yes she loves carrots',o:'she likes everything',r:['I am bringing a bag','good girl']},
- {m:'Can you hear me on the Fortnight?',i:'its fortnite and yes mom',o:'yes mom',r:['ok good. Hi everyone!','I pressed something']},
+ {m:'Can you hear me on the Fortnight?',i:'its couch royale and yes mom',o:'yes mom',r:['ok good. Hi everyone!','I pressed something']},
  {m:'Why does my TV say no signal?',i:'press input on the remote',o:'try turning it off and on',r:['IT WORKED','I pressed every button']},
  {m:'Is the cloud a real cloud?',i:'no its just computers somewhere',o:'kind of',r:['so where are my pictures','ok but where']},
 ];
@@ -847,7 +853,7 @@ function takePizza(){if(run.pizza&&run.pizza.st==='door')run.pzGuy={x:4,st:'leav
 const STAGES=[
  {n:'Girlfriend',i:'💘',goal:'Be a good boyfriend. She is "just staying over a lot".',ms:[[12,'🪥 She left a toothbrush here. It is a statement.'],[28,'🗄 She has a drawer now. You lost the drawer.'],[45,'📺 She knows your gamertag. She thinks it is "cute".'],[65,'👵 Met her mom. She asked about your "career".'],[85,'🧴 Your bathroom has 14 bottles you cannot identify.']]},
  {n:'Moving In',i:'📦',goal:'Unpack the boxes. Bond with the kid. Survive the throw pillows.',ms:[[20,'🧒 Kid called you "Steve" instead of "that guy".'],[45,'🎮 Kid carried you in a match. He will not let it go.'],[70,'🛋 You can no longer sit on the couch. The pillows live there now.']]},
- {n:'Engaged',i:'💍',goal:'Plan the wedding. Have opinions about napkins.',ms:[[25,'🎂 Cake tasting. You voted for "pizza cake". Vetoed.'],[50,'🪑 Seating chart. Uncle Dan cannot sit near the DJ.'],[75,'🎶 First dance song chosen. It is not the Victory Royale music.']]},
+ {n:'Engaged',i:'💍',goal:'Plan the wedding. Have opinions about napkins.',ms:[[25,'🎂 Cake tasting. You voted for "pizza cake". Vetoed.'],[50,'🪑 Seating chart. Uncle Dan cannot sit near the DJ.'],[75,'🎶 First dance song chosen. It is not the Couch Crown music.']]},
  {n:'Married',i:'💒',goal:'Happily ever after. She unlocks Wife Demands. You unlock "honey-do lists".',ms:[]}];
 const BOXES=["Her 41 throw pillows","A kid. Wait, she mentioned the kid. Twice.","Candles that smell like 'Cozy Autumn Linen'","A Live Laugh Love sign. It goes over your TV.","Her ex's old Xbox. It is better than yours.","A cat-shaped lamp (there is no cat)","The kid's 600 Pokemon cards. Do NOT touch the shiny one.","Decorative towels you are not allowed to use"];
 function life(){if(!run.life){run.life={st:0,love:0,ms:0,boxes:0,ring:null,log:[]};run.kidAway=true;}return run.life;}
@@ -869,7 +875,7 @@ window.propose=()=>{const L=life();if(L.st!==1||!L.ring)return;if(L.love<70)retu
   const line=mid?'"Did you just propose... while respawning?" ...yes. YES. Pause it though.':k==='pop'?'"...is this a Ring Pop?" ...yes. But you are buying a real one. And I am eating this.':k==='pawn'?'"Why does it say TO BRENDA?" ...yes. We are getting that engraving fixed.':'"Oh my gosh. OH MY GOSH. YES!"';
   toast('💍 '+line,'#ff9ac0');if(mid)addMood(-5);else addMood(20);if(k==='real')rel('Wife',10);rel('Kid',5);toast('🧒 Kid: "Does this mean I get two Christmases?"','#ffd25a');stageUp();renderPhone();});};
 function wedding(){const L=life();if(L.st!==2||L.wed)return;L.wed=true;later(4,()=>{stageUp();addCash(200,'Wedding gifts (mostly cash, one air fryer)');addMood(30);rel('Wife',15);rel('Mom',10);
- toast('💒 You are MARRIED! The DJ played the Victory Royale music anyway. Uncle Dan cried.','#ff9ac0');toast('💍 Wife Demands skills unlocked','#7fe0a0');});}
+ toast('💒 You are MARRIED! The DJ played the Couch Crown music anyway. Uncle Dan cried.','#ff9ac0');toast('💍 Wife Demands skills unlocked','#7fe0a0');});}
 function lifeTick(dt){const L=life();if(L.st>=3)return;
  if(L.st===0){run.kid.x=-400;run.kid.tx=-400;run.kid.job=null;}
  if(run.wife.mood>60&&!onStrike('Wife'))love(dt*(inMatch()&&!run.afk?.02:.12));}
@@ -899,9 +905,9 @@ function billAmt(){const P=prog();return 45+P.sk.ai*15+P.sk.bot*12+(run.up.assis
 function bills(){coach('bills');const P=prog(),amt=billAmt()+P.debt;if(run.cash>=amt){run.cash-=amt;P.debt=0;if(P.netOff){P.netOff=false;toast('📶 Internet is back on','#7fe0a0');}toast(`🧾 Paid bills: -$${amt} (internet, power, subscriptions)`,'#cfd3dd');}
  else{P.debt=amt;P.netOff=true;toast(`🧾 Can't pay $${amt}. INTERNET SHUT OFF. Sell cars, do jobs.`,'#ff5a5a');beep(150,.4,'sawtooth',.05);}phoneDirty=true;}
 window.payBills=()=>{const P=prog();if(run.cash<P.debt)return toast('Not enough cash yet','#ff7070');P.debt=0;bills();renderPhone();};
-function progTick(dt){const P=prog();lifeTick(dt);
+function progTick(dt){const P=prog();if(on('girl'))lifeTick(dt);else if(run.kidAway){run.kid.x=-400;run.kid.tx=-400;}
  for(const w in P.strain){P.strain[w]=Math.max(0,P.strain[w]-dt*.06);if(P.strike[w]&&P.strain[w]<40){P.strike[w]=false;toast({Wife:'💍 Your wife is talking to you again.',Kid:'🧒 The kid is back.',Family:'📱 Family is answering again.'}[w],'#7fe0a0');}}
- P.billT-=dt;if(P.billT<=0){P.billT=150;bills();}
+ if(on('bills'))P.billT-=dt;if(P.billT<=0){P.billT=150;bills();}
  if(P.sk.bot>=1&&Math.random()<dt/30)addLot(1);
  P.aiT-=dt;if(P.aiT<=0){P.aiT=rnd(35,55);
   if(P.sk.ai>=1){const it=run.inbox.find(x=>x.kind==='text'&&!x.urgent);if(it){run.inbox.splice(run.inbox.indexOf(it),1);const r=relName(it.from);if(r&&r!=='Dan'){rel(r,-3);toast(`🤖 AI replied to ${it.from}. They noticed.`,'#b0a0ff');}else toast(`🤖 AI replied to ${it.from}`,'#b0a0ff');phoneDirty=true;}}
@@ -921,7 +927,7 @@ window.favor=f=>{const P=prog();
  if(f==='sandwich'){if(onStrike('Wife'))return toast('Wife: "Make it yourself."','#ff7070');addFun(15,'Sandwich');addMood(-6);strain('Wife',15);rel('Wife',-3);toast('🥪 Wife: "Here. Your sandwich. Your Majesty."','#ff9ac0');}
  renderPhone();};
 const DOGNEEDS=[['out','🚪 Simba is scratching at the door. She needs to go out.'],['in','🐕 Simba is barking outside. Let her back in.'],['food','🥣 Simba is staring at her empty bowl. Dinner time.'],['snack','🦴 Simba is doing her best sit. She wants a treat (cookies count).'],['toy','🧸 Simba drops the lamb at your feet. Throw it!']];
-function dogTick(dt){if(run.clock<200)return;const d=run.dog||(run.dog={i:0,t:rnd(20,40),need:null,wait:0,happy:60});
+function dogTick(dt){if(!on('dog'))return;if(run.clock<200)return;const d=run.dog||(run.dog={i:0,t:rnd(20,40),need:null,wait:0,happy:60});
  if(!d.need){d.t-=dt;if(d.t<=0){const n=DOGNEEDS[d.i%DOGNEEDS.length];d.need=n[0];d.wait=0;toast(n[1],'#c98f4e');coach('dog');if(d.need==='out'||d.need==='in')beep(500,.1,'sine');phoneDirty=true;}return;}
  d.wait+=dt;d.happy=Math.max(0,d.happy-dt*.15);
  if(d.need==='toy'&&run.lamb.st==='fly'){dogMet('Good throw! Simba sprints after it');return;}
@@ -955,10 +961,34 @@ const COACH={start:['👋 Welcome!','Steve wants to play. The TV plays itself. T
  client:['💼 A customer','Customers wait politely until the match ends, then get impatient. Fast, correct replies pay the best bonus.'],
  door:['🚪 Someone at the door','Deliveries and visitors need Steve to get up. Getting up mid-match costs a heart.'],
  dog:['🐕 Simba needs something','Simba has a routine: out, in, dinner, a treat, the toy. Ignoring her costs aim.'],
- bills:['🧾 Bills','Bills come every few minutes. No money, no internet, no Fortnite. Jobs, sales and hustles pay.'],
+ bills:['🧾 Bills','Bills come every few minutes. No money, no internet, no Couch Royale. Jobs, sales and hustles pay.'],
  walk:['🚶 Walking','A/D or the arrows walk Steve around the house. E or Space uses whatever he is standing at.']};
 function coach(k){run.coached=run.coached||{};if(run.coached[k])return;run.coached[k]=1;const c=COACH[k];if(!c)return;let el=$('coach');if(!el){el=document.createElement('div');el.id='coach';document.body.appendChild(el);}
  el.innerHTML=`<b>${c[0]}</b><div>${c[1]}</div><button onclick="this.parentNode.style.display='none'">GOT IT</button>`;el.style.display='block';clearTimeout(coach.t);coach.t=setTimeout(()=>{el.style.display='none';},12000);}
+
+// ================= feature unlocks: one new thing per match, each with a short tutorial card =================
+const FEATS=[
+ {k:'tv',at:0,t:'📺 Couch Royale',d:'Steve is playing <b>Couch Royale</b>. The match plays itself: tap enemies on the TV to help him aim.<br><br>Want to play it yourself? Hit <b>🎮 TAKE CONTROL</b> during a match: <b>WASD</b> to move, <b>mouse</b> to aim and shoot, <b>F</b> builds a cardboard wall, <b>Space</b> jumps.<br><br>New stuff unlocks after each match. Nothing else needs you yet.'},
+ {k:'texts',at:1,t:'📱 Phone + Quests',d:'People text Steve now. Almost everything can wait until the match ends.<br><br>Open the phone, tap a message, tap words to reply.<br>Quests for the day are listed on the TV between matches.'},
+ {k:'dog',at:2,t:'🐕 Simba has needs',d:'Simba has a routine: out, in, dinner, a treat, her toy. A bubble shows what she wants.<br><br>Walk Steve over with <b>A/D</b> and press <b>E</b>, or click the spot. Steve also needs the bathroom sometimes. Do it between matches.'},
+ {k:'door',at:3,t:'🚪 Shop + Doorbell',d:'<b>SHOP</b> and <b>💎 ITEMS</b> are open between matches. Upgrades get delivered.<br><br>When it rings, someone has to answer the door. Getting up mid-match costs a squad heart. Breaks are free.'},
+ {k:'girl',at:4,t:'💘 Your girlfriend',d:'She is "just staying over a lot." Her mood drops while you game and rises when you do things.<br><br>Happy: cookies. Really unhappy: the power mysteriously goes out.<br>The <b>LIFE</b> page on the phone shows where this is going. 👀'},
+ {k:'lot',at:5,t:'🚗 The car lot',d:'Buyers honk at the gate. Sell them a car or the <b>LOT</b> meter drops.<br><br>The job board in the garage pays skill points. Spend them in <b>SKILLS</b> on the phone.'},
+ {k:'bills',at:6,t:'🧾 Bills + Pizza',d:'Bills arrive every few minutes. No money, no internet, no Couch Royale.<br><br>Reward yourself: <b>🍕 ORDER</b> pizza on the phone. It really shows up at the door.'},
+ {k:'clients',at:7,t:'💼 Clients',d:'Customers text about cars and odd services (knives, leatherwork...). They wait politely until the match ends.<br><br>Fast, correct replies pay a bonus.'},
+ {k:'burglars',at:8,t:'🦹 Burglars',d:'Weird noise in the garage? Could be nothing. Could be two guys in ski masks.<br><br>Get up and scare them off, or buy traps in the shop.'},
+ {k:'hustles',at:9,t:'💸 Hustles',d:'Sell bux on a sketchy website, stream your matches, carry kids for cash.<br><br>That is everything. Go be king of the couch. 👑'}];
+const FEAT_N=FEATS.length-1;
+const on=k=>{if(!run)return true;const f=FEATS.find(x=>x.k===k);return !f||(run.unl||0)>=f.at;};
+const allOn=()=>(run.unl||0)>=FEAT_N;
+function unlockCard(f,first){run.coached=run.coached||{};run.coached.start=1;const oc=$('coach');if(oc)oc.style.display='none';let el=$('unlock');if(!el){el=document.createElement('div');el.id='unlock';($('stage')||document.body).appendChild(el);}
+ el.innerHTML=`<div class="uc">${first?'':'<div class="new">NEW!</div>'}<h3>${f.t}</h3><div class="d">${f.d}</div><div class="pips">${FEATS.map((x,i)=>`<i class="${i<=(run.unl||0)?'on':''}"></i>`).join('')}</div><button onclick="$('unlock').style.display='none'">${first?"LET'S PLAY":"GOT IT"}</button></div>`;el.style.display='flex';if(!first)jingle(3);}
+function unlockNext(){if(allOn())return;run.unl=(run.unl||0)+1;const f=FEATS.find(x=>x.at===run.unl);try{localStorage.setItem('steveUnlMax',Math.max(+localStorage.getItem('steveUnlMax')||0,run.unl));}catch(e){}
+ if(f){run.coached=run.coached||{};['text','dog','door','client','bills'].forEach(k=>run.coached[k]=1);later(1.2,()=>unlockCard(f));}phoneDirty=true;}
+function realEvent(){const pool=[];
+ if(isNight()){if(on('burglars'))pool.push(weirdNoise,burglars);}
+ else{if(on('door'))pool.push(delivery);if(on('lot'))pool.push(gateVisit,gateVisit);if(on('burglars')){pool.push(weirdNoise);if(run.clock>40)pool.push(burglars);}}
+ if(pool.length)pick(pool)();}
 function hustle(){if(!run.hustle)run.hustle={rate:rnd(3,9),rt:60,live:false,viewers:0,earned:0,carry:false};return run.hustle;}
 window.sellBux=n=>{const H=hustle();if(LOCK.bux<n)return toast('Not enough bux','#ff7070');LOCK.bux-=n;saveLock();const cash=Math.round(H.rate*n/100);
  if(Math.random()<.12){toast(`💸 The buyer charged back. You lost 💎${n}. Classic.`,'#ff7070');beep(150,.3,'sawtooth',.05);}else{addCash(cash,`Sold 💎${n} online`);jingle(1);}H.rate=Math.max(2,H.rate*rnd(.85,.97));renderPhone();};
@@ -979,7 +1009,7 @@ function newClient(){run.clients=run.clients||[];if(run.clients.length>=5)return
   :{icon:'🚗',who:pick(['Marketplace buyer','Carl from work','A guy named Tank','Linda','Kevin (again)']),car,q:`Is the ${car} still for sale? Any problems with it?`,pay:ri(4,9)*60,opts:['yes still available, runs great, come see it','sold it yesterday sorry (it is not sold)','yes still avalable, runs grate']};
  c.happy=100;c.wait=run.phase==='match';c.shuffled=shuffle(c.opts.map((t,i)=>({t,i})));run.clients.push(c);
  text({icon:c.icon,from:c.who,msg:c.q+' (answer in 💼 CLIENTS)'});phoneDirty=true;}
-function clientTick(dt){const C=run.clients||[];if(run.phase==='match'&&Math.random()<dt/28)newClient();
+function clientTick(dt){if(!on('clients'))return;const C=run.clients||[];if(run.phase==='match'&&Math.random()<dt/28)newClient();
  for(const c of C){if(c.ok)continue;if(run.phase!=='match'){c.wait=false;c.happy-=dt*1.2;}if(c.happy<=0){c.ok=true;c.gone=true;toast(`${c.who} gave up and went somewhere else`,'#ff7070');rel('Wife',0);}}
  run.clients=C.filter(c=>!(c.ok&&(c.doneT=(c.doneT||0)+dt)>6));}
 window.answerClient=(i,o)=>{const c=run.clients[i];if(!c||c.ok)return;
@@ -1030,7 +1060,7 @@ function nightTick(before,dt){
  if(isNight()&&inMatch()&&!run.afk&&!run.party.includes('Wife'))run.wife.mood-=.08*dt;}
 function snackRun(){if(run.bath||run.task)return;if(!walkTo('stove',()=>{const drink=Math.random()<.5;const it=drink?pick(['a soda','an iced coffee','a sports drink','a big glass of water']):pick(['chips','a slice of leftover pizza','a cookie','string cheese']);
   run.buffs=run.buffs.filter(b=>b.k!=='snack');run.buffs.push({k:'snack',name:drink?'Drink':'Snack',t:40});addFun(6,'Grabbed '+it);run.flow=Math.min(100,run.flow+10);jingle(1);run.bladder+=drink?35:10;say(pick(['ahh','perfect','ok NOW I can play','refueled']),2);if(inMatch())sendHome();}))return;}
-function needsTick(dt){run.bladder+=dt*(run.buffs.some(b=>b.k==='snack')?.18:.08);
+function needsTick(dt){if(!on('dog')&&!run.bath){run.bladder=0;return;}run.bladder+=dt*(run.buffs.some(b=>b.k==='snack')?.18:.08);
  if(run.bath){run.bath.t-=dt;if(run.bath.t<=0){run.bath=null;run.bladder=0;run.steve.x=SPOT.couch;run.afk=false;toast('Steve is back. Washed his hands. Probably.','#9aa0b0');}return;}
  const okNow=!run.task&&!view&&!(run.call&&run.call.live)&&run.steve.target==null;
  if(okNow&&(run.bladder>100&&(run.phase==='lobby'||(inMatch()&&M.phase!=='play'))||run.bladder>150)){
@@ -1116,7 +1146,7 @@ const SCHED=[
 function askWife(job){const w=run.wife;if(onStrike('Wife'))return toast('Wife: "No. Do it yourself."','#ff9ac0');if(w.mood<55&&!hasSk('wife',2)){toast('"Ask me again when you\'ve done something yourself."','#ff9ac0');return;}if(w.job)return toast('She is already helping','#ff9ac0');strain('Wife',w.mood<55?18:8);
  job.who='wife';w.job={job,t:24};w.st='walk';w.tx=SPOT.lift-14;addMood(-10);toast('Wife: "Fine. You owe me."','#ff9ac0');}
 function hireOut(job){job.who='mike';view={type:'thread',openT:performance.now(),item:{icon:'🛠️',from:"Mike's Auto",msg:`Can you take the ${job.car}? ${job.label.split(':')[0]}.`,replies:[['can you take it',1],['can you take it today',1],['k',0]],react:()=>pick(['yep bring it by','on it, done by 5','sure thing'])},typed:[],hint:['can','you','take','it','today'],log:[{who:'me',t:'(new message to Mike)'}],stage:'compose',at:0,after:()=>later(14,()=>{job.done=true;job.who=null;addCash(job.pay,"Mike's: "+job.label.split(':')[0]);addLot(3);toast(`🛠️ Mike's finished the ${job.car}`,'#7fe0a0');})};phoneDirty=true;setPhone(true);}
-function askKid(job){const k=run.kid;if(run.kidAway)return toast('What kid? (He moves in later)','#ffb060');if(onStrike('Kid'))return toast('Kid: "No way. I quit."','#ffd25a');if(k.job)return toast('Kid is busy','#ffd25a');strain('Kid',12);job.who='kid';k.job={job,t:30};k.st='walk';k.tx=SPOT.lift-4;toast('Kid: "Do I get V-Bucks?"','#ffd25a');}
+function askKid(job){const k=run.kid;if(run.kidAway)return toast('What kid? (He moves in later)','#ffb060');if(onStrike('Kid'))return toast('Kid: "No way. I quit."','#ffd25a');if(k.job)return toast('Kid is busy','#ffd25a');strain('Kid',12);job.who='kid';k.job={job,t:30};k.st='walk';k.tx=SPOT.lift-4;toast('Kid: "Do I get bux?"','#ffd25a');}
 
 // ================= Simba =================
 const SLEEPY=()=>run.up.treats?1.5:3;
@@ -1159,7 +1189,7 @@ function simbaUpdate(dt){if(run.simba.st==='outside')return;
 
 // ================= family in the house =================
 function familyUpdate(dt){
- const w=run.wife,k=run.kid;w.t-=dt;
+ const w=run.wife,k=run.kid;w.t-=dt;if(!on('girl'))w.mood=Math.max(w.mood,75);
  // mood: drifts down while Steve plays, recovers while he's up doing stuff
  if(inMatch()&&!run.afk)w.mood-=(.07+.04*run.match)*(run.easy?.45:1)*dt;else if(run.steve.x!==SPOT.couch)w.mood+=.5*dt;else w.mood+=.05*dt;
  w.mood=clamp(w.mood,0,100);
@@ -1169,14 +1199,14 @@ function familyUpdate(dt){
  if(w.job){if(Math.abs(w.x-w.tx)<1){w.st='help';w.job.t-=dt;if(w.job.t<=0){finishJob(w.job.job,'Wife');w.job=null;w.st='walk';w.tx=SPOT.craft;}}}
  else if(w.st==='cookies'){if(Math.abs(w.x-w.tx)<1){rel('Wife',3);w.st='walk';w.tx=SPOT.kitchen;if(!run.task&&run.steve.x===SPOT.couch&&!run.afk)cookieTask();else{run.buffs.push({k:'snack',name:'Cookies',t:30});addFun(8,'Wife left cookies 🍪');}}}
  else if(w.t<=0){w.t=rnd(10,18);
-  if(w.mood>70&&!onStrike('Wife')&&(w.cookieT-=15)<=0){w.cookieT=60;w.st='cookies';w.tx=SPOT.couch+14;}
+  if(w.mood>70&&on('girl')&&!onStrike('Wife')&&(w.cookieT-=15)<=0){w.cookieT=60;w.st='cookies';w.tx=SPOT.couch+14;}
   else{w.st='walk';w.tx=pick([SPOT.kitchen,SPOT.craft,SPOT.craft,90]);}}
- if(!w.job&&Math.abs(w.x-SPOT.kitchen)<2&&run.stove.st==='off'&&w.st!=='cooking'&&Math.random()<dt*.03&&(run.potCD||0)<=0){run.potCD=240;const stays=Math.random()<.75;run.stove={st:'cooking',t:rnd(70,110),served:stays};w.st='cooking';toast(stays?'Wife is cooking something good':'Wife put a pot on the stove... then wandered off','#ff9ac0');w.t=stays?40:2;}
+ if(on('girl')&&!w.job&&Math.abs(w.x-SPOT.kitchen)<2&&run.stove.st==='off'&&w.st!=='cooking'&&Math.random()<dt*.03&&(run.potCD||0)<=0){run.potCD=240;const stays=Math.random()<.75;run.stove={st:'cooking',t:rnd(70,110),served:stays};w.st='cooking';toast(stays?'Wife is cooking something good':'Wife put a pot on the stove... then wandered off','#ff9ac0');w.t=stays?40:2;}
  w.x+=clamp(w.tx-w.x,-30*dt,30*dt);if(!w.job&&w.st==='walk'&&Math.abs(w.x-w.tx)<1)w.st=Math.abs(w.x-SPOT.craft)<2?'craft':'idle';
  // kid
  k.t-=dt;
  if(k.job){if(Math.abs(k.x-k.tx)<1){k.job.t-=dt;if(k.job.t<=0){finishJob(k.job.job,'Kid');k.job=null;k.tx=90;}}}
- else if(k.st==='xbox'){if(k.t<=0){k.st='wander';k.t=rnd(6,10);k.tx=rnd(70,140);if(Math.random()<.3)toast('Kid: "GG! I got a Victory Royale!"','#ffd25a');}}
+ else if(k.st==='xbox'){if(k.t<=0){k.st='wander';k.t=rnd(6,10);k.tx=rnd(70,140);if(Math.random()<.3)toast('Kid: "GG! I got a Couch Crown!"','#ffd25a');}}
  else if(k.t<=0&&!run.kidAway&&Math.random()<.6){k.st='toXbox';k.tx=328;k.t=rnd(40,80);}
  else if(k.st==='toXbox'){if(Math.abs(k.x-k.tx)<1){k.st='xbox';}}
  else if(k.t<=0){k.t=rnd(8,14);if(run.simba.st==='roam'&&Math.random()<.4){run.simba.st='kid';run.simba.t=18;toast('Kid is playing with Simba','#ffd25a');}k.tx=rnd(70,140);}
@@ -1332,7 +1362,7 @@ function updateBR(dt){
  }
  (M.glambs||[]).forEach(g=>{if(!g.taken&&dist(g,me)<8&&!me.down){g.taken=true;addBux(15,'golden lamb');big('GOLDEN LAMB!','#ffd25a',1.2);jingle(2);qp('lamb');}});
  {const pz=M.pois.find(p=>dist(p,me)<40);if(pz&&M.lastPoi!==pz.name){M.lastPoi=pz.name;qp('visit',1,pz.name);}}
- M.chests.forEach(c=>{if(!c.open&&dist(c,me)<6&&!me.down){c.open=true;if(Math.random()<.45&&M.gun<3){M.gun++;feed('Steve looted a '+GUNS[M.gun].n,GUNS[M.gun].c);}}});
+ M.chests.forEach(c=>{if(!c.open&&dist(c,me)<(M.fps?10:6)&&!me.down){c.open=true;chestLoot(me);if(Math.random()<.45&&M.gun<3){M.gun++;feed('Steve looted a '+GUNS[M.gun].n,GUNS[M.gun].c);}}});
  if(inStorm(me)&&!me.down)dmg(me,(4+M.stage)*dt);
  me.x=clamp(me.x,10,MW-10);me.y=clamp(me.y,10,MH-10);
  M.cam.x+=(me.x-M.cam.x)*Math.min(1,dt*5);M.cam.y+=(me.y-M.cam.y)*Math.min(1,dt*5);
@@ -1356,12 +1386,12 @@ function updateBR(dt){
   if(e.alert>0)e.alert-=dt;if(e.flinch>0){e.flinch-=dt;e.x+=Math.sin(M.t*9+e.t)*30*dt;}
   if(near&&(near.d<80||(e.alert>0&&near.d<170))){e.state='fight';const d=near.d;if(d>50)moveTo(e,near.a.x,near.a.y,22,dt);else{e.x+=Math.sin(M.t*2+e.t)*14*dt;e.y+=Math.cos(M.t*1.7+e.t)*14*dt;}
    e.fire-=dt;if(e.fire<=0&&!losOK(e,near.a)){e.fire=.3;moveTo(e,near.a.x,near.a.y,26,dt);}
-   if(e.fire<=0){e.fire=rnd(.8,1.2)*(M.fps&&near.a.me?1.25:1);let dd=e.skill*6*(e.ambush?2.5:1)*(run.easy?.6:1);e.ambush=false;if(near.a.me&&h<.3)dd*=1.4;if(near.a.name==='Mom'&&run.up.mom)dd*=.6;dmg(near.a,dd);M.fx.push({t:'shot',x1:e.x,y1:e.y,x2:near.a.x,y2:near.a.y,life:.06,c:'#ff6a5a'});}}
+   if(e.fire<=0){e.fire=rnd(.8,1.2)*(M.fps&&near.a.me?1.25:1);let dd=e.skill*6*(e.ambush?2.5:1)*(run.easy?.6:1);e.ambush=false;if(near.a.me&&h<.3)dd*=1.4;if(near.a.name==='Mom'&&run.up.mom)dd*=.6;if(!wallBlock(e,near.a,dd))dmg(near.a,dd);M.fx.push({t:'shot',x1:e.x,y1:e.y,x2:near.a.x,y2:near.a.y,life:.06,c:'#ff6a5a'});}}
   else{e.state='idle';if(inStorm(e))moveTo(e,s.cx,s.cy,24,dt);else if(e.t<=0){e.t=rnd(2,5);e.tx=e.home.x+rnd(-30,30);e.ty=e.home.y+rnd(-30,30);}else if(e.tx)moveTo(e,e.tx,e.ty,18,dt);
    if(M.t>M.T*.45||Math.hypot(e.home.x-s.cx,e.home.y-s.cy)>s.to*.8){e.home={x:s.cx+rnd(-s.to*.5,s.to*.5),y:s.cy+rnd(-s.to*.5,s.to*.5)};}}}
  for(const e of [...M.enemies])if(e.hp<=0){M.enemies.splice(M.enemies.indexOf(e),1);const k=e.by||{name:'The storm'};M.fx.push({t:'boom',x1:e.x,y1:e.y,life:.5});
   feed(`${k.name} eliminated ${e.name}`,k.me?'#fff36a':k.simba?'#ffb060':'#fff');
-  if(k.me){M.best=M.best||{};M.best.kill=(M.best.kill||0)+1;if(dist(e,me)>95)M.best.snipe=e.name;M.view3d={style:pick(['orbit','low','high','orbit']),p:{x:e.x,y:e.y},t:0,replay:true,a0:rnd(0,6)};M.last3d=M.t;M.kills++;run.kills++;addBux(25,'elim');streamTip('elim',4);qp('elim');if(M.wpn)qp('wpnElim');M.roll++;king(.6);addFun(3);run.flow=Math.min(100,run.flow+6);beep(990,.05);setTimeout(()=>beep(1320,.06),60);if(M.roll===3)big('ON A ROLL!','#ffd25a');}
+  if(k.me){M.best=M.best||{};M.best.kill=(M.best.kill||0)+1;if(dist(e,me)>95)M.best.snipe=e.name;M.view3d={style:pick(['orbit','low','high','orbit']),p:{x:e.x,y:e.y},t:0,replay:true,a0:rnd(0,6)};M.last3d=M.t;M.kills++;run.kills++;M.mats=(M.mats||0)+10;M.elimBan={n:e.name,t:2.2};addBux(25,'elim');streamTip('elim',4);qp('elim');if(M.wpn)qp('wpnElim');M.roll++;king(.6);addFun(3);run.flow=Math.min(100,run.flow+6);beep(990,.05);setTimeout(()=>beep(1320,.06),60);if(M.roll===3)big('ON A ROLL!','#ffd25a');}
   else if(k.simba){run.simbaKills++;addFun(10,'SIMBA GOT A KILL?!');big('SIMBA GOT A KILL','#ffb060',2.5);}
   else if(k.name==='Mom'){feed('Mom: did I do that?? :D','#c99ae8');addFun(4,'Mom got a kill');}}
  // the rest of the lobby fights each other off screen
@@ -1475,14 +1505,14 @@ function shootAt(e,h,in3d){const me=M.squad[0];M.fx.push({t:'shot',x1:me.x,y1:me
  const d=GUNS[M.gun].d*(M.roll>=3?1.4:1);hitEnemy(e,d,me);run.flow=Math.min(100,run.flow+2);M.fx.push({t:'txt',x1:e.x,y1:e.y,s:String(Math.round(d)),life:.5,in3d});}
 function endMatch(win,why){
  M.ended=true;M.win=win;M.place=win?1:Math.max(2,M.players);M.endT=3;M.view3d=null;
- if(win){run.wins++;prog().sp++;streamTip('VICTORY',40);if(hustle().carry){hustle().carry=false;addCash(60,'Carried the kid to a win');}if(!M.gotUp)qp('noGetUp');king(7);addBux(250,'VICTORY ROYALE');addFun(22,'VICTORY');addMood(-4);M.confetti=Array.from({length:70},()=>({x:rnd(0,TW),y:rnd(-TH,0),v:rnd(20,50),c:pick(['#ffd25a','#ff5a7a','#5ab0ff','#7fe0a0'])}));[660,880,1320].forEach((f,i)=>setTimeout(()=>beep(f,.12),i*120));}
+ if(win){run.wins++;prog().sp++;streamTip('VICTORY',40);if(hustle().carry){hustle().carry=false;addCash(60,'Carried the kid to a win');}if(!M.gotUp)qp('noGetUp');king(7);addBux(250,'COUCH CROWN');addFun(22,'VICTORY');addMood(-4);M.confetti=Array.from({length:70},()=>({x:rnd(0,TW),y:rnd(-TH,0),v:rnd(20,50),c:pick(['#ffd25a','#ff5a7a','#5ab0ff','#7fe0a0'])}));[660,880,1320].forEach((f,i)=>setTimeout(()=>beep(f,.12),i*120));}
  else if(M.place<=5){addFun(4,'Top 5');addBux(60,'top 5');}
  if(!win&&hustle().carry){hustle().carry=false;toast('The dad wants a refund. No win, no pay.','#ff7070');}else{addFun(-5,'Early exit');if(M.place>20)crownDip(2,'Out early');}}
 function startLobby(){
  run.phase='lobby';run.lobbyT=60;run.afk=false;run.partyWait=0;run.partyWarned=false;const won=M.win,place=M.place,k=M.kills,pw=M.power,bst=M.best||{};
  if(!pw)run.recap={win:won,place,kills:k,crown:Math.round((run.king-(run.k0||run.king))*10)/10,best:bst.smash>=2?`Smashed ${bst.smash} buildings`:bst.snipe?`Sniped ${bst.snipe}`:bst.kill>=3?`${bst.kill}-kill game`:bst.tree?'Flew into a tree (iconic)':M.fished?`Fished ${M.fished} time${M.fished>1?'s':''}`:k?'Got on the board':'Survived the bus ride',life:9};M=lobbyScene();
  if(pw){big('POWER OUT','#ff7070',3);return;}
-feed(`Last match: ${k} elims`,'#9aa0b0');
+feed(`Last match: ${k} elims`,'#9aa0b0');unlockNext();
  toast('PREP PHASE: the clock is stopped. Ready up when you are.','#7fe0a0');}
 function endLobby(){if(run&&run.prog&&run.prog.netOff){toast('📵 No internet. Pay your bills on the phone first.','#ff5a5a');return;}
  const k=run.match;let biz=0,fam=0;
@@ -1495,8 +1525,8 @@ function update(dt){
  {const before=hourNow();run.clock+=dt*(run.phase==='lobby'&&run.power?1:2);nightTick(before,dt);}
  for(const t of [...run.timers]){t.d-=dt;if(t.d<=0){run.timers.splice(run.timers.indexOf(t),1);t.fn();}}
  const prog=Math.min(1,run.clock/600);
- if(run.clock>=50)run.nextText-=dt;if(run.nextText<=0){run.nextText=(rnd(90,220))*(run.easy?1.4:1)*(run.up.dnd?1.5:1)*(isNight()?2:1);if(run.inbox.length<8)textEvent();}
- if(run.clock>=140)run.nextReal-=dt;if(run.nextReal<=0){run.nextReal=(rnd(45,80)-prog*10)*(run.easy?1.6:1);const r=Math.random();if(isNight()){if(r<.5)weirdNoise();else burglars();}else if(r<.3)delivery();else if(r<.6)gateVisit();else if(r<.82)weirdNoise();else if(run.clock>40)burglars();}
+ if(run.clock>=50)run.nextText-=dt;if(run.nextText<=0){run.nextText=(rnd(90,220))*(run.easy?1.4:1)*(run.up.dnd?1.5:1)*(isNight()?2:1);if(run.inbox.length<8&&on('texts'))textEvent();}
+ if(run.clock>=140)run.nextReal-=dt;if(run.nextReal<=0){run.nextReal=(rnd(45,80)-prog*10)*(run.easy?1.6:1)*(allOn()?1:1.5);realEvent();}
  progTick(dt);clientTick(dt);{const H=hustle();H.rt-=dt;if(H.rt<=0){H.rt=60;H.rate=clamp(H.rate*rnd(.8,1.3),2,14);}if(H.live&&inMatch()&&Math.random()<dt/20)streamTip('viewers chilling',2);}dogTick(dt);
  if(run.dog&&run.dog.need==='snack'&&run.buffs.some(b=>b.name==='Cookies'&&!b.dog)){run.buffs.forEach(b=>{if(b.name==='Cookies')b.dog=1;});dogMet('Simba got a cookie crumb. Best day ever.');}
  {const s=run.simba;if(s.st==='sit'&&s.tired>=SLEEPY()&&!s.lapSleep){s.lapSleep=true;toast('💤 Simba fell asleep on your lap. Aiming is harder now. Click her to slide out.','#c98f4e');}if(s.st!=='sit')s.lapSleep=false;}pizzaTick(dt);if(run.pizzaEat>0)run.pizzaEat+=0;if(!(M&&M.fps)&&!playingMap()&&!run.task){const l=keys.KeyA||keys.ArrowLeft,r=keys.KeyD||keys.ArrowRight;if((l||r)&&!(run.steve.x===SPOT.couch&&!run.afk&&inMatch())){run.steve.onArrive=null;run.steve.target=clamp(run.steve.x+(l?-30:30),SPOT.door,SPOT.gate);camX=clamp(run.steve.x-VW/2,0,HWW-VW);panHold=2;}}run.pizzaEat-=dt;if(run.pzBang>0)run.pzBang-=dt;
@@ -1998,13 +2028,19 @@ function setupFPS(){
  const hold=(id,on,off)=>{const b=$(id);b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();on();});b.addEventListener('pointerup',e=>{e.stopPropagation();off&&off();});b.addEventListener('pointerleave',()=>off&&off());};
  hold('tFire',()=>{M.firing=true;},()=>{M.firing=false;});hold('tJump',fpsJump);hold('tRun',()=>{tch.run=!tch.run;$('tRun').classList.toggle('on',tch.run);});
 }
-window.addEventListener('keydown',e=>{if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;keys[e.code]=true;if(mode==='play'&&run&&!(M&&M.fps))houseKey(e);if(!M||!M.fps)return;if(e.code==='Space'){e.preventDefault();fpsJump();}if(e.code==='Escape')exitFPS();});
+window.addEventListener('keydown',e=>{if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;keys[e.code]=true;if(mode==='play'&&run&&!(M&&M.fps))houseKey(e);if(!M||!M.fps)return;if(e.code==='Space'){e.preventDefault();fpsJump();}if(e.code==='KeyF'||e.code==='KeyB')buildWall();if(e.code==='Escape')exitFPS();});
 window.addEventListener('keyup',e=>{keys[e.code]=false;});
 function enterFPS(){if(!fpsC)setupFPS();const me=M.squad[0];
- {const hv=Math.hypot(me.vx||0,me.vy||0);M.ang=hv>.1?Math.atan2(me.vy,me.vx):-Math.PI/2;M.pitch=0;}toast('🎮 First person: W forward, A/D strafe, mouse or Q/E to turn','#7fe0a0');
- M.fps=true;M.view3d=null;M.way=null;M.fly=0;$('fpsWrap').style.display='block';
+ {const hv=Math.hypot(me.vx||0,me.vy||0);M.ang=hv>.1?Math.atan2(me.vy,me.vx):-Math.PI/2;M.pitch=0;}toast('🎮 You have control: WASD move · drag mouse to aim · click shoot · F wall · ESC autoplay','#7fe0a0');
+ M.fps=true;M.view3d=null;M.way=null;M.fly=0;M.mats=Math.max(M.mats||0,30);$('fpsWrap').style.display='block';
  if(!M.fpsTip){M.fpsTip=1;feed('Steve: ok, I got this','#9fe07f');}beep(660,.06);}
 function exitFPS(){if(M)M.fps=false;M&&(M.firing=false);if(fpsC){$('fpsWrap').style.display='none';}if(document.pointerLockElement)try{document.exitPointerLock();}catch(_){}}
+function buildWall(){const me=M.squad[0];if(!M.fps||me.down)return;if((M.mats||0)<10){big('NEED 🧱 10','#ff7070',1);beep(140,.08,'square',.03);return;}
+ M.mats-=10;const a=M.ang||0,cx=me.x+Math.cos(a)*7,cy=me.y+Math.sin(a)*7,px=-Math.sin(a)*6,py=Math.cos(a)*6;
+ (M.walls||(M.walls=[])).push({x1:cx-px,y1:cy-py,x2:cx+px,y2:cy+py,hp:90,max:90,a});if(M.walls.length>12)M.walls.shift();beep(240,.05,'square',.04);beep(320,.05,'square',.03);}
+function segX(a,b,c,d){const r=(p,q,t)=>(q.x-p.x)*(t.y-p.y)-(q.y-p.y)*(t.x-p.x);return r(a,b,c)*r(a,b,d)<0&&r(c,d,a)*r(c,d,b)<0;}
+function wallBlock(from,to,d){for(const w of (M.walls||[])){if(segX(from,to,{x:w.x1,y:w.y1},{x:w.x2,y:w.y2})){w.hp-=d*1.6;w.hitT=.15;if(w.hp<=0){M.walls.splice(M.walls.indexOf(w),1);M.fx.push({t:'boom',x1:(w.x1+w.x2)/2,y1:(w.y1+w.y2)/2,life:.4});if(to.me)feed('Steve: my wall!!','#9fe07f');}return true;}}return false;}
+function chestLoot(me){if(!M.fps)return;M.mats=(M.mats||0)+20;me.sh=Math.min(50,me.sh+25);big('CHEST · +25 SHIELD · +20 🧱','#ffd25a',1.4);jingle(1);}
 function fpsJump(){if(M&&M.fps&&!(M.jz>0)){M.jv=7;M.jz=.01;beep(300,.03);}}
 function fpsUpdate(dt,me){
  let fx=0,fy=0;if(keys.KeyW||keys.ArrowUp)fy+=1;if(keys.KeyS||keys.ArrowDown)fy-=1;if(keys.KeyA)fx-=1;if(keys.KeyD)fx+=1;if(keys.ArrowLeft||keys.KeyQ)M.ang-=2.2*dt;if(keys.ArrowRight||keys.KeyE)M.ang+=2.2*dt;
@@ -2013,6 +2049,7 @@ function fpsUpdate(dt,me){
  const l=Math.max(1,Math.hypot(fx,fy)),ca=Math.cos(M.ang),sa=Math.sin(M.ang);
  if(fx||fy){const vx=(ca*fy-sa*fx)/l*sp*dt,vy=(sa*fy+ca*fx)/l*sp*dt;if(solidAt(me.x+vx*2,me.y)<1||solidAt(me.x+vx*2,me.y)===0)me.x+=vx;if(solidAt(me.x,me.y+vy*2)===0)me.y+=vy;M.bob=(M.bob||0)+dt*sp*.25;}
  M.jv=(M.jv||0)-28*dt;M.jz=Math.max(0,(M.jz||0)+M.jv*dt*8);if(M.jz<=0)M.jv=0;
+ if(M.dn){M.dn.forEach(q=>q.t-=dt);M.dn=M.dn.filter(q=>q.t>0);}if(M.elimBan&&(M.elimBan.t-=dt)<=0)M.elimBan=null;(M.walls||[]).forEach(w=>{if(w.hitT>0)w.hitT-=dt;});
  M.fireCD=(M.fireCD||0)-dt;M.kick=Math.max(0,(M.kick||0)-dt*40);M.flashT=(M.flashT||0)-dt;M.hitT=(M.hitT||0)-dt;M.hurtT=(M.hurtT||0)-dt;
  if(M.firing&&M.fireCD<=0)fpsShoot(me);
  for(const r of M.rares)if(!r.taken&&dist(r,me)<8){r.taken=true;if(r.tier>M.gun){M.gun=r.tier;big(GUNS[M.gun].n.toUpperCase()+'!',GUNS[M.gun].c,1.5);addFun(4);}}
@@ -2022,7 +2059,7 @@ function fpsShoot(me){M.fireCD=[.34,.24,.2,.11,.26][M.gun];M.kick=7;M.flashT=.05
  for(const e of M.enemies)if(dist(e,me)<170)e.alert=4;
  let best=null,bd=1e9;for(const e of M.enemies){if(e.hidden)continue;const dx=e.x-me.x,dy=e.y-me.y,d=Math.hypot(dx,dy);if(d>230)continue;let a=Math.atan2(dy,dx)-M.ang;a=Math.atan2(Math.sin(a),Math.cos(a));
   const half=Math.atan2(3.4,d),pitchOK=Math.abs(M.pitch)<40;if(Math.abs(a)<half+.012&&pitchOK&&d<bd&&losOK(me,e)){best=e;bd=d;}}
- if(best){const head=M.pitch>Math.min(18,250/bd)-6;const d=GUNS[M.gun].d*(head?1.6:1)*(1+(run.buffs.some(b=>b.k==='conf')?.2:0)+run.king/300);hitEnemy(best,d,me);best.alert=6;best.flinch=.35;M.hitT=.15;M.headT=head?.2:0;beep(head?1100:760,.03);}
+ if(best){const head=M.pitch>Math.min(18,250/bd)-6;const d=GUNS[M.gun].d*(head?1.6:1)*(1+(run.buffs.some(b=>b.k==='conf')?.2:0)+run.king/300);hitEnemy(best,d,me);best.alert=6;best.flinch=.35;M.hitT=.15;(M.dn||(M.dn=[])).push({x:best.x,y:best.y,v:Math.round(d),head,t:.9});M.headT=head?.2:0;beep(head?1100:760,.03);}
 }
 function islandWorld(){const w={cx0:500,cy0:500,isR:70,mtn:{x:-9999,y:-9999},solids:[[512,470,24,18,2]]};return {grid:buildGrid(w),w,palms:[{x:450,y:480},{x:555,y:520}],dancers:Array.from({length:7},(_,i)=>({x:470+i*10,y:500+rnd(-14,14),skin:pick(SKINS),hp:100,sh:0,state:'idle',flash:0}))};}
 function islandRender(t){ensureCine();const I=M.isl,sv={...M};
@@ -2104,12 +2141,36 @@ function fpsDraw(){if(!fpsC||!M)return;const wrap=$('fpsWrap');
   const w=Math.min(1280,Math.round(wrap.clientWidth*(devicePixelRatio>1?1.25:1))),h=Math.round(w*wrap.clientHeight/Math.max(1,wrap.clientWidth));X3D.render('play',w,h,xState());xc.style.display='block';fpsC.classList.add('hud');
   fctx.clearRect(0,0,FW,FH);xHud();}
  else{if(window.x3dCanvas)window.x3dCanvas.style.display='none';fpsC.classList.remove('hud');fpsRender();}}
-function xHud(){const g=fctx,me=M.squad[0],W=FW,H=FH;g.save();const K=FW/240;g.scale(K,K);const w=240,h=FH/K;
- g.fillStyle=M.hitT>0?'#ff5a5a':'#fff';g.fillRect(w/2-6,h/2,4,1);g.fillRect(w/2+3,h/2,4,1);g.fillRect(w/2,h/2-6,1,4);g.fillRect(w/2,h/2+3,1,4);
- g.fillStyle='rgba(0,0,0,.55)';g.fillRect(4,h-22,82,18);g.fillStyle='#46c46e';g.fillRect(6,h-12,78*me.hp/100,5);g.fillStyle='#5ab0ff';g.fillRect(6,h-19,78*me.sh/50,5);
- g.font='bold 8px monospace';g.fillStyle=M.wpn?M.wpn.c:GUNS[M.gun].c;g.textAlign='right';g.fillText(M.wpn?M.wpn.n+' x'+M.wpn.ammo:GUNS[M.gun].n,w-6,h-8);g.fillStyle='#fff';g.fillText('👤'+M.players+'  ☠'+M.kills,w-6,12);g.textAlign='left';
- if(inStorm(me)){g.fillStyle='rgba(150,60,220,.25)';g.fillRect(0,0,w,h);g.fillStyle='#e0b0ff';g.fillText('IN THE STORM',6,12);}
- if(M.hurtT>0){g.fillStyle='rgba(255,0,0,'+M.hurtT+')';g.fillRect(0,0,w,h);}g.restore();}
+function xHud(){const g=fctx,me=M.squad[0];g.save();const K=FW/320;g.scale(K,K);const w=320,h=FH/K,cx=w/2,cy=h/2;
+ const T=(t,x,y,c='#fff',sz=8,al='left')=>{g.font=`bold ${sz}px monospace`;g.textAlign=al;g.fillStyle='#000';g.fillText(t,x+1,y+1);g.fillStyle=c;g.fillText(t,x,y);};
+ // crosshair + hitmarker
+ g.fillStyle='#fff';g.fillRect(cx-7,cy,4,1);g.fillRect(cx+4,cy,4,1);g.fillRect(cx,cy-7,1,4);g.fillRect(cx,cy+4,1,4);
+ if(M.hitT>0){g.strokeStyle=M.headT>0?'#ffd25a':'#fff';g.lineWidth=1.5;g.beginPath();[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b])=>{g.moveTo(cx+a*3,cy+b*3);g.lineTo(cx+a*7,cy+b*7);});g.stroke();}
+ // damage numbers
+ if(M.dn&&X3D.project)for(const q of M.dn){const p=X3D.project(q.x,q.y,9+(.9-q.t)*6);if(p)T(String(q.v),p.x*w,p.y*h,q.head?'#ffd25a':'#fff',q.head?11:9,'center');}
+ // top: players, elims, storm
+ const st=M.storm,phaseLeft=Math.max(0,Math.ceil(((([0,.15,.4,.65,.86].find(x=>x>M.t/M.T)??1)*M.T)-M.t)/TVSPD));
+ g.fillStyle='rgba(0,0,0,.5)';g.fillRect(cx-70,3,140,14);T(`👤 ${M.players}   ☠ ${M.kills}   🌀 ${Math.floor(phaseLeft/60)}:${String(phaseLeft%60).padStart(2,'0')}`,cx,13,'#fff',8,'center');
+ // minimap
+ const mm=58,mx=w-mm-4,my=22;g.fillStyle='rgba(0,0,0,.55)';g.fillRect(mx-2,my-2,mm+4,mm+4);const sc=mm/360,ox=M.cx0-180,oy=M.cy0-180;
+ if(mapC)g.drawImage(mapC,ox*mapC.width/MW,oy*mapC.height/MH,360*mapC.width/MW,360*mapC.height/MH,mx,my,mm,mm);
+ g.save();g.beginPath();g.rect(mx,my,mm,mm);g.clip();g.strokeStyle='#c27aff';g.lineWidth=1.5;g.beginPath();g.arc(mx+(st.cx-ox)*sc,my+(st.cy-oy)*sc,Math.max(1,st.r*sc),0,7);g.stroke();
+ g.strokeStyle='rgba(255,255,255,.6)';g.lineWidth=.8;g.beginPath();g.arc(mx+(st.cx-ox)*sc,my+(st.cy-oy)*sc,Math.max(1,st.to*sc),0,7);g.stroke();
+ M.squad.forEach(a=>{if(a.out||a.me)return;g.fillStyle=a.down?'#ff7070':'#7fb2ff';g.fillRect(mx+(a.x-ox)*sc-1.5,my+(a.y-oy)*sc-1.5,3,3);});
+ const px=mx+(me.x-ox)*sc,py=my+(me.y-oy)*sc,a=M.ang||0;g.fillStyle='#ffd25a';g.beginPath();g.moveTo(px+Math.cos(a)*5,py+Math.sin(a)*5);g.lineTo(px+Math.cos(a+2.5)*3,py+Math.sin(a+2.5)*3);g.lineTo(px+Math.cos(a-2.5)*3,py+Math.sin(a-2.5)*3);g.fill();g.restore();
+ if(inStorm(me))T('IN THE STORM · GET TO THE CIRCLE',cx,30,'#e0b0ff',8,'center');
+ // feed
+ M.feed.slice(-4).forEach((f,i)=>T(f.t.slice(0,46),5,26+i*10,f.c,7));
+ // big messages + elim banner
+ M.msgs.forEach((m,i)=>T(m.t,cx,cy-34-i*14,m.c,11,'center'));
+ if(M.elimBan){g.fillStyle='rgba(0,0,0,.55)';g.fillRect(cx-80,cy+30,160,16);T('☠ ELIMINATED '+M.elimBan.n.toUpperCase(),cx,cy+42,'#ffd25a',9,'center');}
+ // bottom left: shield + health with numbers
+ g.fillStyle='rgba(0,0,0,.55)';g.fillRect(4,h-28,110,24);g.fillStyle='#24486a';g.fillRect(6,h-26,80,8);g.fillStyle='#5ab0ff';g.fillRect(6,h-26,80*me.sh/50,8);
+ g.fillStyle='#244a2a';g.fillRect(6,h-15,80,8);g.fillStyle=me.hp<35?'#ff5a5a':'#46c46e';g.fillRect(6,h-15,80*me.hp/100,8);T(String(Math.ceil(me.sh)),90,h-19,'#9fd4ff',7);T(String(Math.ceil(me.hp)),90,h-8,'#b6f0b6',7);
+ // bottom right: weapon + mats
+ const gn=M.wpn?M.wpn.n+' ×'+M.wpn.ammo:GUNS[M.gun].n,gc=M.wpn?M.wpn.c:GUNS[M.gun].c;g.fillStyle='rgba(0,0,0,.55)';g.fillRect(w-112,h-28,108,24);T(gn,w-8,h-17,gc,8,'right');T(`🧱 ${M.mats||0}  [F] wall`,w-8,h-7,'#e0c080',7,'right');
+ if(me.down)T(me.out?'ELIMINATED':'KNOCKED · wait for a revive',cx,cy+60,'#ff7070',10,'center');
+ if(M.hurtT>0){g.fillStyle='rgba(255,0,0,'+M.hurtT*.6+')';g.fillRect(0,0,w,h);}g.restore();}
 function fpsRender(){
  if(!fpsC||!M)return;
  const me=M.squad[0],W=FW,H=FH,buf=fbuf,ang=M.ang,t=performance.now()/1000;
@@ -2290,7 +2351,7 @@ function droidHTML(){const P=prog(),done=run.board.filter(j=>j.done).length,ups=
  <div style="color:#9acd32;margin-top:6px">📦 OWNED</div><div>${ups.length?ups.join(', '):'nothing yet'}</div>`;}
 function gbcHTML(){const pg=deckPg.g,m=inMatch()?M:null;
  if(pg===2&&false)return '';
- if(pg===0)return `<b>QUESTS</b><br>${quests().map(q=>`${q.done?'✔':'·'} ${q.t} ${Math.min(q.p,q.n)}/${q.n}`).join('<br>')}<br><br><b>FORTNITE TODAY</b><br>Wins ${run.wins}<br>Elims ${run.kills}<br>Spotted ${run.spots}<br>Simba elims ${run.simbaKills}<br>Match # ${run.match}<br>King ${Math.floor(run.king)}%<br>Aim ${Math.round(run.flow)}%`;
+ if(pg===0)return `<b>QUESTS</b><br>${quests().map(q=>`${q.done?'✔':'·'} ${q.t} ${Math.min(q.p,q.n)}/${q.n}`).join('<br>')}<br><br><b>COUCH ROYALE TODAY</b><br>Wins ${run.wins}<br>Elims ${run.kills}<br>Spotted ${run.spots}<br>Simba elims ${run.simbaKills}<br>Match # ${run.match}<br>King ${Math.floor(run.king)}%<br>Aim ${Math.round(run.flow)}%`;
  if(pg===1)return m?`<b>THIS MATCH</b><br>Players ${m.players}<br>Elims ${m.kills}<br>Mode ${m.mode}<br>Gun ${GUNS[m.gun].n}<br>Special ${m.wpn?m.wpn.n+' x'+m.wpn.ammo:'-'}<br>Mats ${m.mats||0}<br>Combo x${m.combo||0}<br>Smashed ${m.smashed||0}`:`<b>THIS MATCH</b><br>Not in a match.<br><br>Ready up on the TV.`;
  const own=LOCK.own.length;return `<b>LOCKER</b><br>Bux ${LOCK.bux}<br>Skin ${IT(LOCK.skin).n}<br>Wings ${IT(LOCK.glider).n}<br>Pickaxe ${LOCK.pick?IT(LOCK.pick).n:'Default'}<br>Tracers ${IT(LOCK.wrap).n}<br>Emote ${IT(LOCK.emote).n}<br>Items ${own}/${ITEMS.length}`;}
 // ---- theme store: everything is free, unlocked by pressing GIVE ME (or minigames later) ----
@@ -2319,7 +2380,7 @@ function drawHUD(){
   const pz=run.party;txt(pz.length?'Party: Steve, '+pz.map(n=>n==='Randoms'?'Taco & Dano':n).join(', '):'Party: just Steve (solo)',L+W2/2,T+50,'#ffd25a',8,'center');
   if(pz.length){const f=1-clamp(run.partyWait/75,0,1);txt('PARTY PATIENCE',L+W2/2-150,T+74,'#cfd3dd',7);bar(L+W2/2-20,T+66,170,8,f,f>.5?'#46c46e':f>.2?'#f0b43c':'#e23b3b');}
   else txt('Invite someone from your phone contacts, or FIND A SQUAD.',L+W2/2,T+74,'#cfd3dd',7,'center');
-  quests().forEach((q,i)=>txt(`${q.done?'✅':q.npc?'💬':'📜'} ${q.t}  ${Math.min(q.p,q.n)}/${q.n}`,L+12,T+H2-(quests().length-i)*12*TXK-4,q.done?'#7fe0a0':q.npc?'#ffb27a':'#cfe9ff',7));}
+  if(on('quests')&&on('texts'))quests().forEach((q,i)=>txt(`${q.done?'✅':q.npc?'💬':'📜'} ${q.t}  ${Math.min(q.p,q.n)}/${q.n}`,L+12,T+H2-(quests().length-i)*12*TXK-4,q.done?'#7fe0a0':q.npc?'#ffb27a':'#cfe9ff',7));}
  else{
   txt(`👤${M.players}`,L+10,T+22,'#fff',11);txt(`☠${M.kills}`,L+10+52*TXK,T+22,'#fff36a',11);txt(M.mode.toUpperCase(),L+10+90*TXK,T+22,'#cfd3dd',8);
   if(M.phase==='play'){txt(`${GUNS[M.gun].n}${M.flyCD>0?'':' · wings ready'}`,L+10,T+22+12*TXK,GUNS[M.gun].c,7);}
@@ -2338,19 +2399,19 @@ function drawHUD(){
   if(M.phase==='play'){if(M.wpn)txt(M.wpn.n+' ×'+M.wpn.ammo,L+W2/2,T+62,M.wpn.c,7,'center');if(M.mats)txt('🪵'+M.mats,L+W2-10-60*TXK,T+22,'#d8b080',8,'right');
    if(M.combo>1){const pulse=1+.25*Math.max(0,M.comboT-1.1)*4;txt(`x${M.combo} COMBO`,L+W2-12,T+H2-60,M.combo>=20?'#ff7ae0':M.combo>=10?'#7fe8ff':'#fff',Math.round(10*pulse),'right');}
    if(M.buxPop&&M.buxPop.t>0)txt(`+${M.buxPop.n} 💎`,L+W2-10,T+40+(1.2-M.buxPop.t)*-10,'#7fe8ff',8,'right');}
-  if(M.ended&&!M.power)txt(M.win?'#1 VICTORY ROYALE!':`ELIMINATED · #${M.place}`,L+W2/2,T+H2/2,M.win?'#ffd25a':'#ff7070',18,'center');}
+  if(M.ended&&!M.power)txt(M.win?'#1 COUCH CROWN!':`ELIMINATED · #${M.place}`,L+W2/2,T+H2/2,M.win?'#ffd25a':'#ff7070',18,'center');}
  M.feed.slice(-4).forEach((f,i)=>txt(f.t,L+W2-10,T+(M.phase==='lobby'?100:36+16*TXK)+i*11*TXK,f.c,7,'right'));
  M.msgs.forEach((m,i)=>txt(m.t,L+W2/2,T+H2/2-20+i*20*TXK,m.c,12,'center'));
  if(run.recap&&run.phase==='lobby'){const rc=run.recap;rc.life-=1/60;if(rc.life<=0)run.recap=null;else{const a=Math.min(1,rc.life/1,(9-rc.life)*3),cw=320,ch=150,cx=L+W2/2-cw/2,cy=T+46;ctx.globalAlpha=a;ctx.fillStyle='rgba(10,12,20,.92)';ctx.fillRect(cx,cy,cw,ch);ctx.strokeStyle=rc.win?'#ffd25a':'#5a6690';ctx.lineWidth=3;ctx.strokeRect(cx,cy,cw,ch);
-  txt(rc.win?'#1 VICTORY ROYALE':'MATCH RECAP · #'+rc.place,cx+cw/2,cy+24,rc.win?'#ffd25a':'#fff',11,'center');
+  txt(rc.win?'#1 COUCH CROWN':'MATCH RECAP · #'+rc.place,cx+cw/2,cy+24,rc.win?'#ffd25a':'#fff',11,'center');
   txt(`☠ ${rc.kills} elims`,cx+20,cy+56,'#fff36a',9);txt(`👑 ${rc.crown>=0?'+':''}${rc.crown}`,cx+cw-20,cy+56,rc.crown>=0?'#ffc23a':'#ff7070',9,'right');
   txt('BEST MOMENT',cx+cw/2,cy+86,'#9aa0b0',7,'center');txt(rc.best,cx+cw/2,cy+106,'#7fe0a0',9,'center');
-  txt(`👑 KING OF FORTNITE ${Math.floor(run.king)}%`,cx+cw/2,cy+136,'#ffc23a',7,'center');ctx.globalAlpha=1;}}
+  txt(`👑 KING OF THE COUCH ${Math.floor(run.king)}%`,cx+cw/2,cy+136,'#ffc23a',7,'center');ctx.globalAlpha=1;}}
  if(run.tvMsg){const tm=run.tvMsg,str=`📺 MESSAGE FROM ${tm.from.toUpperCase()}: ${tm.t}`;ctx.font=`8px ${FONT}`;const w=ctx.measureText(str).width+20;ctx.fillStyle='rgba(10,20,40,.9)';ctx.fillRect(L+W2/2-w/2,T+H2-46,w,22);ctx.strokeStyle='#5ab0ff';ctx.strokeRect(L+W2/2-w/2,T+H2-46,w,22);txt(str,L+W2/2,T+H2-30,'#cfe9ff',8,'center');}
  const my=(TY+TH+7)*SC;{const g=ctx.createLinearGradient(0,my-4,0,my+30);g.addColorStop(0,'#3a3530');g.addColorStop(.5,'#1e1b18');g.addColorStop(1,'#2c2824');ctx.fillStyle=g;ctx.fillRect(0,my-4,cv.width,34);ctx.fillStyle='#8a7a5a';ctx.fillRect(0,my-4,cv.width,1);ctx.fillStyle='#050807';ctx.fillRect(2,my-1,446,28);}
  hits.push({x:0,y:my-4,w:450,h:34,fn:openDeck});
- {const kx=(TX+60)*SC,kw=(TW-120)*SC,ky=TY*SC-14;ctx.fillStyle='#000';ctx.fillRect(kx-2,ky-2,kw+4,10);ctx.fillStyle='#3a2a10';ctx.fillRect(kx,ky,kw,6);ctx.fillStyle=run.king>=100?'#fff':'#ffc23a';ctx.fillRect(kx,ky,kw*run.king/100,6);txt(`👑 KING OF FORTNITE ${Math.floor(run.king)}%`,kx+kw/2,ky+16,'#ffd25a',7,'center');}
- {const M4=[['AIM',run.flow],['FUN',run.fun],['LOT',run.lot],[PN().toUpperCase().slice(0,6),run.wife.mood]];M4.forEach(([l,v],k)=>{const x=6+k*90;ctx.font=`bold ${Math.round(6*TXK)}px ${FONT}`;ctx.fillStyle='#5affd8';ctx.textAlign='left';ctx.fillText(l,x,my+7);ctx.textAlign='right';ctx.fillStyle=v<30?'#ff6a5a':'#fff';ctx.fillText(Math.round(v)+'%',x+84,my+7);ctx.textAlign='left';led(x,my+11,84,13,v/100);});
+ {const kx=(TX+60)*SC,kw=(TW-120)*SC,ky=TY*SC-14;ctx.fillStyle='#000';ctx.fillRect(kx-2,ky-2,kw+4,10);ctx.fillStyle='#3a2a10';ctx.fillRect(kx,ky,kw,6);ctx.fillStyle=run.king>=100?'#fff':'#ffc23a';ctx.fillRect(kx,ky,kw*run.king/100,6);txt(`👑 KING OF THE COUCH ${Math.floor(run.king)}%`,kx+kw/2,ky+16,'#ffd25a',7,'center');}
+ {const M4=[['AIM',run.flow],['FUN',run.fun],on('lot')&&['LOT',run.lot],on('girl')&&[PN().toUpperCase().slice(0,6),run.wife.mood]].filter(Boolean);M4.forEach(([l,v],k)=>{const x=6+k*90;ctx.font=`bold ${Math.round(6*TXK)}px ${FONT}`;ctx.fillStyle='#5affd8';ctx.textAlign='left';ctx.fillText(l,x,my+7);ctx.textAlign='right';ctx.fillStyle=v<30?'#ff6a5a':'#fff';ctx.fillText(Math.round(v)+'%',x+84,my+7);ctx.textAlign='left';led(x,my+11,84,13,v/100);});
   const gx=370;// mini handheld = quests, mini phone = money, mini player = relationships
   ctx.fillStyle='#000';ctx.fillRect(gx-1,my-3,15,29);ctx.fillStyle='#2ac0b0';ctx.fillRect(gx,my-2,13,27);ctx.fillStyle='#9bbc0f';ctx.fillRect(gx+2,my,9,8);ctx.fillStyle='#8a1a3a';ctx.fillRect(gx+8,my+14,3,3);ctx.fillStyle='#222';ctx.fillRect(gx+2,my+14,4,2);
   const qd=quests().filter(q=>q.done).length;ctx.font=`bold ${Math.round(6*TXK)}px ${FONT}`;ctx.fillStyle='#9bbc0f';ctx.fillText('QUESTS',gx+18,my+7);ctx.fillStyle='#fff';ctx.fillText(qd+'/'+quests().length,gx+18,my+20);
@@ -2360,7 +2421,7 @@ function drawHUD(){
   hits.push({x:gx-2,y:my-4,w:64,h:34,fn:()=>{deckPg.g=0;openDeck();}});hits.push({x:px-2,y:my-4,w:64,h:34,fn:()=>openDeck()});}
  if(inMatch()){if(run.afk||run.steve.x!==SPOT.couch)btn('BACK TO GAME',580,my+1,170,22,'#2f8f50',()=>{if(run.task)return toast('Finish the job first','#ff8b8b');boardOpen=false;sendHome();});
   else{btn('GET UP (AFK) -1❤',580,my+1,170,22,'#c06a1c',goAFK);btn('🍕 SNACK',760,my+1,90,22,'#7a4ab0',()=>{goAFK();snackRun();});}}
- else if(run.phase==='lobby'&&run.power){const bw=cv.width-560,u=bw/400;btn('SHOP',556+100*u,my+1,64*u,22,'#3a7bd5',openShop);btn('💎 ITEMS',556+168*u,my+1,84*u,22,'#7a3ab0',openIShop);btn('🍕',556+356*u,my+1,40*u,22,'#c06a1c',snackRun);bigReady();if(!run.party.includes('Randoms'))btn('SQUAD',556,my+1,96*u,22,'#7a4ab0',()=>{joinParty('Randoms');feed('Taco: sup. Dano: hey','#ffb27a');});}
+ else if(run.phase==='lobby'&&run.power){const bw=cv.width-560,u=bw/400;if(on('door')){btn('SHOP',556+100*u,my+1,64*u,22,'#3a7bd5',openShop);btn('💎 ITEMS',556+168*u,my+1,84*u,22,'#7a3ab0',openIShop);}btn('🍕',556+356*u,my+1,40*u,22,'#c06a1c',snackRun);bigReady();if(!run.party.includes('Randoms'))btn('SQUAD',556,my+1,96*u,22,'#7a4ab0',()=>{joinParty('Randoms');feed('Taco: sup. Dano: hey','#ffb27a');});}
  const H=(s,x,y,c='#ffd25a')=>{const q=(x-camX)*SC;if(q>-40&&q<1000)txt(s,q,y*SC,c,7,'center');};
  const jobs=run.board.filter(j=>!j.done).length;if(jobs)H(`${jobs} jobs`,218+GX,154,'#3a3a5a');
  const vms=run.inbox.filter(x=>x.kind==='vm').length;if(vms)H(`📼${vms}`,143,210);
@@ -2593,23 +2654,20 @@ function score(){return run.wins*1000+run.kills*100+run.cash+run.sales*150+run.s
 function summary(){const r=run.rel;return `<p>Relationships: ${REL_KEYS.map(k=>k+' '+Math.round(r[k])).join(' · ')}</p><p>Wins ${run.wins} · Elims ${run.kills} · Spotted ${run.spots} · Simba elims ${run.simbaKills} · Cars sold ${run.sales} · Jobs done ${run.board.filter(j=>j.done).length}/${run.board.length} · Burglars stopped ${run.stops} · Cash $${run.cash}</p>
  <p style="color:#ffd25a;font-size:12px">SCORE ${score()}${score()>=best?' · NEW BEST':' · best '+best}</p>`;}
 function saveBest(){if(score()>best){best=score();try{localStorage.setItem('steveBest5',best)}catch(e){}}}
-function kingWin(){mode='over';saveBest();show(`<h2>👑 KING OF FORTNITE</h2><p>The lot is humming, the family is happy, Simba is asleep dreaming about treats, and Steve cannot miss. The squad bows. Mom screenshots it.</p><p>Day ${run.day} · ${clockStr()}</p>${summary()}<button class="big" onclick="startRun(run.easy)">PLAY AGAIN ▶</button>`);beep(660,.15);setTimeout(()=>beep(990,.2),150);setTimeout(()=>beep(1320,.3),300);}
+function kingWin(){mode='over';saveBest();show(`<h2>👑 KING OF THE COUCH</h2><p>The lot is humming, the family is happy, Simba is asleep dreaming about treats, and Steve cannot miss. The squad bows. Mom screenshots it.</p><p>Day ${run.day} · ${clockStr()}</p>${summary()}<button class="big" onclick="startRun(run.easy)">PLAY AGAIN ▶</button>`);beep(660,.15);setTimeout(()=>beep(990,.2),150);setTimeout(()=>beep(1320,.3),300);}
 function dayOver(){mode='over';const left=run.board.filter(j=>!j.done).length;saveBest();
  show(`<h2>DINNER'S READY</h2><p>It's 7:30. ${run.wife.mood>50?'Your wife made your favorite.':'Your wife made... dinner.'}${left?` ${left} board jobs wait for tomorrow.`:' The board is clear, too.'}</p>${summary()}<button class="big" onclick="startRun()">ANOTHER AFTERNOON ▶</button>`);}
 function gameOver(why){mode='over';saveBest();
  const msg={fun:['Steve put the controller down','"Eh, I\'m not feeling it anymore. C\'mon Simba."'],lot:['The lot needs Steve','Too many missed buyers and blown jobs. Steve has to go run the business.'],squad:['Nobody wants to play','Steve went AFK one too many times. Nobody will party up with him today. Except Mom.']}[why];
  show(`<h2>${msg[0]}</h2><p>${msg[1]} (${clockStr()} PM)</p>${summary()}<button class="big" onclick="startRun()">ONE MORE GAME ▶</button>`);}
-window.startRun=(easy)=>{try{AC=AC||new AudioContext();AC.resume&&AC.resume();}catch(e){}newRun();run.easy=!!easy;run.ringer='ring';$('ringer').textContent='🔔 RING';hide();mode='play';phoneDirty=true;view=null;boardOpen=false;beep(660,.08);
+window.startRun=(easy)=>{try{AC=AC||new AudioContext();AC.resume&&AC.resume();}catch(e){}newRun();run.easy=easy!==false&&easy!=='vet';run.unl=easy==='vet'?FEAT_N:easy===undefined?Math.min(FEAT_N,(()=>{try{return +localStorage.getItem('steveUnlMax')||0}catch(e){return 0}})()):0;run.ringer='ring';$('ringer').textContent='🔔 RING';hide();mode='play';phoneDirty=true;view=null;boardOpen=false;beep(660,.08);
  toast('2:00 PM. Prep phase: the clock is stopped. Invite people, then READY.','#7fe0a0');
- later(3,()=>text({icon:'👵',from:'Mom',fam:true,msg:'Are you playing today? 😊 Invite me!',replies:R_MOM,onReply:(v)=>{addFun(3);if(v>0)joinParty('Mom');}}));};
+ if(!allOn())later(.5,()=>unlockCard(FEATS[0],true));
+ later(allOn()?3:12,()=>text({icon:'👵',from:'Mom',fam:true,msg:'Are you playing today? 😊 Invite me!',replies:R_MOM,onReply:(v)=>{addFun(3);if(v>0)joinParty('Mom');}}));};
 show(`<h2>STEVE'S DAY OFF</h2>
- <p>Steve runs a used car lot out of his garage. It's 2:00. Dinner is at 7:30. In between, he wants to win some matches: usually solo, often with his Mom, sometimes a full squad. Never build mode. Never marking. The match plays itself; click the TV when you have a spare second to help.</p>
- <p><b>The TV:</b> ride the bus, drop into town, and play. Click enemies to shoot, click rustling bushes to spot sneaky players, click sparkles for rare guns, click cars to drive, click the ground to move (far away = jetpack wings). Sometimes it goes close-up.</p>
- <p><b>The phone:</b> texts and calls can wait until the break between matches. Tap words to reply. Ignored calls go to the answering machine.</p>
- <p><b>The house:</b> deliveries, honking buyers, weird noises, and burglars don't wait. GET UP to handle them, but going AFK mid-match costs squad patience. Breaks are free. Work ahead on the board, or ask your wife or kid to help.</p>
- <p><b>Your wife</b> brings cookies when she's happy. Play too long without doing anything and the power might "go out."</p>
- <p><b>Simba</b> brings her lamb toy. If she goes to sleep really fast, she can dream about treats.</p>
- <div><button class="big" style="background:#2f8f50" onclick="startRun(true)">EASY ▶</button> <button class="big" onclick="startRun(false)">NORMAL ▶</button></div>
- <p style="color:#9aa0b0">Easy: fewer interruptions, a patient wife, and going AFK doesn't bother the squad.</p>`);
+ <p>Steve runs a used car lot out of his garage. Today he just wants to play some <b>Couch Royale</b>.</p>
+ <p>Life keeps getting in the way. You start with just the couch and the TV; the rest of Steve's life shows up one match at a time.</p>
+ <div><button class="big" style="background:#2f8f50" onclick="startRun(true)">PLAY ▶</button> <button class="big" onclick="startRun('vet')">VETERAN ▶</button></div>
+ <p style="color:#9aa0b0">Veteran: everything unlocked from the start, normal pace.</p>`);
 requestAnimationFrame(t=>{last=t;loop(t);});
 </script></body></html>

@@ -5,7 +5,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
 const G = window; let S = {};
 let R = null, scene, cam, sun, hemi, built = null, guys = new Map(), fxGroup, stormMesh, waterMesh, terrain, dropGroup, lambGroup, chestGroup;
-let tmpV = new THREE.Vector3();
+let tmpV = new THREE.Vector3(), wallGroup, cardTex;
 
 function canvasTex(w, h, paint) { const c = document.createElement('canvas'); c.width = w; c.height = h; paint(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; }
 function noiseTex(base, var1, n = 128) { return canvasTex(n, n, (g, w, h) => { g.fillStyle = base; g.fillRect(0, 0, w, h); for (let i = 0; i < w * h / 3; i++) { g.fillStyle = var1[i % var1.length]; g.globalAlpha = Math.random() * .35; g.fillRect(Math.random() * w, Math.random() * h, 1 + Math.random() * 2, 1 + Math.random() * 2); } g.globalAlpha = 1; }); }
@@ -79,7 +79,8 @@ function buildWorld(M) {
   dropGroup = new THREE.Group(); lambGroup = new THREE.Group(); built.add(dropGroup, lambGroup);
   // storm wall
   stormMesh = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 260, 64, 1, true), new THREE.MeshBasicMaterial({ color: 0x9a3ad8, transparent: true, opacity: .28, side: THREE.DoubleSide, depthWrite: false })); built.add(stormMesh);
-  fxGroup = new THREE.Group(); built.add(fxGroup);
+  fxGroup = new THREE.Group(); built.add(fxGroup); wallGroup = new THREE.Group(); built.add(wallGroup);
+  cardTex = cardTex || canvasTex(64, 64, (g, w, h) => { g.fillStyle = '#c49a5a'; g.fillRect(0, 0, w, h); for (let x = 0; x < w; x += 6) { g.fillStyle = 'rgba(90,60,20,.18)'; g.fillRect(x, 0, 2, h); } g.fillStyle = '#8a6a3a'; g.fillRect(0, 0, w, 3); g.fillRect(0, h - 3, w, 3); g.fillStyle = 'rgba(60,40,10,.5)'; g.font = 'bold 12px monospace'; g.fillText('THIS SIDE', 6, 28); g.fillText('UP ↑', 18, 44); });
   built.userData.match = M;
 }
 
@@ -139,16 +140,22 @@ export function render(mode, w, h, st) {
   for (const f of M.fx) { if ((f.t === 'shot' || f.t === 'laser' || f.t === 'rocket' || f.t === 'bub') && f.x2 != null) { const y1 = heightAt(f.x1, f.y1) + 4.5, y2 = heightAt(f.x2, f.y2) + 4.5; pts.push(f.x1, y1, f.y1, f.x2, y2, f.y2); const c = new THREE.Color(f.c || '#fff36a'); cols.push(c.r, c.g, c.b, c.r, c.g, c.b); }
     if (f.t === 'boom' || f.t === 'ring' || f.t === 'nade') { const k = 1 - f.life / .6, m = new THREE.Mesh(new THREE.SphereGeometry(2 + k * 10, 12, 8), new THREE.MeshBasicMaterial({ color: f.t === 'ring' ? 0xffc878 : 0xff8a3a, transparent: true, opacity: Math.max(0, f.life * 1.4), depthWrite: false })); m.position.set(f.x1, heightAt(f.x1, f.y1) + 3, f.y1); fxGroup.add(m); } }
   if (pts.length) { const gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3)); gg.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3)); fxGroup.add(new THREE.LineSegments(gg, new THREE.LineBasicMaterial({ vertexColors: true }))); }
+  // cardboard walls
+  while (wallGroup.children.length) { const c = wallGroup.children[0]; wallGroup.remove(c); c.geometry && c.geometry.dispose(); c.material && c.material.dispose(); }
+  for (const wl of M.walls || []) { const len = Math.hypot(wl.x2 - wl.x1, wl.y2 - wl.y1), mx = (wl.x1 + wl.x2) / 2, mz = (wl.y1 + wl.y2) / 2, k = wl.hp / wl.max;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(len, 9, .8), new THREE.MeshStandardMaterial({ map: cardTex, roughness: .95, color: new THREE.Color(1, .6 + .4 * k, .5 + .5 * k), emissive: wl.hitT > 0 ? 0x553311 : 0 }));
+    m.position.set(mx, heightAt(mx, mz) + 4.5, mz); m.rotation.y = -Math.atan2(wl.y2 - wl.y1, wl.x2 - wl.x1); m.castShadow = m.receiveShadow = true; wallGroup.add(m); }
   // camera
   let tx = me.x, tz = me.y;
-  if (mode === 'play') { const a = M.ang || 0, p = (M.pitch || 0) / 60, back = 16, up = 7 - p * 6; const gy = heightAt(me.x, me.y) + (M.jz || 0) * .6;
-    cam.position.set(me.x - Math.cos(a) * back + Math.cos(a + Math.PI / 2) * 2.5, gy + up, me.y - Math.sin(a) * back + Math.sin(a + Math.PI / 2) * 2.5);
+  if (mode === 'play') { const a = M.ang || 0, p = (M.pitch || 0) / 60, back = 15, up = 7.5 - p * 6; const gy = heightAt(me.x, me.y) + (M.jz || 0) * .6;
+    cam.position.set(me.x - Math.cos(a) * back + Math.cos(a + Math.PI / 2) * 4.5, gy + up, me.y - Math.sin(a) * back + Math.sin(a + Math.PI / 2) * 4.5);
     const ch = heightAt(cam.position.x, cam.position.z) + 2; if (cam.position.y < ch) cam.position.y = ch;
-    cam.lookAt(me.x + Math.cos(a) * 30, gy + 5 + p * 22, me.y + Math.sin(a) * 30); }
+    cam.lookAt(me.x + Math.cos(a) * 30 + Math.cos(a + Math.PI / 2) * 4.5, gy + 5 + p * 22, me.y + Math.sin(a) * 30 + Math.sin(a + Math.PI / 2) * 4.5); }
   else { const v = M.view3d || {}, tg = v.e || v.p || me; tx = tg.x; tz = tg.y; const a = (v.a0 || 0) + (v.t || 0) * .35, rad = v.style === 'high' ? 40 : v.style === 'low' ? 14 : 24, hgt = v.style === 'high' ? 34 : v.style === 'low' ? 3 : 11;
     const gy = heightAt(tx, tz); cam.position.set(tx + Math.cos(a) * rad, gy + hgt, tz + Math.sin(a) * rad); cam.lookAt(tx, gy + 4, tz); }
   sun.position.set(tx + 120, 220, tz + 60); sun.target.position.set(tx, 0, tz); sun.target.updateMatrixWorld();
   waterMesh.material.color.setHSL(.58, .6, .38 + Math.sin(t * .7) * .015);
   R.render(scene, cam); return R.domElement;
 }
-G.X3D = { init, render };
+export function project(x, z, up) { if (!cam || !S.M) return null; tmpV.set(x, heightAt(x, z) + (up || 0), z).project(cam); if (tmpV.z > 1 || tmpV.z < -1) return null; return { x: (tmpV.x + 1) / 2, y: (1 - tmpV.y) / 2 }; }
+G.X3D = { init, render, project };
