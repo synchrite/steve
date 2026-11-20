@@ -2,6 +2,14 @@
 
 Plain list of where the game is going, in order. Update it when an item finishes or the plan changes.
 
+## Target (set 2026-11-20)
+- Platform: PC, landscape, 1920x1080 is the reference screen. Landscape phones get the same layout scaled down.
+- One look: CLASSIC pixel style everywhere (house, TV overhead view, phone, HUD). Other themes are optional extras, not the default.
+- Characters at realistic height: adults 54 units in a 96-unit room (assets/classic/, 2 px per unit).
+- Screen: top bar (title, ticker, tips, full screen, menu), TV and the two-floor house on the left, phone always on the right.
+- Readability: one font (Press Start 2P), phone text at least 11 to 12 px at 1080p, canvas text at least 8 units.
+- Pace: one new system per match through the tutorial; one urgent house event at a time.
+
 ## Now
 
 - Theme art pass (Codex): finish 16-BIT and RPG, add GRITTY, MODERN, HALLOWEEN. See `ASSETS.md`.

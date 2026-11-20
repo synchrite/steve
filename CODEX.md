@@ -618,3 +618,19 @@ colours plus same-hue shading; some minor accents are approximated. It does
 not meet an exact match for EVERY CLASSIC colour. Owner question: should the
 house-only palette cap increase, or should a reduced CLASSIC palette be
 approved? The current 64-colour approximation is retained for review.
+
+### Notes from Codex - 2026-11-20 (CLASSIC characters)
+
+Exported all 13 sprites in assets/classic/ at two pixels per game unit.
+Standing adults are 54 units, the short burglar 46, the kid 38, and Simba's
+standing shoulder 20. Measured the front door at 42 units, fridge at 56,
+and couch cushion top at 24 above the floor. The floor-line preview is
+tools/art/sheet_classic_chars.png. Rebuild and validate the PNGs with
+python tools/art/classic_chars.py (Pillow). Palette, binary opacity, and
+bottom-center anchors pass.
+
+Integration note for Claude: the seated sprite uses its shoe soles as the
+bottom anchor. With the hips about 14 game units above the soles, anchor
+near y=224 to seat Steve on the cushion at y=210. The current draw call uses
+y=214. The current game source also has code-drawn pizza drivers and
+burglars. Initial pull failed because .git/FETCH_HEAD is read-only.
