@@ -634,3 +634,16 @@ bottom anchor. With the hips about 14 game units above the soles, anchor
 near y=224 to seat Steve on the cushion at y=210. The current draw call uses
 y=214. The current game source also has code-drawn pizza drivers and
 burglars. Initial pull failed because .git/FETCH_HEAD is read-only.
+
+### Notes from Codex - 2026-11-20 (CLASSIC pass 2)
+
+Redrew all 13 CLASSIC sprites at 1.5 pixels per game unit and exported the
+990 x 144 house, garage and lot strip. Steve is 66 px, the girlfriend is
+62 px, and Simba's standing shoulder is about 23 px. The new seated Steve
+anchors at the couch cushion (y=210); during this pass, index.html still
+placed the sprite at y=224. The preview at tools/art/sheet_classic_v2.png
+shows all 13 sprites across three house snapshots. Rebuild with
+python -B tools/art/classic_pass2.py (Pillow and Node). Validated sprite
+dimensions, palette, binary alpha, centered bottom anchors and byte-identical
+regeneration of all 15 PNGs. Initial pull was blocked by pre-existing
+unstaged changes. No commit or push.

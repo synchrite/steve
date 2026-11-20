@@ -9,14 +9,17 @@ PALETTE = {line.split()[0] for line in (ART / 'classic_palette.txt').read_text()
 
 
 class Sprite:
-    def __init__(self, height):
-        self.height = height
-        self.image = Image.new('RGBA', (140, height))
+    def __init__(self, height, scale=1):
+        self.height = round(height * scale)
+        self.scale = scale
+        self.y_scale = (self.height - 1) / (height - 1)
+        self.image = Image.new('RGBA', (140, self.height))
         self.draw = ImageDraw.Draw(self.image)
 
     def poly(self, color, *points):
         assert '#' + color in PALETTE
-        self.draw.polygon(points, fill='#' + color)
+        self.draw.polygon([(round(x * self.scale), round(y * self.y_scale))
+                           for x, y in points], fill='#' + color)
 
     def box(self, color, x, y, right, bottom):
         self.poly(color, (x, y), (right, y), (right, bottom), (x, bottom))
@@ -27,9 +30,9 @@ class Sprite:
         return ImageOps.expand(cropped, (3, 0, 3, 0))
 
 
-def person(role):
+def person(role, scale=1):
     height = {'short': 92, 'kid': 76}.get(role, 108)
-    s = Sprite(height)
+    s = Sprite(height, scale)
     # Draw successive hard-edged clusters on a shared figure grid.
     width = {'short': 1.22, 'tall': .79, 'kid': .83}.get(role, 1)
 
@@ -169,8 +172,8 @@ def head(p, b, role, skin, shade):
             b('2a2a30', 35, 17, 36, 18)
 
 
-def couch_steve():
-    s = Sprite(94)
+def couch_steve(scale=1):
+    s = Sprite(94, scale)
     p, b = s.poly, s.box
     p('2a2a30', (49, 59), (60, 63), (59, 82), (66, 85), (66, 90), (48, 90), (47, 85))
     p('9aa0a6', (52, 64), (57, 66), (56, 82), (50, 82))
@@ -197,8 +200,8 @@ def couch_steve():
     return s.finish()
 
 
-def pizza_fall():
-    s = Sprite(36)
+def pizza_fall(scale=1):
+    s = Sprite(36, scale)
     p, b = s.poly, s.box
     p('2a2a40', (61, 17), (77, 18), (92, 8), (105, 12), (109, 20), (100, 23),
       (94, 19), (77, 32), (58, 31))
@@ -220,8 +223,8 @@ def pizza_fall():
     return s.finish()
 
 
-def dog(pose):
-    s = Sprite({'stand': 61, 'sit': 61, 'sleep': 30, 'lap': 38}[pose])
+def dog(pose, scale=1):
+    s = Sprite({'stand': 61, 'sit': 61, 'sleep': 30, 'lap': 38}[pose], scale)
     p, b = s.poly, s.box
     base, edge, shadow, light = 'c98f4e', '5a3a22', '8a5a2e', 'd8a060'
 
@@ -299,8 +302,8 @@ def dog(pose):
     return s.finish()
 
 
-def lamb():
-    s = Sprite(23)
+def lamb(scale=1):
+    s = Sprite(23, scale)
     p, b = s.poly, s.box
     p('c9b38f', (5, 7), (10, 4), (25, 4), (29, 6), (31, 2), (36, 0), (43, 3),
       (46, 7), (46, 13), (42, 17), (35, 17), (32, 14), (29, 19), (28, 22),
