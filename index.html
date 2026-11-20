@@ -2479,8 +2479,8 @@ function flushArt(){const k=SC/2;for(const a of ART_Q){if(a.raw){ctx.imageSmooth
 // every canvas text gets a black outline so it reads on any background
 {const P=CanvasRenderingContext2D.prototype,F=P.fillText;P.fillText=function(s,x,y,m){const fs=String(this.fillStyle).toLowerCase();if(fs!=='#000000'&&fs!=='#000'&&!this._noOutline){const px=parseFloat(this.font)||8;this.save();this.strokeStyle='#000';this.lineWidth=Math.max(2,px/3);this.lineJoin='round';this.miterLimit=2;m==null?this.strokeText(s,x,y):this.strokeText(s,x,y,m);this.restore();}return m==null?F.call(this,s,x,y):F.call(this,s,x,y,m);};}
 // canvas text grows when the game is shown small (phones), so it stays readable
-let TXK=1.45;function fitTXK(){TXK=1.8;}
-function txt(s,x,y,c='#fff',sz=8,al='left'){ctx.font=`${Math.round(Math.max(8,sz)*TXK)}px ${FONT}`;ctx.textAlign=al;ctx.fillStyle=c;ctx.fillText(s,x,y);ctx.textAlign='left';}
+let TXK=1.45;function fitTXK(){const ui=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui'))||1;TXK=1.8;window.BUBF=Math.round(16/ui);}
+function txt(s,x,y,c='#fff',sz=8,al='left'){const f=Math.round(Math.max(8,sz)*TXK);ctx.font=`${f}px ${FONT}`;ctx.textAlign=al;const o=Math.max(2,Math.round(f/8));ctx.fillStyle='rgba(0,0,0,.85)';ctx.fillText(s,x+o,y+o);ctx.fillStyle=c;ctx.fillText(s,x,y);ctx.textAlign='left';}
 function led(x,y,w,h,f){const n=14,sw=w/n;f=clamp(f,0,1);for(let i=0;i<n;i++){const on=i<Math.round(f*n),c=i<n*.5?'#3aff8a':i<n*.8?'#ffd23a':'#ff4a3a';ctx.fillStyle=on?c:'#14201a';ctx.fillRect(x+i*sw,y,sw-2,h);if(on){ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(x+i*sw,y,sw-2,2);}}}
 function bar(x,y,w,h,f,c){ctx.fillStyle='#000';ctx.fillRect(x-2,y-2,w+4,h+4);ctx.fillStyle='#222';ctx.fillRect(x,y,w,h);ctx.fillStyle=c;ctx.fillRect(x,y,w*clamp(f,0,1),h);}
 function bigReady(){const w=260,h=64,x=cv.width/2-w/2-(VW===480?0:0),y=(TY+TH*.62)*SC,t=performance.now()/1000,L=(TX)*SC,W2=TW*SC,cx=L+W2/2-w/2;
@@ -2624,10 +2624,10 @@ function drawHUD(){
   const sy0=Y+38+run.board.length*24+8;txt('SCHEDULE AHEAD',X+10,sy0+8,'#9aa0b0',6);
   SCHED.forEach((sd,i)=>{const y=sy0+16+i*20;txt((run.sched[sd.k]?'✔ ':'')+sd.label,X+10,y+11,run.sched[sd.k]?'#46c46e':'#cfe0ff',6);
    if(!run.sched[sd.k])btn('TEXT',X+RW-80,y-1,66,16,'#2f64b8',()=>{boardOpen=false;view={type:'thread',item:{icon:'📋',from:sd.who,msg:sd.msg,replies:sd.replies,onReply:()=>{run.sched[sd.k]=true;toast('Scheduled: '+sd.label,'#7fe0a0');if(sd.k==='mike'){const left=run.board.filter(j=>!j.done&&!j.who);left.forEach(j=>{j.done=true;addCash(j.kind==='hire'?j.pay-60:-60);});if(left.length)toast(`Mike's took ${left.length} jobs (-$${60*left.length})`,'#9aa0b0');}}},typed:[]};phoneDirty=true;});});}
- const bubble=(str,x,y,fill,ink,tail)=>{ctx.font=`${Math.round(7*TXK)}px ${FONT}`;const words=str.split(' ');const lines=[];let cur='';for(const w of words){if(ctx.measureText(cur+' '+w).width>200*TXK&&cur){lines.push(cur);cur=w;}else cur=cur?cur+' '+w:w;}lines.push(cur);
-  const w=Math.max(...lines.map(l=>ctx.measureText(l).width))+16,h=lines.length*12*TXK+10;let bx=clamp(x-w/2,4,956-w),by=y-h-10;
+ const BB=[];const bubble=(str,x,y,fill,ink,tail)=>{const F=clamp(Math.round(16/((cv.getBoundingClientRect().width||cv.width)/cv.width)),14,40),LH=Math.round(F*1.5);ctx.font=`${F}px ${FONT}`;const words=str.split(' ');const lines=[];let cur='';for(const w of words){if(ctx.measureText(cur+' '+w).width>F*22&&cur){lines.push(cur);cur=w;}else cur=cur?cur+' '+w:w;}lines.push(cur);
+  const w=Math.max(...lines.map(l=>ctx.measureText(l).width))+F*1.2,h=lines.length*LH+F*.6;let bx=clamp(x-w/2,4,cv.width-4-w),by=Math.max(4,y-h-10);for(const r of BB)if(bx<r.x+r.w&&bx+w>r.x&&by<r.y+r.h&&by+h>r.y)by=r.y-h-8;BB.push({x:bx,y:by,w,h});
   ctx.fillStyle='#000';ctx.fillRect(bx-2,by-2,w+4,h+4);ctx.fillStyle=fill;ctx.fillRect(bx,by,w,h);ctx.beginPath();ctx.moveTo(clamp(x,bx+8,bx+w-8)-6,by+h);ctx.lineTo(clamp(x,bx+8,bx+w-8)+(tail||0),by+h+10);ctx.lineTo(clamp(x,bx+8,bx+w-8)+6,by+h);ctx.fill();
-  ctx.fillStyle=ink;ctx.textAlign='left';lines.forEach((l,i)=>ctx.fillText(l,bx+8,by+8+10*TXK+i*12*TXK));};
+  ctx.fillStyle=ink;ctx.textAlign='left';lines.forEach((l,i)=>ctx.fillText(l,bx+F*.6,by+F*.3+F+i*LH));};
  if(run.say)bubble(run.say.t,HX(run.steve.x),HY2(run.steve.x,run.steve.x===SPOT.couch&&!run.afk?190:FLOOR-16),'#ffffff','#111',0);
  if(run.voice){const v=run.voice;bubble((v.phone?'📞 ':'🎧 ')+v.who+': '+v.t,v.phone?HX(run.steve.x+10):HX(101),v.phone?HY2(run.steve.x,run.steve.x===SPOT.couch?186:FLOOR-20):174*SC,v.who==='Mom'?'#e8d0ff':v.who==='Dan'?'#c8f0d8':v.phone?'#d8e8ff':'#ffe0c8','#111',8);}
  
