@@ -172,18 +172,31 @@ header,#help,#side,#tabs,#pill{display:none!important}
 #gfxBtn{display:none!important}
 header{display:none!important}
 #topbar{display:flex;align-items:center;gap:6px;padding:4px 10px;height:34px;box-sizing:border-box;background:#0c0d12;border-bottom:2px solid #2a2f3e}
-#game{height:calc(100dvh - 34px)!important}
+#game{height:calc(100dvh - 34px - var(--notes-h,0px))!important}
 #topbar b{color:#ffd25a;font-size:11px;letter-spacing:1px;white-space:nowrap}#tbBtns{flex-shrink:0}
 #topbar #ticker{position:relative;flex:1;min-width:0;height:26px;border:2px solid #2a2f3e;border-top:2px solid #5affd8;bottom:auto;left:auto;right:auto}#topbar #ticker .tk-hist{bottom:auto;top:100%}#topbar span{display:flex;gap:6px}
 #topbar button{font:inherit;font-size:10px!important;padding:6px 10px!important;width:auto!important;height:auto!important;margin:0!important}
 #rtop{display:none!important}
+#tbClock{color:#5affd8;font-size:10px;margin-left:auto;white-space:nowrap}
+#phoneTop{font:inherit;font-size:11px!important;background:#2a6ab0;color:#fff;border:3px solid #000;padding:6px 12px;cursor:pointer}#phoneTop i{font-style:normal;background:#e23b3b;border:2px solid #000;padding:0 5px;margin-left:4px}
+#notes{position:relative;display:grid;grid-template-columns:1fr auto;grid-template-rows:repeat(3,26px);gap:3px 6px;padding:4px 10px;background:#0c0d12;border-bottom:3px solid #000;font-family:"Press Start 2P",monospace}
+#notes .nt{grid-column:1;display:flex;align-items:center;gap:8px;background:#20232f;border:2px solid #000;box-shadow:2px 2px 0 #000;padding:0 8px;font-size:11px;cursor:pointer;overflow:hidden;white-space:nowrap}
+#notes .nt:hover{background:#2c3142}#notes .nt.empty{background:transparent;border-color:transparent;box-shadow:none;cursor:default}
+#notes .nt.fresh{animation:ntin .4s ease-out}@keyframes ntin{from{transform:translateY(-6px);background:#3a4a70}to{transform:none}}
+#notes .ic{width:18px;text-align:center;flex-shrink:0}#notes .tx{flex:1;overflow:hidden;text-overflow:ellipsis}#notes .ag{color:#7a8090;font-size:9px;flex-shrink:0}
+#notes .tk-log{grid-column:2;grid-row:1/4;font:inherit;font-size:10px;background:#2a2f3e;color:#fff;border:3px solid #000;padding:0 10px;cursor:pointer}
+#notes .tk-hist{display:none;position:absolute;left:10px;right:10px;top:100%;z-index:45;max-height:50vh;overflow:auto;background:#0a0b10f5;border:3px solid #5affd8;padding:8px;font-size:11px;line-height:1.8}
+#rcol{display:none!important}
+body.phoneUp #rcol{display:flex!important;position:fixed;z-index:30;left:50%;top:calc(42px + var(--notes-h,0px));transform:translateX(-50%);width:min(460px,94vw);height:min(calc(100dvh - 54px - var(--notes-h,0px)),780px);flex-basis:auto;zoom:1!important}
+body.phoneUp #rcol #phone{flex:1}
+body.phoneUp #stage{filter:none!important}body.phoneUp #stage::after{content:'';position:absolute;inset:0;background:rgba(5,6,12,.35);pointer-events:none}
 #phoneCover{display:none;position:absolute;inset:0;z-index:5;background:#0b0c12f0;color:#cfd3dd;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;font-size:11px;cursor:pointer;border-radius:inherit}
 #phoneCover b{font-size:30px}#phoneCover i{font-style:normal;background:#e23b3b;color:#fff;border:2px solid #000;padding:2px 8px}
-body.solo.inmatch:not(.phoneUp) #phoneCover{display:flex}#rcol #phone{position:relative!important;top:auto!important;right:auto!important}
+#rcol #phone{position:relative!important;top:auto!important;right:auto!important}
 body.solo #cuWrap{display:none!important}
 body.solo.phoneUp #rcol{display:flex!important;position:fixed;z-index:30;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,92vw);height:min(86vh,760px);flex-basis:auto}
 body.solo.phoneUp #rcol #rtop{display:none}body.solo.phoneUp #phone{flex:1;font-size:1.25em}
-body.solo.phoneUp #stage{filter:blur(3px) brightness(.45)}
+
 #phoneBtn{position:fixed;transform:translateX(-100%);z-index:31;font:inherit;font-size:calc(13px*var(--ui,1));background:#2a2f3e;color:#fff;border:3px solid #000;box-shadow:3px 3px 0 #000;padding:8px 12px;cursor:pointer}
 #phoneBtn i{font-style:normal;background:#e23b3b;border:2px solid #000;padding:0 5px;margin-left:4px}
 body.phoneUp #phoneBtn{top:auto!important;bottom:3vh;left:50%!important;transform:translateX(-50%);background:#2f8f50}
@@ -277,7 +290,8 @@ body.gfx-rpg #phone button:hover{background:#e0e6cb!important}body.gfx-rpg #phon
 #topbar,#topbar *{font-family:"Press Start 2P",monospace}#topbar #ticker{font-size:11px!important}
 </style></head><body>
 <header><h1>STEVE'S DAY OFF</h1><div><button id="gfx">GRAPHICS: RPG</button> <button id="mute">SOUND: ON</button></div></header>
-<div id="topbar"><b>STEVE'S DAY OFF</b><span id="tbBtns"></span></div>
+<div id="topbar"><b>STEVE'S DAY OFF</b><span id="tbClock"></span><button id="phoneTop" onclick="phoneUp(!document.body.classList.contains('phoneUp'))">📱 PHONE</button><span id="tbBtns"></span></div>
+<div id="notes"></div>
 <div id="game">
  <div id="lcol"><button id="menuBtn" class="colbtn">☰ MENU</button></div>
  <div id="stage"><canvas id="c" width="1068" height="1026"></canvas><div id="ov"></div></div>
@@ -460,12 +474,14 @@ function pop(t,x,c){if(!run)return;(run.pops||(run.pops=[])).push({t,x,c,life:1.
 function king(d){if(!run)return;if(d>0)d*=1.35;const was=run.king;run.king=clamp(run.king+d,0,100);if(d>=.5)pop('+'+d.toFixed(1)+'👑',480,'#ffc23a');if(Math.floor(was/10)<Math.floor(run.king/10)&&run.king<100){jingle(3);toast(`👑 KING OF THE COUCH ${Math.floor(run.king/10)*10}%`,'#ffc23a');}if(was<100&&run.king>=100&&mode==='play')later(.5,kingWin);}
 function deed(brag){if(run)run.lastDeed={t:performance.now(),brag};}
 function toast(t,c){if(!run)return;t=partnerName(t);const T=run.tick||(run.tick=[]);if(T.length&&T[T.length-1].t===t)return;T.push({t,c,at:performance.now(),clock:typeof clockStr==='function'?clockStr():''});if(T.length>40)T.shift();renderTicker();}
-function renderTicker(){let el=$('ticker');if(!el){el=document.createElement('div');el.id='ticker';el.innerHTML='<div class="tk-clock"></div><div class="tk-msg"></div><button class="tk-log" onclick="toggleTickLog()">LOG</button><div class="tk-hist"></div>';($('topbar')||document.body).insertBefore(el,$('tbBtns'));}
- const T=run.tick||[],now=performance.now(),cur=T.filter(q=>now-q.at<9000).slice(-2);
- el.querySelector('.tk-clock').textContent=weekday()+' '+clockStr();
- el.querySelector('.tk-msg').innerHTML=cur.length?cur.map(q=>`<span style="color:${q.c||'#fff'}">${q.t}</span>`).join('<i>•</i>'):'<span style="opacity:.5">All quiet.</span>';
- const h=el.querySelector('.tk-hist');if(h.style.display==='block')h.innerHTML=T.slice().reverse().map(q=>`<div><b>${q.clock}</b> <span style="color:${q.c||'#fff'}">${q.t}</span></div>`).join('');}
-window.toggleTickLog=()=>{const h=$('ticker').querySelector('.tk-hist');h.style.display=h.style.display==='block'?'none':'block';renderTicker();};
+function renderTicker(){const el=$('notes');if(!el||!run)return;
+ const T=run.tick||[],now=performance.now(),rows=T.slice(-3).reverse();
+ const ago=q=>{const sec=Math.floor((now-q.at)/1000);return sec<5?'now':sec<60?sec+'s':Math.floor(sec/60)+'m';};
+ el.innerHTML=[0,1,2].map(i=>{const q=rows[i];if(!q)return `<div class="nt empty"></div>`;const m=/^(\p{Extended_Pictographic}️?)\s*(.*)$/u.exec(q.t),ic=m?m[1]:'🔔',tx=m?m[2]:q.t;
+  return `<div class="nt${now-q.at<1500?' fresh':''}" style="opacity:${1-i*.22}" onclick="phoneUp(true)"><span class="ic">${ic}</span><span class="tx" style="color:${q.c||'#fff'}">${tx}</span><span class="ag">${ago(q)}</span></div>`;}).join('')+`<button class="tk-log" onclick="toggleTickLog()">LOG</button><div class="tk-hist" id="tkHist"></div>`;
+ const h=$('tkHist');if(window._tkOpen){h.style.display='block';h.innerHTML=T.slice().reverse().map(q=>`<div><b>${q.clock}</b> <span style="color:${q.c||'#fff'}">${q.t}</span></div>`).join('');}
+ const c=$('tbClock');if(c)c.textContent=weekday()+' '+clockStr();const pb=$('phoneTop');if(pb){const n=run.inbox?run.inbox.length:0;pb.innerHTML=document.body.classList.contains('phoneUp')?'✕ CLOSE PHONE':'📱 PHONE'+(n?` <i>${n}</i>`:'');}}
+window.toggleTickLog=()=>{window._tkOpen=!window._tkOpen;if(!window._tkOpen)$('tkHist').style.display='none';renderTicker();};
 setInterval(()=>{if(run)renderTicker();},1000);
 function later(d,fn){run.timers.push({d,fn});}
 function addLot(n,w){run.lot=clamp(run.lot+n,0,100);pop((n>0?'+':'')+n,288,n>0?'#5ab0ff':'#ff7070');if(w)toast((n>0?'+':'')+n+' LOT · '+w,n>0?'#5ab0ff':'#ff7070');}
@@ -507,7 +523,7 @@ function hands(){if(run.bath)return 0;
  if(run.task)h=0;
  if(run.call&&run.call.live)h=Math.min(h,run.up.headset?.8:.45);
  if(view&&view.type==='thread')h=Math.min(h,.6);
- if(document.body.classList.contains('phoneUp'))h=Math.min(h,.3);
+ if(document.body.classList.contains('phoneUp')&&inMatch())h=Math.min(h,on('multi')?.75:.5);
  const s=run.simba.st;if(s==='sit')h*=.45;if(s==='tug')h*=.5;if(s==='gamer')h=0;
  return h;}
 
@@ -515,7 +531,7 @@ function hands(){if(run.bath)return 0;
 let itemId=0;
 function buzz(call){if(run&&run.ringer==='silent')return;if(run&&run.ringer==='vibrate'){const p=$('phone');p.classList.remove('buzz');void p.offsetWidth;p.classList.add('buzz');const pl=$('pill');pl.classList.add('alert');return;}const p=$('phone');p.classList.remove('buzz');void p.offsetWidth;p.classList.add('buzz');beep(call?520:880,.09);if(call)setTimeout(()=>beep(620,.09),180);}
 function dueNow(){return run.phase==='match'?run.match:run.match+1;}
-function text(o){o.id=++itemId;if(o.from)o.from=partnerName(o.from);if(o.msg)o.msg=partnerName(o.msg);o.kind=o.kind||'text';o.due=o.urgent?null:dueNow();run.inbox.unshift(o);phoneDirty=true;buzz(false);if((run.ringer||'ring')!=='silent'&&typeof setPhone==='function')setPhone(true);return o;}
+function text(o){o.id=++itemId;if(o.from)o.from=partnerName(o.from);if(o.msg)o.msg=partnerName(o.msg);if(run&&o.msg)setTimeout(()=>toast(`${o.icon||'💬'} ${o.from||'Message'}: ${String(o.msg).replace(/<[^>]+>/g,'').slice(0,90)}`,'#cfe9ff'),0);o.kind=o.kind||'text';o.due=o.urgent?null:dueNow();run.inbox.unshift(o);phoneDirty=true;buzz(false);if((run.ringer||'ring')!=='silent'&&typeof setPhone==='function')setPhone(true);return o;}
 function options(replies,typed){const n=typed.length,out=[];let complete=null;
  for(const [s,v] of replies){const w=s.split(' ');if(w.slice(0,n).join(' ')!==typed.join(' '))continue;if(w.length===n)complete=[s,v];else if(!out.includes(w[n]))out.push(w[n]);}
  return {next:out,complete};}
@@ -1006,7 +1022,7 @@ const FEATS=[
  {k:'texts',at:1,t:'📱 Phone + Quests',d:'People text Steve now. Almost everything can wait until the match ends.<br><br>Open the phone, tap a message, tap words to reply.<br>Quests for the day are listed on the TV between matches.'},
  {k:'dog',at:2,t:'🐕 Simba has needs',d:'Simba has a routine: out, in, dinner, a treat, her toy. A bubble shows what she wants.<br><br>Walk Steve over with <b>A/D</b> and press <b>E</b>, or click the spot. Steve also needs the bathroom sometimes. Do it between matches.'},
  {k:'door',at:3,t:'🚪 Shop + Doorbell',d:'<b>SHOP</b> and <b>💎 ITEMS</b> are open between matches. Upgrades get delivered.<br><br>When it rings, someone has to answer the door. Getting up mid-match costs a squad heart. Breaks are free.'},
- {k:'multi',at:4,t:'🧠 Multitasking',d:'Steve can now keep the phone open next to the TV. The close-up camera is back too.<br><br>Reading during a match still slows his aim a little. Replying does more.'},
+ {k:'multi',at:4,t:'🧠 Multitasking',d:'Steve plays much better with the phone open now (75% instead of 50%).<br><br>The close-up camera is back too.'},
  {k:'girl',at:5,t:'💘 Your girlfriend',d:'She is "just staying over a lot." Her mood drops while you game and rises when you do things.<br><br>Happy: cookies. Really unhappy: the power mysteriously goes out.<br>The <b>LIFE</b> page on the phone shows where this is going. 👀'},
  {k:'lot',at:6,t:'🚗 The car lot',d:'Buyers honk at the gate. Sell them a car or the <b>LOT</b> meter drops.<br><br>The job board in the garage pays skill points. Spend them in <b>SKILLS</b> on the phone.'},
  {k:'bills',at:7,t:'🧾 Bills + Pizza',d:'Bills arrive every few minutes. No money, no internet, no Couch Royale.<br><br>Reward yourself: <b>🍕 ORDER</b> pizza on the phone. It really shows up at the door.'},
@@ -1020,12 +1036,12 @@ window.toggleDev=()=>{try{localStorage.setItem('steveDev',DEV()?'0':'1');}catch(
 function devBar(){let el=$('devbar');if(!DEV()){if(el)el.remove();return;}if(!el){el=document.createElement('div');el.id='devbar';$('stage').appendChild(el);}
  el.innerHTML=`<b>🛠 DEV</b><button onclick="run.unl=Math.min(FEAT_N,(run.unl||0)+1);applySolo();phoneDirty=true">+1 UNLOCK</button><button onclick="run.unl=0;applySolo();phoneDirty=true">RESET</button><button onclick="run.unl=FEAT_N;applySolo();phoneDirty=true">ALL</button><button onclick="if(inMatch())endMatch(true)">WIN MATCH</button><button onclick="addCash(500,'dev')">+$500</button><button onclick="window.DEVSPD=(window.DEVSPD||1)>=4?1:(window.DEVSPD||1)*2;this.textContent='SPEED x'+DEVSPD">SPEED x${window.DEVSPD||1}</button><span id="devU"></span>`;}
 // before Multitasking, the phone is its own screen: looking at it means not looking at the TV
-function applySolo(){if(!run)return;const solo=!on('multi');document.body.classList.toggle('solo',solo);if(!solo)document.body.classList.remove('phoneUp');let b=$('phoneBtn');
+function applySolo(){if(!run)return;const solo=!on('multi');document.body.classList.toggle('solo',solo);let b=$('phoneBtn');
  if(!b){b=document.createElement('button');b.id='phoneBtn';b.onclick=()=>phoneUp(!document.body.classList.contains('phoneUp'));document.body.appendChild(b);}
  
- const n=run.inbox?run.inbox.length:0;b.innerHTML=document.body.classList.contains('phoneUp')?'📺 BACK TO TV':'📱 PHONE'+(n?` <i>${n}</i>`:'');b.style.display=solo&&document.body.classList.contains('phoneUp')?'block':'none';document.body.classList.toggle('inmatch',inMatch()&&!run.afk);
+ const n=run.inbox?run.inbox.length:0;b.innerHTML=document.body.classList.contains('phoneUp')?'📺 BACK TO TV':'📱 PHONE'+(n?` <i>${n}</i>`:'');b.style.display='none';document.body.classList.toggle('inmatch',inMatch()&&!run.afk);
  let pc=$('phoneCover');if(!pc){pc=document.createElement('div');pc.id='phoneCover';pc.onclick=()=>phoneUp(true);$('phone').appendChild(pc);}pc.innerHTML=`<b>📱</b><div>Phone is face down.<br>Steve is playing.</div>${n?`<i>${n} new</i>`:''}<div style="opacity:.7">Tap to pick it up<br>(Steve stops playing)</div>`;const u=$('devU');if(u)u.textContent=`unlocks ${run.unl||0}/${FEAT_N}`;}
-window.phoneUp=v=>{document.body.classList.toggle('phoneUp',!!v);if(v){phoneDirty=true;if(inMatch()&&!run.afk)toast('📱 Eyes on the phone. Steve is barely playing.','#ffb060');}applySolo();};
+window.phoneUp=v=>{document.body.classList.toggle('phoneUp',!!v);if(v){phoneDirty=true;}else{view=null;phoneDirty=true;}applySolo();renderTicker();};
 setInterval(applySolo,500);
 const on=k=>{if(!run)return true;const f=FEATS.find(x=>x.k===k);return !f||(run.unl||0)>=f.at;};
 const allOn=()=>(run.unl||0)>=FEAT_N;
@@ -1373,7 +1389,7 @@ function updateBR(dt){
  // ---- play ----
  if(M.spect){M.spect.t+=dt;const k=M.spect.k;if(k&&M.enemies.includes(k)){M.cam.x+=(k.x-M.cam.x)*dt*3;M.cam.y+=(k.y-M.cam.y)*dt*3;}if(M.spect.t>5)endMatch(false);return;}
  setStorm();const s=M.storm;s.k=Math.min(1,s.k+dt/30);s.r=s.from+(s.to-s.from)*s.k;
- M.flyCD-=dt;if(M.jumpT>0)M.jumpT-=dt;
+ M.flyCD-=dt;if(M.jumpT>0)M.jumpT-=dt;if(M.focus&&!M.enemies.includes(M.focus))M.focus=null;if(M.focus){M.focT=(M.focT||0)-dt;if(M.focT<=0){M.focT=.5;M.fx.push({t:'ping',x1:M.focus.x,y1:M.focus.y,life:.45});}}
  if(M.comboT>0){M.comboT-=dt;if(M.comboT<=0){if(M.combo>=10)feed(`Steve: ${M.combo} hit combo!`,'#7fe8ff');M.combo=0;}}
  if(M.swingT>0)M.swingT-=dt;if(M.spin>0)M.spin-=dt*1.6;if(M.emoteT>0)M.emoteT-=dt;if(M.buxPop&&M.buxPop.t>0)M.buxPop.t-=dt;
  if(M.drops){const me0=M.squad[0];for(const d of [...M.drops]){d.life-=dt;if(!me0.down&&dist(d,me0)<7){M.drops.splice(M.drops.indexOf(d),1);M.wpn={...d.w};big('GOT '+d.w.n.toUpperCase()+'!',d.w.c,1.3);jingle(2);addBux(5,'new weapon');if(M.way&&Math.abs(M.way.x-d.x)<1)M.way=null;}else if(d.life<=0)M.drops.splice(M.drops.indexOf(d),1);}}
@@ -1393,7 +1409,7 @@ function updateBR(dt){
   if(M.fly>0)M.fly-=dt;
   if(M.way){if(moveTo(me,M.way.x,M.way.y,sp,dt)){if(M.way.rare&&!M.way.rare.taken){M.way.rare.taken=true;if(M.way.rare.tier>M.gun){M.gun=M.way.rare.tier;big(GUNS[M.gun].n.toUpperCase()+'!',GUNS[M.gun].c,2);addFun(4,'Rare gun');beep(1100,.08);}}
     if(M.way.carHop){M.car=M.way.carHop;toast('Driving. Wheee.','#9aa0b0');M.way={x:s.cx,y:s.cy};}else{M.way=null;M.fly=0;if(M.car){M.car=null;}}}}
-  else if(foes.length){target=foes[0];const d=dist(target,me);if(d>55)moveTo(me,target.x,target.y,26,dt);else{me.x+=-me.vy*Math.sin(M.t*2)*12*dt;me.y+=me.vx*Math.sin(M.t*2)*12*dt;}}
+  else if((M.focus&&M.enemies.includes(M.focus)&&!M.focus.hidden)||foes.length){target=(M.focus&&M.enemies.includes(M.focus)&&!M.focus.hidden)?M.focus:foes[0];const d=dist(target,me);if(d>55)moveTo(me,target.x,target.y,26,dt);else{me.x+=-me.vy*Math.sin(M.t*2)*12*dt;me.y+=me.vx*Math.sin(M.t*2)*12*dt;}}
   else if((inStorm(me)||dist(me,{x:s.cx,y:s.cy})>s.to*.85)&&!(M.act&&!M.act.done&&Math.hypot(M.act.o.x-s.cx,M.act.o.y-s.cy)<Math.min(s.r,s.to+40)*.9)){const tx=s.cx,ty=s.cy;if(dist(me,{x:tx,y:ty})>70&&M.flyCD<=0)takeOff();moveTo(me,tx,ty,M.fly>0?75:30,dt);}
   else{const a=M.act;
    if(a&&!a.done&&Math.hypot(a.o.x-s.cx,a.o.y-s.cy)>s.to+40&&!a.started)a.done=1;
@@ -1495,6 +1511,11 @@ function lobbyClick(bx,by,btn){if(!M||M.phase!=='lobby')return false;
  return true;}
 function tvClick(bx,by){if(lobbyClick(bx,by,0))return;
  if(inMatch()&&M.phase==='play'&&!M.spect&&!M.squad[0].down){const h=hands();if(h<.3){big(run.simba.st==='gamer'?'SIMBA HAS THE CONTROLLER':"STEVE ISN'T HOLDING THE CONTROLLER",'#ff7070',1);return;}
+  if(!M.view3d){const w=S2W(bx,by),me=M.squad[0],near=(arr,r)=>(arr||[]).filter(q=>Math.hypot(q.x-w.x,q.y-w.y)<r).sort((a,c)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(c.x-w.x,c.y-w.y))[0];
+   const e=near(M.enemies.filter(q=>!q.hidden),12);if(e){M.focus=e;M.way=null;M.manualT=0;M.fx.push({t:'ping',x1:e.x,y1:e.y,life:.6});if(M.lastFocus!==e){M.lastFocus=e;feed('Steve: going after '+e.name,'#9fe07f');}}
+   else{const hid=near(M.enemies.filter(q=>q.hidden),10);if(hid){hid.hidden=false;run.spots++;qp('spot');big('SPOTTED!','#ffd25a',1.2);addFun(3);M.focus=hid;}
+    else{const c=near(M.chests.filter(q=>!q.open),10)||near(M.rares.filter(q=>!q.taken),10)||near(M.drops,10)||near((M.glambs||[]).filter(q=>!q.taken),10)||near(M.vends&&M.vends.filter(q=>!q.used),10);
+     if(c){M.way={x:c.x,y:c.y,rare:M.rares.includes(c)?c:null};M.focus=null;M.fx.push({t:'ping',x1:c.x,y1:c.y,life:.6});feed('Steve: grabbing that','#9fe07f');if(dist(c,me)>140&&M.flyCD<=0){M.fly=5;M.flyCD=14;}}}}}
   tapCombo(h);return;}
  if(!inMatch()||M.phase!=='play')return;
  const h=hands();if(h<.3){big(run.simba.st==='gamer'?'SIMBA HAS THE CONTROLLER':"STEVE ISN'T HOLDING THE CONTROLLER",'#ff7070',1);return;}
@@ -1516,7 +1537,7 @@ function tapCombo(h){const me=M.squad[0];
  M.combo=(M.comboT>0?(M.combo||0):0)+1;M.comboT=1.5;const cb=M.combo;if(cb%5===0)qp('combo',cb);
  addBux(1+Math.floor(cb/6),'taps');M.fx.push({t:'tap',x1:me.x,y1:me.y,life:.35});
  if(cb%10===0){big(`COMBO x${cb}! +${cb} BUX`,'#7fe8ff',1.2);addBux(cb,'combo');jingle(cb>=30?3:2);run.flow=Math.min(100,run.flow+5);}
- const foe=M.enemies.filter(e=>!e.hidden&&dist(e,me)<(M.wpn?M.wpn.rng:130)&&losOK(me,e)).sort((a,c)=>dist(a,me)-dist(c,me))[0];
+ const foe=(M.focus&&M.enemies.includes(M.focus)&&!M.focus.hidden&&dist(M.focus,me)<(M.wpn?M.wpn.rng:130))?M.focus:M.enemies.filter(e=>!e.hidden&&dist(e,me)<(M.wpn?M.wpn.rng:130)&&losOK(me,e)).sort((a,c)=>dist(a,me)-dist(c,me))[0];
  if(foe){fireWpn(foe,h,cb);if(cb%5===0)special(me,cb,foe);return;}
  // pickaxe: smash the nearest building
  const bi=nearBld(me,70);if(bi>=0&&(cb%3!==0||dist(me,bCenter(M.solids[bi]))<26)){const c=bCenter(M.solids[bi]);if(dist(me,c)>24){M.way={x:c.x,y:c.y+16};if(cb===1)feed('Steve: *pulls out the pickaxe*','#9fe07f');}else pickaxe(bi);return;}
@@ -2569,12 +2590,12 @@ const isRot=()=>document.body.classList.contains('rot');
 const winH=()=>isRot()?innerWidth:innerHeight,winW=()=>isRot()?innerHeight:innerWidth;
 function scaleUI(){
  document.body.classList.toggle('rot',matchMedia('(orientation:portrait) and (pointer:coarse)').matches);
- const k=Math.max(.1,Math.min((winW()-18)/(cv.width+360),(winH()-12-($('topbar')?$('topbar').offsetHeight:0))/CH));
+ const k=Math.max(.1,Math.min((winW()-18)/cv.width,(winH()-12-($('topbar')?$('topbar').offsetHeight:0)-($('notes')?$('notes').offsetHeight:0))/CH));
  document.documentElement.style.setProperty('--ui',k);
  document.documentElement.style.setProperty('--game-w',cv.width);
  fitTXK();
 }
-function topbar(){const sp=$('tbBtns');if(!sp)return;['tipsBtn','fsBtn','menuBtn'].forEach(id=>{const e=$(id);if(e&&e.parentNode!==sp)sp.appendChild(e);});}
+function topbar(){const nb=$('notes');if(nb)document.documentElement.style.setProperty('--notes-h',nb.offsetHeight+'px');const sp=$('tbBtns');if(!sp)return;['tipsBtn','fsBtn','menuBtn'].forEach(id=>{const e=$(id);if(e&&e.parentNode!==sp)sp.appendChild(e);});}
 setTimeout(()=>{topbar();scaleUI();},0);setInterval(topbar,2000);
 addEventListener('resize',scaleUI);scaleUI();
 // Zoom is stable until an outside tap; scrolling and controls never trigger it.
